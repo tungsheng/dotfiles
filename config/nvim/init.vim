@@ -419,6 +419,11 @@ endfunction
 
 
 "----------------------------------------------
+" Plugin: rking/ag.vim
+"----------------------------------------------
+let g:ag_working_path_mode="r"
+
+"----------------------------------------------
 " Plugin: zchee/deoplete-go
 "----------------------------------------------
 " Enable completing of go pointers
