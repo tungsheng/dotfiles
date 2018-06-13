@@ -1,0 +1,6 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =4
+let g:netrw_dirhist_1='/Users/tonylee/Documents/webapp/startup/tomorrow'
+let g:netrw_dirhist_2='/Users/tonylee/Documents/webapp/startup/jerry/portfolio'
+let g:netrw_dirhist_3='/Users/tonylee/.dotfiles/scripts'
+let g:netrw_dirhist_4='/Users/tonylee/.dotfiles'

@@ -1,0 +1,6 @@
+# gitconfig
+[user]
+	name = Tony Lee
+	email = tungsheng@gmail.com
+[github]
+    user = tungsheng

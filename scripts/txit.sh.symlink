@@ -1,0 +1,15 @@
+#!/bin/sh
+
+tmux list-windows -F "#{window_index}" |
+    while read -r window; do
+        echo $window
+        tmux select-window -t $window
+        tmux list-panes -F "#{pane_index}" |
+            while read -r pane; do
+                echo $pane
+                tmux select-pane -t $window.$pane
+                tmux send-keys C-c
+                tmux send-keys ',Q'
+            done
+    done
+tmux kill-session
