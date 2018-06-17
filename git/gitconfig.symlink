@@ -13,6 +13,7 @@
     diff = diff --ignore-space-at-eol -b -w --ignore-blank-lines
     cnv = commit --no-verify
     pnv = push --no-verify
+    cm = commit -m
     co = checkout
     cob = checkout -b
     s = status --short

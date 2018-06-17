@@ -2,7 +2,7 @@
 alias ga="git add"
 alias gcb="git co -b"
 alias gck="git checkout"
-alias gcm="git commit -m"
+alias gcm="git cm"
 alias gl="git pull"
 alias gp="git push"
 alias gd="git diff"
