@@ -54,12 +54,6 @@ function server() {
     python -c $'import SimpleHTTPServer;\nmap = SimpleHTTPServer.SimpleHTTPRequestHandler.extensions_map;\nmap[""] = "text/plain";\nfor key, value in map.items():\n\tmap[key] = value + ";charset=UTF-8";\nSimpleHTTPServer.test();' "$port"
 }
 
-# take this repo and copy it to somewhere else minus the .git stuff.
-function gitexport(){
-    mkdir -p "$1"
-    git archive master | tar -x -C "$1"
-}
-
 # get gzipped size
 function gz() {
     echo "orig size    (bytes): "
