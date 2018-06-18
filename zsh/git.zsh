@@ -21,7 +21,7 @@ alias git-count="git shortlog -sn"
 alias git-undopush="git push -f origin HEAD^:master"
 alias cpbr="git rev-parse --abbrev-ref HEAD | pbcopy"
 # git root
-alias gr="[ ! -z `git rev-parse --show-cdup` ] && cd `git rev-parse --show-cdup || pwd`"
+alias gr='[ ! -z `git rev-parse --show-cdup` ] && cd `git rev-parse --show-cdup || pwd`'
 
 alias sub-pull="git submodule foreach git pull origin master"
 
