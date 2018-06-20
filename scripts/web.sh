@@ -1,5 +1,5 @@
-WNAME=web-maker
-DNAME=web-maker
+WNAME=web-design
+DNAME=web-design
 DIRDEV=$HOME/Documents/webapp/fullinn/
 
 SPLIT=15
