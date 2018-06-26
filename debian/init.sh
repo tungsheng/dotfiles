@@ -1,6 +1,5 @@
+#!/bin/bash
 log_file=~/install_progress_log.txt
-
-
 
 echo -ne "Initiating...\n"
 sudo apt-get update
