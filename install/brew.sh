@@ -13,6 +13,7 @@ brew install ack
 brew install the_silver_searcher
 brew install tree
 brew install wget
+brew install watchman
 
 # development server setup
 brew install nginx
