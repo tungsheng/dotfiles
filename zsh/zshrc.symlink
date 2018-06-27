@@ -1,10 +1,8 @@
 export DOTFILES=$HOME/.dotfiles
 export ZSH=$DOTFILES/zsh
+export ZPLUG=$HOME/.zplug
 
-source ~/.zplug/init.zsh
-zplug "zsh-users/zsh-autosuggestions"
-zplug "zsh-users/zsh-syntax-highlighting"
-zplug "zsh-users/zsh-history-substring-search"
+source $ZPLUG/init.zsh
 
 # Install plugins if there are plugins that have not been installed
 if ! zplug check --verbose; then
@@ -89,15 +87,6 @@ if hash brew 2>/dev/null; then
 fi
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-if [ -z ${DOTFILES_LOADED+x} ]; then
-    # install zsh-syntax-highlighting
-    source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-    # install zsh autosuggestions
-    source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-fi
-
-DOTFILES_LOADED=1
 
 export PATH="$HOME/.yarn/bin:$PATH"
 

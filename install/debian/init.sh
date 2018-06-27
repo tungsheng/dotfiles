@@ -16,7 +16,13 @@ echo -ne "Installing zsh...\n"
 sudo apt-get -y install zsh
 
 echo -ne "Installing zplug...\n"
-curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh| zsh
+hash zplug 2>/dev/null || { \
+    git clone https://github.com/zplug/zplug $HOME/.zplug \
+}
+
+zplug "zsh-users/zsh-autosuggestions"
+zplug "zsh-users/zsh-syntax-highlighting"
+zplug "zsh-users/zsh-history-substring-search"
 
 if hash zsh 2>/dev/null; then
     echo "zsh Installed" >> $log_file

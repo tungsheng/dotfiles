@@ -25,12 +25,22 @@ brew install hub
 brew install fzf
 brew install reattach-to-user-namespace
 brew install tmux
-brew install zsh
 brew install z
+brew install zsh
 brew install highlight
 brew install nvm
 
 # install neovim
 brew install neovim/neovim/neovim
+
+echo -ne "Installing zplug...\n"
+hash zplug 2>/dev/null || { \
+    git clone https://github.com/zplug/zplug $HOME/.zplug \
+}
+
+zplug "zsh-users/zsh-autosuggestions"
+zplug "zsh-users/zsh-syntax-highlighting"
+zplug "zsh-users/zsh-history-substring-search"
+
 
 exit 0
