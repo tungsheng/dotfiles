@@ -37,3 +37,10 @@ sudo apt-get -y install silversearcher-ag
 sudo apt-get -y install python-pip
 sudo apt-get install -y apt-transport-https ca-certificates software-properties-common
 
+
+source adduser.sh
+source golang.sh
+source caddy.sh
+source docker.sh
+
+
