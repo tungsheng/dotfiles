@@ -1,5 +1,6 @@
 #!/bin/bash
-log_file=~/install_progress_log.txt
+source ../path.sh
+log_file=$HOME/install_progress_log.txt
 
 echo -ne "Initiating...\n"
 sudo apt-get update
@@ -13,7 +14,10 @@ sudo apt-get install neovim
 
 echo -ne "Installing zsh...\n"
 sudo apt-get -y install zsh
-sudo apt-get install zsh-syntax-highlighting
+
+echo -ne "Installing zplug...\n"
+curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh| zsh
+
 if hash zsh 2>/dev/null; then
     echo "zsh Installed" >> $log_file
 else
@@ -37,6 +41,9 @@ sudo apt-get -y install silversearcher-ag
 sudo apt-get -y install python-pip
 sudo apt-get install -y apt-transport-https ca-certificates software-properties-common
 
+echo "Install color...\n"
+tic $DOT/color/xterm-256color-italic.terminfo
+tic $DOT/color/tmux-256color-italic.terminfo
 
 source adduser.sh
 source golang.sh
