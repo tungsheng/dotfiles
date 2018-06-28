@@ -70,8 +70,8 @@ precmd() {
     fi
 
     vcs_info
-    print -P '\n%F{141}%M [%F{139}$ip]\n%F{161}%n%F{121} %F{105}%~'
+    print -P '\n%F{1}%M %F{white}[%F{154}$ip%F{white}]\n%F{154}%n %F{white}in %F{220}%~'
 }
 
-export PROMPT='%(?.%F{41}.%F{red})⇨%f '
+export PROMPT='%(?.%F{white}.%F{196})§%f '
 export RPROMPT='`git_dirty`%F{241}$vcs_info_msg_0_%f `git_arrows``suspended_jobs`'
