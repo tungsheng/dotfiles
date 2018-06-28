@@ -62,8 +62,15 @@ suspended_jobs() {
 }
 
 precmd() {
+    ip="127.0.0.1"
+    if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+        SESSION_TYPE=remote/ssh
+        # many other tests omitted
+        ip="$(ifconfig | grep -A 1 'eth0' | tail -1 | cut -d ':' -f 2 | cut -d ' ' -f 1)"
+    fi
+
     vcs_info
-    print -P '\n%F{141}%M\n%F{161}%n%F{121} %F{105}%~'
+    print -P '\n%F{141}%M [%F{139}$ip]\n%F{161}%n%F{121} %F{105}%~'
 }
 
 export PROMPT='%(?.%F{41}.%F{red})⇨%f '
