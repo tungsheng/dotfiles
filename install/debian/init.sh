@@ -47,7 +47,6 @@ sudo apt-get -y install silversearcher-ag
 sudo apt-get -y install python-pip
 sudo apt-get install -y apt-transport-https ca-certificates software-properties-common
 
-
 # download z.sh (https://github.com/rupa/z)
 [ -f "${HOME}/z.sh" ] && rm -rf ${HOME}/z.sh
 curl -L "https://raw.githubusercontent.com/rupa/z/master/z.sh" -o ~/z.sh
@@ -62,4 +61,4 @@ source golang.sh
 source caddy.sh
 source docker.sh
 
-
+exit 0
