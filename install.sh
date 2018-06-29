@@ -1,9 +1,12 @@
 #!/bin/bash
 
-echo "Installing dotfiles"
+echo "Installing dotfiles..."
+git pull origin master
 
 echo "Initializing submodule(s)"
 git submodule update --init --recursive
+
+[ -d "${HOME}/bin" ] || mkdir ~/bin
 
 echo $(uname)
 if [ "$(uname)" == "Darwin" ]; then
