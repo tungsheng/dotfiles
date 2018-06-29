@@ -47,6 +47,12 @@ sudo apt-get -y install silversearcher-ag
 sudo apt-get -y install python-pip
 sudo apt-get install -y apt-transport-https ca-certificates software-properties-common
 
+
+# download z.sh (https://github.com/rupa/z)
+[ -f "${HOME}/z.sh" ] && rm -rf ${HOME}/z.sh
+curl -L "https://raw.githubusercontent.com/rupa/z/master/z.sh" -o ~/z.sh
+chmod +x ~/z.sh
+
 echo "Install color...\n"
 tic $DOT/color/xterm-256color-italic.terminfo
 tic $DOT/color/tmux-256color-italic.terminfo
