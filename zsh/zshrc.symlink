@@ -1,8 +1,13 @@
 export DOTFILES=$HOME/.dotfiles
 export ZSH=$DOTFILES/zsh
 export ZPLUG=$HOME/.zplug
+export BASE16_SHELL="$HOME/.config/base16-shell/"
 
 source $ZPLUG/init.zsh
+
+zplug "zsh-users/zsh-autosuggestions"
+zplug "zsh-users/zsh-syntax-highlighting"
+zplug "zsh-users/zsh-history-substring-search"
 
 # Install plugins if there are plugins that have not been installed
 if ! zplug check --verbose; then
@@ -15,10 +20,7 @@ fi
 zplug load --verbose
 
 # Base16 Shell
-BASE16_SHELL="$HOME/.config/base16-shell/"
-[ -n "$PS1" ] && \
-    [ -s "$BASE16_SHELL/profile_helper.sh" ] && \
-        eval "$("$BASE16_SHELL/profile_helper.sh")"
+[ -n "$PS1" ] && [ -s "$BASE16_SHELL/profile_helper.sh" ] && eval "$("$BASE16_SHELL/profile_helper.sh")"
 
 # display how long all tasks over 10 seconds take
 export REPORTTIME=10
