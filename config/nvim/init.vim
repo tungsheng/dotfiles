@@ -419,6 +419,14 @@ endfunction
 
 
 "----------------------------------------------
+" Plugin: chriskempson/base16-vim
+"----------------------------------------------
+if filereadable(expand("~/.vimrc_background"))
+  let base16colorspace=256  " Access colors present in 256 colorspace
+  source ~/.vimrc_background
+endif
+
+"----------------------------------------------
 " Plugin: rking/ag.vim
 "----------------------------------------------
 let g:ag_working_path_mode="r"
