@@ -20,6 +20,7 @@ elif [ "$(uname)" == "Linux" ]; then
     echo -e "\n\nRunning on Linux"
     source install/debian/init.sh
     source install/debian/link.sh
+    source install/debian/caddy.sh
 fi
 
 echo "creating vim directories"
