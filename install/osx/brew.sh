@@ -38,9 +38,4 @@ hash zplug 2>/dev/null || { \
     git clone https://github.com/zplug/zplug $HOME/.zplug \
 }
 
-zplug "zsh-users/zsh-autosuggestions"
-zplug "zsh-users/zsh-syntax-highlighting"
-zplug "zsh-users/zsh-history-substring-search"
-
-
 exit 0
