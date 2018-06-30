@@ -56,4 +56,3 @@ tic $HOME/$DOT/color/tmux-256color-italic.terminfo
 # source caddy.sh
 # source docker.sh
 
-exit 0
