@@ -16,13 +16,7 @@ echo -ne "Installing zsh...\n"
 sudo apt-get -y install zsh
 
 echo -ne "Installing zplug...\n"
-hash zplug 2>/dev/null || { \
-    git clone https://github.com/zplug/zplug $HOME/.zplug \
-}
-
-zplug "zsh-users/zsh-autosuggestions"
-zplug "zsh-users/zsh-syntax-highlighting"
-zplug "zsh-users/zsh-history-substring-search"
+hash zplug 2>/dev/null || git clone https://github.com/zplug/zplug $HOME/.zplug 
 
 if hash zsh 2>/dev/null; then
     echo "zsh Installed" >> $log_file
@@ -48,6 +42,7 @@ sudo apt-get -y install python-pip
 sudo apt-get install -y apt-transport-https ca-certificates software-properties-common
 
 # download z.sh (https://github.com/rupa/z)
+echo "Install z...\n"
 [ -f "${HOME}/z.sh" ] && rm -rf ${HOME}/z.sh
 curl -L "https://raw.githubusercontent.com/rupa/z/master/z.sh" -o ~/z.sh
 chmod +x ~/z.sh
@@ -56,9 +51,9 @@ echo "Install color...\n"
 tic $DOT/color/xterm-256color-italic.terminfo
 tic $DOT/color/tmux-256color-italic.terminfo
 
-source adduser.sh
-source golang.sh
-source caddy.sh
-source docker.sh
+# source adduser.sh
+# source golang.sh
+# source caddy.sh
+# source docker.sh
 
 exit 0
