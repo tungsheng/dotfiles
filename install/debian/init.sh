@@ -1,5 +1,5 @@
 #!/bin/bash
-source "$(dirname $(pwd -P))/path.sh"
+source "$(dirname $(pwd))/path.sh"
 log_file=$HOME/install_progress_log.txt
 
 echo -ne "Initiating...\n"
