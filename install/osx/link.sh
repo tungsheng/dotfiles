@@ -30,3 +30,8 @@ for config in $DOTFILES/config/*; do
     fi
 done
 
+
+echo -e "\nInstall color...\n"
+tic $DOTFILES/color/xterm-256color-italic.terminfo
+tic $DOTFILES/color/tmux-256color-italic.terminfo
+
