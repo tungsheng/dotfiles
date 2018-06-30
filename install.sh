@@ -1,5 +1,11 @@
 #!/bin/bash
 
+export DOT=dotfiles
+export DOTBACK=dotfiles-backup
+export DOTFILES=$HOME/$DOT
+export BACKUP_DIR=$HOME/$DOTBACK
+
+
 echo "Installing dotfiles..."
 git pull origin master
 
