@@ -1,5 +1,4 @@
 #!/bin/bash
-source "$HOME/.dotfiles/helper/path.sh"
 log_file=$HOME/install_progress_log.txt
 
 echo -ne "Initiating...\n"

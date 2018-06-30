@@ -1,6 +1,4 @@
-#!/usr/bin/env bash
-
-DOTFILES=$HOME/.dotfiles
+#!/bin/bash
 
 echo -e "\nCreating symlinks"
 echo "=============================="

@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-DOTFILES=$HOME/.dotfiles
-
 echo -e "\nCreating symlinks"
 echo "=============================="
 linkables=$( find -H "$DOTFILES" -maxdepth 3 -name '*.symlink' )

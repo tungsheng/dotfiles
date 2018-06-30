@@ -2,8 +2,6 @@
 
 # Backup files that are provided by the dotfiles into a ~/dotfiles-backup directory
 
-DOTFILES=$HOME/.dotfiles
-BACKUP_DIR=$HOME/dotfiles-backup
 
 set -e # TODO: what does this do?
 
