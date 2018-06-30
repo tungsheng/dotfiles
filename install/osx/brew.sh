@@ -34,8 +34,4 @@ brew install nvm
 brew install neovim/neovim/neovim
 
 echo -ne "Installing zplug...\n"
-hash zplug 2>/dev/null || { \
-    git clone https://github.com/zplug/zplug $HOME/.zplug \
-}
-
-exit 0
+hash zplug 2>/dev/null || git clone https://github.com/zplug/zplug $HOME/.zplug
