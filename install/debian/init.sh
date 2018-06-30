@@ -50,8 +50,8 @@ echo "Install color...\n"
 tic $DOTFILES/color/xterm-256color-italic.terminfo
 tic $DOTFILES/color/tmux-256color-italic.terminfo
 
-# source adduser.sh
-# source golang.sh
+source adduser.sh
+source golang.sh
+source docker.sh
 # source caddy.sh
-# source docker.sh
 
