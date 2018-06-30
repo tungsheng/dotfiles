@@ -48,8 +48,8 @@ curl -L "https://raw.githubusercontent.com/rupa/z/master/z.sh" -o ~/z.sh
 chmod +x ~/z.sh
 
 echo "Install color...\n"
-tic $DOT/color/xterm-256color-italic.terminfo
-tic $DOT/color/tmux-256color-italic.terminfo
+tic $HOME/$DOT/color/xterm-256color-italic.terminfo
+tic $HOME/$DOT/color/tmux-256color-italic.terminfo
 
 # source adduser.sh
 # source golang.sh
