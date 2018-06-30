@@ -25,19 +25,19 @@ zplug load --verbose
 # display how long all tasks over 10 seconds take
 export REPORTTIME=10
 
-[[ -e ~/.terminfo ]] && export TERMINFO_DIRS=~/.terminfo:/usr/share/terminfo
+[[ -e $HOME/.terminfo ]] && export TERMINFO_DIRS=$HOME/.terminfo:/usr/share/terminfo
 
 # define the code directory
 # This is where my code exists and where I want the `c` autocomplete to work from exclusively
-if [[ -d ~/code ]]; then
-    export CODE_DIR=~/code
+if [[ -d $HOME/code ]]; then
+    export CODE_DIR=$HOME/code
 fi
 
 # source all .zsh files inside of the zsh/ directory
 for config ($ZSH/**/*.zsh) source $config
 
-if [[ -a ~/.localrc ]]; then
-    source ~/.localrc
+if [[ -a $HOME/.localrc ]]; then
+    source $HOME/.localrc
 fi
 
 # initialize autocomplete
@@ -65,8 +65,8 @@ fi
 export PATH=$DOTFILES/bin:$PATH
 
 # check for custom bin directory and add to path
-if [[ -d ~/bin ]]; then
-    export PATH=~/bin:$PATH
+if [[ -d $HOME/bin ]]; then
+    export PATH=$HOME/bin:$PATH
 fi
 
 [ -z "$TMUX" ] && export TERM=xterm-256color-italic
@@ -77,7 +77,7 @@ if hash hub 2>/dev/null; then
 fi
 
 # source nvm
-export NVM_DIR=~/.nvm
+export NVM_DIR=$HOME/.nvm
 
 load-nvmrc() {
     if [[ -f .nvmrc && -r .nvmrc ]]; then
@@ -94,7 +94,7 @@ if hash brew 2>/dev/null; then
 
 fi
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+[ -f $HOME/.fzf.zsh ] && source $HOME/.fzf.zsh
 
 export PATH="$HOME/.yarn/bin:$PATH"
 
