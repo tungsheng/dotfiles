@@ -21,7 +21,7 @@ if [ ! -d $HOME/.config ]; then
 fi
 # configs=$( find -path "$DOTFILES/config.symlink" -maxdepth 1 )
 for config in $DOTFILES/config/*; do
-    target=$HOME/.config/$( basename $config )
+    target="$HOME/.config/$( basename $config )"
     if [ -e $target ]; then
         echo "~${target#$HOME} already exists... Skipping."
     else

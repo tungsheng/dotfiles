@@ -38,7 +38,7 @@ sudo apt-get -y install curl
 sudo apt-get -y install wget
 sudo apt-get -y install silversearcher-ag
 sudo apt-get -y install python-pip
-sudo apt-get install -y apt-transport-https ca-certificates software-properties-common
+sudo apt-get -y install apt-transport-https ca-certificates software-properties-common
 
 # download z.sh (https://github.com/rupa/z)
 echo "Install z...\n"
@@ -47,8 +47,8 @@ curl -L "https://raw.githubusercontent.com/rupa/z/master/z.sh" -o ~/z.sh
 chmod +x ~/z.sh
 
 echo "Install color...\n"
-tic $HOME/$DOT/color/xterm-256color-italic.terminfo
-tic $HOME/$DOT/color/tmux-256color-italic.terminfo
+tic $DOTFILES/color/xterm-256color-italic.terminfo
+tic $DOTFILES/color/tmux-256color-italic.terminfo
 
 # source adduser.sh
 # source golang.sh

@@ -1,5 +1,5 @@
 WNAME=dot
-DIRDOT=$HOME/.dotfiles/
+DIRDOT=$HOME/dotfiles/
 
 SPLIT=15
 ADJUST=10

@@ -8,7 +8,7 @@
 
 sn=$(tmux display-message -p "#S")
 base_session=dev
-DIRSCRIPTS=$HOME/.dotfiles/scripts/
+DIRSCRIPTS=$HOME/dotfiles/scripts/
 
 if [[ -z "$TMUX" ]]; then
     echo "Launching base session $base_session..."
