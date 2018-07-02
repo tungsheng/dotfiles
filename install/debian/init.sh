@@ -6,6 +6,9 @@ sudo apt-get update
 sudo apt-get -y update
 sudo apt-get -y install openssh-server sudo
 
+echo -ne "Installing tmux...\n"
+sudo apt-get install tmux
+
 echo -ne "Installing neovim...\n"
 sudo apt-get install neovim
 # sudo apt-get install python-neovim
