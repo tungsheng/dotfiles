@@ -5,9 +5,8 @@ export DOTBACK=dotfiles-backup
 export DOTFILES=$HOME/$DOT
 export BACKUP_DIR=$HOME/$DOTBACK
 
-
 echo "Installing dotfiles..."
-git pull origin master
+# git pull origin master
 
 [ -d "${HOME}/bin" ] || mkdir ~/bin
 

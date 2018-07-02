@@ -6,7 +6,7 @@ export DOTFILES="$PWD"
 export BACKUP_DIR="$(dirname "$DOTFILES")/$DOTBACK"
 
 echo "Installing dotfiles..."
-git pull origin master
+# git pull origin master
 
 [ -d "${HOME}/bin" ] || mkdir ~/bin
 
