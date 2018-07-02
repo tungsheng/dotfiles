@@ -8,9 +8,20 @@ dbget() {
     source ./scripts/util/db-get.sh
 }
 
+dkinst() {
+    source ./docker-install.sh
+}
+
+inst() {
+    source ./install.sh
+}
+
 if [ $# -gt 0 ]; then
     case $1 in
         db-get | dbget )        dbget
+                                exit
+                                ;;
+        dk-inst | dkinst )      dkinst
                                 exit
                                 ;;
         * )                     error
