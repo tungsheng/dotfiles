@@ -36,9 +36,9 @@ fi
 
 echo -ne "Installing utils...\n"
 sudo apt-get -y install git tig 
+sudo apt-get -y install make locate
 sudo apt-get -y install whois
-sudo apt-get -y install curl
-sudo apt-get -y install wget
+sudo apt-get -y install curl wget
 sudo apt-get -y install silversearcher-ag
 sudo apt-get -y install python-pip
 sudo apt-get -y install apt-transport-https ca-certificates software-properties-common
