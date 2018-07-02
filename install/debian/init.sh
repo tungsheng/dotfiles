@@ -43,9 +43,6 @@ sudo apt-get -y install silversearcher-ag
 sudo apt-get -y install python-pip
 sudo apt-get -y install apt-transport-https ca-certificates software-properties-common
 
-# Install yarn
-curl -o- -L https://yarnpkg.com/install.sh | bash
-
 # neovim
 echo -ne "Installing neovim...\n"
 sudo apt-get install neovim
@@ -62,8 +59,9 @@ echo "Install color...\n"
 tic $DOTFILES/color/xterm-256color-italic.terminfo
 tic $DOTFILES/color/tmux-256color-italic.terminfo
 
-source adduser.sh
-source golang.sh
+source $DOTFILES/install/debian/nvm.sh
+source $DOTFILES/install/debian/golang.sh
+# source $DOTFILES/install/debian/adduser.sh
 # source docker.sh
 # source caddy.sh
 
