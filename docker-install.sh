@@ -5,12 +5,8 @@ export DOTBACK=dotfiles-backup
 export DOTFILES="$PWD"
 export BACKUP_DIR="$(dirname "$DOTFILES")/$DOTBACK"
 
-
 echo "Installing dotfiles..."
 git pull origin master
-
-echo "Initializing submodule(s)"
-git submodule update --init --recursive
 
 [ -d "${HOME}/bin" ] || mkdir ~/bin
 

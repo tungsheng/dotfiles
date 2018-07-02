@@ -9,9 +9,6 @@ export BACKUP_DIR=$HOME/$DOTBACK
 echo "Installing dotfiles..."
 git pull origin master
 
-echo "Initializing submodule(s)"
-git submodule update --init --recursive
-
 [ -d "${HOME}/bin" ] || mkdir ~/bin
 
 echo $(uname)
