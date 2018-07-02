@@ -13,3 +13,6 @@ export NVM_DIR="$HOME/.nvm" && (
 nvm install node
 nvm use node
 
+
+# Install yarn
+curl -o- -L https://yarnpkg.com/install.sh | bash
