@@ -2,20 +2,15 @@
 log_file=$HOME/install_progress_log.txt
 
 echo -ne "Initiating...\n"
-apt-get update
-apt-get -y update
-apt-get -y install openssh-server sudo
+sudo apt-get update
+sudo apt-get -y update
+sudo apt-get -y install openssh-server sudo
 
 echo -ne "Installing tmux...\n"
-apt-get install tmux
-
-echo -ne "Installing neovim...\n"
-apt-get install neovim
-# apt-get install python-neovim
-# apt-get install python3-neovim
+sudo apt-get install tmux
 
 echo -ne "Installing zsh...\n"
-apt-get -y install zsh
+sudo apt-get -y install zsh
 
 echo -ne "Installing zplug...\n"
 hash zplug 2>/dev/null || git clone https://github.com/zplug/zplug $HOME/.zplug 
@@ -27,7 +22,7 @@ else
 fi
 
 echo -ne "Installing tmux...\n"
-apt-get -y install tmux
+sudo apt-get -y install tmux
 if hash tmux 2>/dev/null; then
     echo "tmux Installed" >> $log_file
 else
@@ -35,17 +30,17 @@ else
 fi
 
 echo -ne "Installing utils...\n"
-apt-get -y install git tig 
-apt-get -y install make locate
-apt-get -y install whois
-apt-get -y install curl wget
-apt-get -y install silversearcher-ag
-apt-get -y install python-pip
-apt-get -y install apt-transport-https ca-certificates software-properties-common
+sudo apt-get -y install git tig 
+sudo apt-get -y install make locate
+sudo apt-get -y install whois
+sudo apt-get -y install curl wget
+sudo apt-get -y install silversearcher-ag
+sudo apt-get -y install python-pip
+sudo apt-get -y install apt-transport-https ca-certificates software-properties-common
 
 # neovim
 echo -ne "Installing neovim...\n"
-apt-get install neovim
+sudo apt-get install neovim
 # apt-get install python-neovim
 # apt-get install python3-neovim
 
@@ -53,7 +48,7 @@ apt-get install neovim
 echo "Install z...\n"
 [ -f "${HOME}/z.sh" ] && rm -rf ${HOME}/z.sh
 curl -L "https://raw.githubusercontent.com/rupa/z/master/z.sh" -o ~/z.sh
-chmod +x ~/z.sh
+sudo chmod +x ~/z.sh
 
 echo "Install color...\n"
 tic $DOTFILES/color/xterm-256color-italic.terminfo

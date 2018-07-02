@@ -3,7 +3,7 @@
 # install Go
 wget https://dl.google.com/go/go1.10.3.linux-amd64.tar.gz
 tar -xvf go1.10.3.linux-amd64.tar.gz
-mv go /usr/local
+sudo mv go /usr/local
 
 # set Go path
 GOROOT=/usr/local/go

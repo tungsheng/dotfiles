@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # install packaegs
-apt-get install -y build-essential and libssl-dev
+sudo apt-get install -y build-essential and libssl-dev
 
 #install nvm
 export NVM_DIR="$HOME/.nvm" && (
