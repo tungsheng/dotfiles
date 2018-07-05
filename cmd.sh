@@ -1,4 +1,5 @@
 #!/bin/bash
+export serv="fullinn-$2"
 
 error() {
     echo "could not execute cmd... Exit!"
