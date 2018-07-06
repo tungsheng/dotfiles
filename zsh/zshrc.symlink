@@ -32,6 +32,8 @@ fi
 # source all .zsh files inside of the zsh/ directory
 for config ($ZSH/**/*.zsh) source $config
 
+for config ($ZSH/**/*.sh) source $config
+
 if [[ -a $HOME/.localrc ]]; then
     source $HOME/.localrc
 fi
