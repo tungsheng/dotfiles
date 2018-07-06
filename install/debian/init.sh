@@ -56,6 +56,6 @@ tic $DOTFILES/color/tmux-256color-italic.terminfo
 source $DOTFILES/install/debian/nvm.sh
 source $DOTFILES/install/debian/golang.sh
 # source $DOTFILES/install/debian/adduser.sh
-source docker.sh
+source $DOTFILES/install/debian/docker.sh
 # source caddy.sh
 
