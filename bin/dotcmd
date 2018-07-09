@@ -20,16 +20,27 @@ inst() {
     source ./install.sh
 }
 
+# copy ssh file
+scpkey() {
+    scp ~/.ssh/id_rsa "$1:~/.ssh"
+    scp ~/.ssh/id_rsa.pub "$1:~/.ssh"
+}
+
+
 if [ $# -gt 0 ]; then
     case $1 in
-        db-get | dbget )        dbget
-                                exit
-                                ;;
-        dk-inst | dkinst )      dkinst
-                                exit
-                                ;;
-        * )                     error
-                                exit 1
+        db-get | dbget )        
+            dbget
+            exit;;
+        dk-inst | dkinst )
+            dkinst
+            exit;;
+        scpkey )
+            scpkey $2
+            exit;;
+        * )                     
+            error
+            exit 1
     esac
 else
     echo "Need to pass args..."
