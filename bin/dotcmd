@@ -5,14 +5,17 @@ error() {
     echo "could not execute cmd... Exit!"
 }
 
+# dbget gets db data from server db to local db
 dbget() {
     source ./scripts/util/db-get.sh
 }
 
+# dkinst install docker script
 dkinst() {
     source ./docker-install.sh
 }
 
+# inst install all script
 inst() {
     source ./install.sh
 }
