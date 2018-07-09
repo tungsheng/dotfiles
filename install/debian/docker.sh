@@ -1,17 +1,18 @@
 #!/bin/bash
 
+set -e
 
 println() {
-    echo "\n"
-    echo $1
-    echo "...\n"
+    echo -e "\n"
+    echo -e "$1..."
+    echo -e "\n"
 }
 
 # remove older docker compose if exist
 which docker-compose || sudo rm /usr/local/bin/docker-compose
 
 # install docker daemon
-output "Install docker daemon"
+println "Install docker daemon"
 wget -qO- https://get.docker.com/ | sh
 
 # install docker compose
