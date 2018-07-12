@@ -17,7 +17,7 @@ dkinst() {
 
 # inst install all script
 inst() {
-    source ./install.sh
+    source ~/dotfiles/install.sh
 }
 
 # copy ssh file
@@ -37,6 +37,9 @@ if [ $# -gt 0 ]; then
             exit;;
         scpkey )
             scpkey $2
+            exit;;
+        inst )
+            inst
             exit;;
         * )                     
             error
