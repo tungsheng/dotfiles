@@ -13,15 +13,15 @@ echo "Installing dotfiles..."
 echo $(uname)
 if [ "$(uname)" == "Darwin" ]; then
     echo -e "\n\nRunning on OSX"
-    source install/osx/brew.sh
-    source install/osx/osx.sh
-    source install/osx/nvm.sh
-    source install/osx/shlink.sh
-    source install/osx/link.sh
+    source $DOTFILES/install/osx/brew.sh
+    source $DOTFILES/install/osx/osx.sh
+    source $DOTFILES/install/osx/nvm.sh
+    source $DOTFILES/install/osx/shlink.sh
+    source $DOTFILES/install/osx/link.sh
 elif [ "$(uname)" == "Linux" ]; then
     echo -e "\n\nRunning on Linux"
-    source install/debian/init.sh
-    source install/debian/link.sh
+    source $DOTFILES/install/debian/init.sh
+    source $DOTFILES/install/debian/link.sh
     # source install/debian/caddy.sh
 fi
 
