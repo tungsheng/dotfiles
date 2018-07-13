@@ -47,15 +47,16 @@ Plug 'junegunn/limelight.vim', { 'on': 'Limelight' } " focus tool. Good for pres
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'nsf/gocode', { 'rtp': 'nvim', 'do': '~/.config/nvim/plugged/gocode/nvim/symlink.sh' }  " Go auto completion
 Plug 'zchee/deoplete-go', { 'do': 'make'}      " Go auto completion
-Plug 'zchee/deoplete-jedi'                     " Go auto completion
+" Plug 'zchee/deoplete-jedi'                     " Go auto completion
 
 " html / templates
 Plug 'mattn/emmet-vim', { 'for': 'html' } " emmet support for vim - easily create markdup wth CSS-like syntax
 Plug 'gregsexton/MatchTag', { 'for': 'html' } " match tags in html, similar to paren support
 Plug 'othree/html5.vim', { 'for': 'html' } " html5 support
 " Plug 'mustache/vim-mustache-handlebars' " mustach support
-Plug 'digitaltoad/vim-jade', { 'for': ['jade', 'pug'] } " jade support
+" Plug 'digitaltoad/vim-jade', { 'for': ['jade', 'pug'] } " jade support
 " Plug 'juvenn/mustache.vim', { 'for': 'mustache' } " mustache support
+Plug 'stephpy/vim-yaml'
 
 " JavaScript
 Plug 'gavocanov/vim-js-indent', { 'for': 'javascript' } " JavaScript indent support
