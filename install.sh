@@ -19,6 +19,7 @@ if [ "$(uname)" == "Darwin" ]; then
     source $DOTFILES/install/osx/shlink.sh
     source $DOTFILES/install/osx/link.sh
 elif [ "$(uname)" == "Linux" ]; then
+    # TODO: need hardening
     echo -e "\n\nRunning on Linux"
     source $DOTFILES/install/debian/init.sh
     source $DOTFILES/install/debian/link.sh
