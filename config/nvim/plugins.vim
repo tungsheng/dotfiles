@@ -6,6 +6,10 @@ Plug 'flazz/vim-colorschemes'
 " game
 Plug 'johngrib/vim-game-code-break'
 
+" theme
+Plug 'vim-airline/vim-airline' " fancy statusline
+Plug 'vim-airline/vim-airline-themes' " themes for vim-airline
+
 " utilities
 " Plug 'ctrlpvim/ctrlp.vim' " fuzzy file finder, mapped to <leader>t
 Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] } | Plug 'Xuyuanp/nerdtree-git-plugin' | Plug 'ryanoasis/vim-devicons' " file drawer
@@ -20,9 +24,6 @@ Plug 'tpope/vim-unimpaired' " mappings which are simply short normal mode aliase
 " Plug 'tpope/vim-endwise' " automatically add end in ruby
 Plug 'tpope/vim-ragtag' " endings for html, xml, etc. - ehances surround
 Plug 'tpope/vim-surround' " mappings to easily delete, change and add such surroundings in pairs, such as quotes, parens, etc.
-Plug 'benmills/vimux' " tmux integration for vim
-Plug 'vim-airline/vim-airline' " fancy statusline
-Plug 'vim-airline/vim-airline-themes' " themes for vim-airline
 Plug 'benekastah/neomake' " neovim replacement for syntastic using neovim's job control functonality
 Plug 'tpope/vim-fugitive' " amazing git wrapper for vim
 Plug 'airblade/vim-gitgutter' "  shows git diff in the gutter
