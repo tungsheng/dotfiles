@@ -20,6 +20,10 @@ set directory=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
 let g:python_host_prog = '/usr/local/bin/python'
 let g:python3_host_prog = '/usr/local/bin/python3'
 
+" Search down into subfolders
+" Provides tab-completion for all file-related tasks
+set path+=**
+
 " }}}
 
 " Section User Interface {{{
@@ -42,7 +46,7 @@ endif
 
 syntax on
 " set t_Co=256                " Explicitly tell vim that the terminal supports 256 colors"
-colorscheme ir_black          " Set the colorscheme
+colorscheme jellybeans          " Set the colorscheme
 
 " make the highlighting of tabs and other non-text less annoying
 highlight SpecialKey ctermbg=none ctermfg=237
@@ -291,8 +295,8 @@ nmap <silent> <leader>k :NERDTreeToggle<cr>
 nmap <silent> <leader>y :NERDTreeFind<cr>
 
 let NERDTreeShowHidden=1
-let NERDTreeDirArrowExpandable = '▷'
-let NERDTreeDirArrowCollapsible = '▼'
+let NERDTreeDirArrowExpandable = '>'
+let NERDTreeDirArrowCollapsible = '-'
 
 let g:fzf_layout = { 'down': '~25%' }
 
