@@ -4,9 +4,12 @@ export ZPLUG=$HOME/.zplug
 
 source $ZPLUG/init.zsh
 
+zplug "mafredri/zsh-async", from:github
+zplug "sindresorhus/pure", use:pure.zsh, from:github, as:theme
 zplug "zsh-users/zsh-autosuggestions"
-zplug "zsh-users/zsh-syntax-highlighting"
 zplug "zsh-users/zsh-history-substring-search"
+zplug "zsh-users/zsh-syntax-highlighting"
+zplug 'zsh-users/zsh-completions'
 
 # Install plugins if there are plugins that have not been installed
 if ! zplug check --verbose; then
@@ -31,7 +34,6 @@ fi
 
 # source all .zsh files inside of the zsh/ directory
 for config ($ZSH/**/*.zsh) source $config
-
 for config ($ZSH/**/*.sh) source $config
 
 if [[ -a $HOME/.localrc ]]; then
