@@ -73,5 +73,5 @@ precmd() {
     print -P '\n%F{1}%M %B%F{white}[%F{154}$ip%B%F{white}]\n%F{154}%n %F{white}in %F{220}%~'
 }
 
-export PROMPT='%(?.%B%F{white}.%F{196})§%f '
-export RPROMPT='`git_dirty`%F{241}$vcs_info_msg_0_%f `git_arrows``suspended_jobs`'
+#export PROMPT='%(?.%B%F{white}.%F{196})§%f '
+#export RPROMPT='`git_dirty`%F{241}$vcs_info_msg_0_%f `git_arrows``suspended_jobs`'
