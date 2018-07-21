@@ -25,5 +25,6 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
+* [Christoomey Dotfiles](https://github.com/christoomey/dotfiles)
 * [Nicknisi Dotfiles](https://github.com/nicknisi/dotfiles)
 * [Neovim Setup For Go](https://hackernoon.com/my-neovim-setup-for-go-7f7b6e805876)
