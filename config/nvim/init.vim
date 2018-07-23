@@ -218,6 +218,9 @@ map <leader>wc :wincmd q<cr>
 " toggle cursor line
 nnoremap <leader>i :set cursorline!<cr>
 
+" toggle cursor column
+nnoremap <leader>ii :set cursorcolumn!<cr>
+
 " scroll the viewport faster
 nnoremap <C-e> 20<C-e>
 nnoremap <C-y> 20<C-y>
@@ -227,9 +230,6 @@ nnoremap <silent> j gj
 nnoremap <silent> k gk
 nnoremap <silent> ^ g^
 nnoremap <silent> $ g$
-
-" search for word under the cursor
-nnoremap <leader>/ "fyiw :/<c-r>f<cr>
 
 " inoremap <tab> <c-r>=Smart_TabComplete()<CR>
 
