@@ -37,8 +37,9 @@ export REPORTTIME=5
 
 # source all .zsh files inside of the zsh/ directory
 for config ($ZSH/**/*.zsh) source $config
-for config ($ZSH/**/*.sh) source $config
 
+# util
+. $DOTFILES/util/z.sh
 
 # add go related paths
 export GOPATH=$HOME/go
