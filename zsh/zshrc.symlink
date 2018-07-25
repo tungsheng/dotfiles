@@ -22,6 +22,9 @@ fi
 zplug load --verbose
 echo -e "\n"
 
+zstyle ':completion:*:*:git:*' script $DOTFILES/zsh/git-completion.bash
+# git completion
+fpath=($DOTFILES/zsh/functions $fpath)
 
 # initialize autocomplete
 autoload -U compinit add-zsh-hook
