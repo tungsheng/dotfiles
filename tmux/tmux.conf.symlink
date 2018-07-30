@@ -117,14 +117,14 @@ bind-key -T copy-mode-vi WheelDownPane send -X halfpage-down
 
 
 # set vi mode for copy mode
-#setw -g mode-keys vi
+setw -g mode-keys vi
 # more settings to make copy-mode more vim-like
-#unbind [
-#bind Escape copy-mode
-#unbind p
-#bind p paste-buffer
-#bind -T copy-mode-vi 'v' send -X begin-selection
-#bind -T copy-mode-vi 'y' send -X copy-selection
+unbind [
+bind Escape copy-mode
+unbind p
+bind p paste-buffer
+bind -T copy-mode-vi 'v' send -X begin-selection
+bind -T copy-mode-vi 'y' send -X copy-selection
 
 # Buffers to/from Mac clipboard, yay tmux book from pragprog
 #bind C-c run "tmux save-buffer - | reattach-to-user-namespace pbcopy"
@@ -158,4 +158,6 @@ set -g status-bg colour234
 set -g status-left '[#S] '
 set -g status-right "#{?pane_synchronized,--SYNCED--,} #(is-online) #(battery -t -g black)  #(date '+%a, %b %d - %I:%M') "
 
-#source $HOME/dotfiles/tmux/theme.sh
+
+setw -g window-status-current-fg colour1
+setw -g window-status-current-attr bold
