@@ -377,7 +377,7 @@ let g:tsuquyomi_disable_default_mappings = 1
 " don't hide quotes in json files
 let g:vim_json_syntax_conceal = 0
 
-let g:SuperTabCrMapping = 0
+" let g:SuperTabCrMapping = 0
 
 " }}}
 
@@ -457,8 +457,8 @@ xmap <C-k>     <Plug>(neosnippet_expand_target)
 " \ pumvisible() ? "\<C-n>" :
 " \ neosnippet#expandable_or_jumpable() ?
 " \    "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
-smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
-\ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
+" smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
+ "\ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
 
 " For conceal markers.
 if has('conceal')
