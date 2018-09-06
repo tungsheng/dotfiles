@@ -60,6 +60,15 @@ function! functions#HtmlUnEscape()
 endfunction
 
 
+function! functions#SetTabSpace()
+  set expandtab               " insert spaces rather than tabs for <Tab>
+  set smarttab                " tab respects 'tabstop', 'shiftwidth', and 'softtabstop'
+  set tabstop=2               " the visible width of tabs
+  set softtabstop=2           " edit as if the tabs are 4 characters wide
+  set shiftwidth=2            " number of spaces to use for indent and unindent
+  set shiftround              " round indent to a multiple of 'shiftwidth'
+endfunction
+
 " BufOnly.vim  -  Delete all the buffers except the current/named buffer.
 "
 " Copyright November 2003 by Christian J. Robinson <infynity@onewest.net>
