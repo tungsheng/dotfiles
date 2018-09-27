@@ -67,6 +67,10 @@ bind c new-window -c "#{pane_current_path}"
 bind \ split-window -h -c "#{pane_current_path}"
 bind - split-window -v -c "#{pane_current_path}"
 
+# split window and fix path for tmux 1.9
+bind | split-window -fh
+bind _ split-window -fv
+
 # Quick session switching back and forth.
 bind-key Space switch-client -l
 
