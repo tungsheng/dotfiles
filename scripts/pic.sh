@@ -1,6 +1,6 @@
 WNAME=pic
 DNAME=pic
-DIRDEV=$HOME/Documents/webapp/fullinn/
+DIRDEV=$HOME/Documents/workApp/fullinn/
 
 SPLIT=15
 ADJUST=10

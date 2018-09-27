@@ -1,6 +1,6 @@
 WNAME=front
 DNAME=front
-DIRDEV=$HOME/Documents/webapp/fullinn/
+DIRDEV=$HOME/Documents/workApp/fullinn/
 
 SPLIT=15
 SPLIT_1_2=50
