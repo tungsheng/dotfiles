@@ -139,6 +139,14 @@ endif
 " set a map leader for more key combos
 let mapleader = ','
 
+" tab mapping
+nnoremap th  :tabfirst<CR>
+nnoremap tj  :tabnext<CR>
+nnoremap tk  :tabprev<CR>
+nnoremap tl  :tablast<CR>
+nnoremap tn :tabnew<CR>
+nnoremap tm  :tabm<Space>
+nnoremap td  :tabclose<CR>
 
 " unmap keys
 nmap H <Nop>
