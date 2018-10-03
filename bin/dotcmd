@@ -1,5 +1,9 @@
 #!/bin/bash
 export serv="fullinn-$2"
+export DOT=dotfiles
+export DOTBACK=dotfiles-backup
+export DOTFILES=$HOME/$DOT
+export BACKUP_DIR=$HOME/$DOTBACK
 
 error() {
     echo "could not execute cmd... Exit!"
