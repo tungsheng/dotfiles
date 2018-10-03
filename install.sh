@@ -22,8 +22,6 @@ elif [ "$(uname)" == "Linux" ]; then
     # TODO: need hardening
     echo -e "\n\nRunning on Linux"
     source $DOTFILES/install/debian/init.sh
-    source $DOTFILES/install/debian/link.sh
-    # source install/debian/caddy.sh
 fi
 
 echo "creating vim directories"

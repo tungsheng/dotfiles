@@ -16,8 +16,14 @@ dkinst() {
 }
 
 # inst install all script
-inst() {
+osx-inst() {
     source ~/dotfiles/install.sh
+}
+
+# inst install all script
+deb-inst() {
+    echo -e "\nStart installing on Debian..."
+    source $DOTFILES/install/debian/init.sh
 }
 
 # copy ssh file
@@ -38,8 +44,11 @@ if [ $# -gt 0 ]; then
         scpkey )
             scpkey $2
             exit;;
-        inst )
-            inst
+        osx-inst )
+            osx-inst
+            exit;;
+        deb-inst )
+            deb-inst
             exit;;
         * )                     
             error
