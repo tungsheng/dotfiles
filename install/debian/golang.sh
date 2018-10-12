@@ -1,8 +1,11 @@
 #!/bin/bash
 
+# variables
+version=1.11.1
+
 # install Go
-wget https://dl.google.com/go/go1.10.3.linux-amd64.tar.gz
-tar -xvf go1.10.3.linux-amd64.tar.gz
+wget "https://dl.google.com/go/go$version.linux-amd64.tar.gz"
+tar -xvf "go$version.linux-amd64.tar.gz"
 sudo mv go /usr/local
 
 # set Go path
