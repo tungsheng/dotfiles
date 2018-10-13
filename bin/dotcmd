@@ -32,8 +32,9 @@ deb-inst() {
 
 # copy ssh file
 scpkey() {
-    scp ~/.ssh/id_$1 "$1:~/.ssh/id_rsa"
-    scp ~/.ssh/id_$1.pub "$1:~/.ssh/id_rsa.pub"
+    ssh-copy-id -i ~/.ssh/tonka-key-ecdsa $1
+    scp ~/.ssh/tonka-key-ecdsa "$1:~/.ssh/id_rsa"
+    scp ~/.ssh/tonka-key-ecdsa.pub "$1:~/.ssh/id_rsa.pub"
 }
 
 sshkey() {
