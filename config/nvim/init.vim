@@ -422,6 +422,7 @@ let g:ale_fix_on_save = 1
 let g:ale_fixers = {
 \   '*': ['remove_trailing_lines', 'trim_whitespace'],
 \   'javascript': ['prettier', 'eslint'],
+\   'css': ['prettier'],
 \}
 " Enable integration with airline.
 let g:airline#extensions#ale#enabled = 1
@@ -494,7 +495,8 @@ let g:neosnippet#snippets_directory='~/dotfiles/config/nvim/snippets'
 "----------------------------------------------
 " Plugin: prettier/vim-prettier
 "----------------------------------------------
+" when running at every change you may want to disable quickfix
 let g:prettier#quickfix_enabled = 0
 
 let g:prettier#autoformat = 0
-autocmd BufWritePre,TextChanged,InsertLeave *.js,*.jsx,*.mjs,*.ts,*.tsx,*.css,*.less,*.scss,*.json,*.graphql,*.md,*.vue PrettierAsync
+autocmd BufWritePre *.js,*.jsx,*.mjs,*.ts,*.tsx,*.css,*.less,*.scss,*.json,*.graphql,*.md,*.vue PrettierAsync

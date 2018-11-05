@@ -93,4 +93,3 @@ Plug 'fatih/vim-go', { 'for': 'go' , 'do': ':GoUpdateBinaries' } " go support
 " Plug 'tclem/vim-arduino' " arduino support - compile wihtout needing to open the arduino IDE
 
 call plug#end()
-
