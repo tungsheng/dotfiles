@@ -412,10 +412,17 @@ let g:go_highlight_structs = 1
 let g:go_highlight_types = 1
 let g:go_snippet_engine = "neosnippet"
 
-" ale setting
+"----------------------------------------------
+" Plugin: w0rp/ale
+"----------------------------------------------
 " Error and warning signs.
 let g:ale_sign_error = '⤫'
 let g:ale_sign_warning = '⚠'
+let g:ale_fix_on_save = 1
+let g:ale_fixers = {
+\   '*': ['remove_trailing_lines', 'trim_whitespace'],
+\   'javascript': ['prettier', 'eslint'],
+\}
 " Enable integration with airline.
 let g:airline#extensions#ale#enabled = 1
 
@@ -482,3 +489,12 @@ endif
 
 " Use custom snippets
 let g:neosnippet#snippets_directory='~/dotfiles/config/nvim/snippets'
+
+
+"----------------------------------------------
+" Plugin: prettier/vim-prettier
+"----------------------------------------------
+let g:prettier#quickfix_enabled = 0
+
+let g:prettier#autoformat = 0
+autocmd BufWritePre,TextChanged,InsertLeave *.js,*.jsx,*.mjs,*.ts,*.tsx,*.css,*.less,*.scss,*.json,*.graphql,*.md,*.vue PrettierAsync

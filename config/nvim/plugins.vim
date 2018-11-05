@@ -58,6 +58,9 @@ Plug 'othree/html5.vim', { 'for': 'html' } " html5 support
 " Plug 'digitaltoad/vim-jade', { 'for': ['jade', 'pug'] } " jade support
 " Plug 'juvenn/mustache.vim', { 'for': 'mustache' } " mustache support
 Plug 'stephpy/vim-yaml'
+Plug 'prettier/vim-prettier', {
+  \ 'do': 'yarn install',
+  \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue'] }
 
 " JavaScript
 Plug 'gavocanov/vim-js-indent', { 'for': 'javascript' } " JavaScript indent support
