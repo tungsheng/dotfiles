@@ -50,6 +50,10 @@ export GOROOT=/usr/local/go
 export PATH=$GOROOT/bin:$PATH
 export PATH=$GOPATH/bin:$PATH
 
+# add flutter path
+export FLUTTERPATH=$HOME/flutter
+export PATH=$FLUTTERPATH/bin:$PATH
+
 # add android SDK path
 export ANDROID_HOME=/Users/tonylee/Library/Android/sdk
 export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
