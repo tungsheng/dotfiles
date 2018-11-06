@@ -500,3 +500,12 @@ let g:prettier#quickfix_enabled = 0
 
 let g:prettier#autoformat = 0
 autocmd BufWritePre *.js,*.jsx,*.mjs,*.ts,*.tsx,*.css,*.less,*.scss,*.json,*.graphql,*.md,*.vue PrettierAsync
+
+
+"----------------------------------------------
+" Plugin: dart-lang/dart-vim-plugin
+"----------------------------------------------
+let dart_html_in_string=v:true
+let dart_corelib_highlight=v:false
+let dart_style_guide = 2
+let dart_format_on_save = 1

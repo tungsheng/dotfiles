@@ -62,6 +62,9 @@ Plug 'prettier/vim-prettier', {
   \ 'do': 'yarn install',
   \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue'] }
 
+" Dart
+Plug 'dart-lang/dart-vim-plugin' " Dart syntax highlight
+
 " JavaScript
 Plug 'gavocanov/vim-js-indent', { 'for': 'javascript' } " JavaScript indent support
 Plug 'moll/vim-node', { 'for': 'javascript' } " node support
