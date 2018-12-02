@@ -14,7 +14,7 @@ echo $(uname)
 if [ "$(uname)" == "Darwin" ]; then
     echo -e "\n\nRunning on OSX"
     source $DOTFILES/install/osx/brew.sh
-    source $DOTFILES/install/osx/osx.sh
+    # source $DOTFILES/install/osx/osx.sh
     source $DOTFILES/install/osx/nvm.sh
     source $DOTFILES/install/osx/shlink.sh
     source $DOTFILES/install/osx/link.sh
