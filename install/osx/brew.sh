@@ -16,8 +16,8 @@ brew install wget
 brew install watchman
 
 # development server setup
-brew install nginx
-brew install dnsmasq
+# brew install nginx
+# brew install dnsmasq
 
 # development tools
 brew install git
