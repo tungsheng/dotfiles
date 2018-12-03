@@ -28,10 +28,9 @@ brew install tmux
 brew install z
 brew install zsh
 brew install highlight
-brew install nvm
 
 # install neovim
-brew install neovim/neovim/neovim
+brew install neovim
 
 echo -ne "Installing zplug...\n"
 hash zplug 2>/dev/null || git clone https://github.com/zplug/zplug $HOME/.zplug

@@ -3,8 +3,9 @@
 echo -e "\n\nInstalling Node (from nvm)"
 echo "=============================="
 
-# reload nvm into this environment
-source $(brew --prefix nvm)/nvm.sh
+# Install nvm
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
 
-nvm install stable
-nvm alias default stable
+
+# Install node
+nvm install node
