@@ -29,7 +29,7 @@ set path+=**
 " Section User Interface {{{
 
 " switch cursor to line when in insert mode, and block when not
-let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+" let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
 
 if &term =~ '256color'
     " disable background color erase
@@ -47,6 +47,8 @@ endif
 syntax on
 " set t_Co=256                " Explicitly tell vim that the terminal supports 256 colors"
 colorscheme jellybeans          " Set the colorscheme
+set encoding=utf8
+set guifont=Hack_Regular_Nerd_Font:h11
 
 " make the highlighting of tabs and other non-text less annoying
 highlight SpecialKey ctermbg=none ctermfg=237

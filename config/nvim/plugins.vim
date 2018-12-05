@@ -95,4 +95,7 @@ Plug 'fatih/vim-go', { 'for': 'go' , 'do': ':GoUpdateBinaries' } " go support
 " Plug 'timcharper/textile.vim', { 'for': 'textile' } " textile support
 " Plug 'tclem/vim-arduino' " arduino support - compile wihtout needing to open the arduino IDE
 
+" icon
+Plug 'ryanoasis/vim-devicons' " dev icons
+
 call plug#end()
