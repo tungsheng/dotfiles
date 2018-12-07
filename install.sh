@@ -8,6 +8,10 @@ export BACKUP_DIR=$HOME/$DOTBACK
 echo "Installing dotfiles..."
 # git pull origin master
 
+echo "Installing colors..."
+tic -x color/xterm-256color-italic.terminfo
+tic -x color/tmux-256color.terminfo
+
 [ -d "${HOME}/bin" ] || mkdir ~/bin
 
 echo $(uname)

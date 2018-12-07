@@ -36,19 +36,13 @@ if &term =~ '256color'
     set t_ut=
 endif
 
-" enable 24 bit color support if supported
-if (empty($TMUX) && has("termguicolors"))
-    set termguicolors
-endif
-
-" let g:onedark_termcolors=16
-" let g:onedark_terminal_italics=1
-
 syntax on
-" set t_Co=256                " Explicitly tell vim that the terminal supports 256 colors"
-colorscheme jellybeans          " Set the colorscheme
 set encoding=utf8
 set guifont=Hack_Regular_Nerd_Font:h11
+
+let &t_8f="\<Esc>[38;2;%lu;%lu;%lum"
+let &t_8b="\<Esc>[48;2;%lu;%lu;%lum"
+set termguicolors
 
 " make the highlighting of tabs and other non-text less annoying
 highlight SpecialKey ctermbg=none ctermfg=237
@@ -448,14 +442,6 @@ endfunction
 
 
 "----------------------------------------------
-" Plugin: chriskempson/base16-vim
-"----------------------------------------------
-if filereadable(expand("~/.vimrc_background"))
-  let base16colorspace=256  " Access colors present in 256 colorspace
-  source ~/.vimrc_background
-endif
-
-"----------------------------------------------
 " Plugin: rking/ag.vim
 "----------------------------------------------
 let g:ag_working_path_mode="r"
@@ -511,3 +497,12 @@ let dart_html_in_string=v:true
 let dart_corelib_highlight=v:false
 let dart_style_guide = 2
 let dart_format_on_save = 1
+
+"----------------------------------------------
+" Plugin: nanotech/jellybeans
+"----------------------------------------------
+let g:jellybeans_use_term_italics = 1
+let g:jellybeans_overrides = {
+      \}
+
+colorscheme jellybeans          " Set the colorscheme
