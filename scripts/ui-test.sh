@@ -5,14 +5,14 @@ SPLIT1=30
 SPLIT2=50
 ADJUST=10
 
-CMD1='RAILS_EV=test bundle exec rake e2e:server'
-CMD2='RAILS_EV=test bin/webpack --watch --mode development --devtool cheap-module-source-map'
+CMD0='yarn protractor'
+CMD1='RAILS_ENV=test bundle exec rake e2e:server'
+CMD2='RAILS_ENV=test bin/webpack --watch --mode development --devtool cheap-module-source-map'
 
 # new back window
 tmux new-window -n $WNAME
 tmux send-keys 'cd '$DIRDEV C-m
-tmux send-keys 'vim' C-m
-tmux send-keys ',k'
+tmux send-keys "$CMD0"
 tmux split-window -h -p $SPLIT1
 tmux send-keys 'cd '$DIRDEV C-m
 tmux send-keys "$CMD1" C-m
