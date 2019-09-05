@@ -51,7 +51,7 @@ PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
 # Use Java 11
 # export JAVA_HOME=$(/usr/libexec/java_home -v 11)
 # Use Java 1.8
-export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
+# export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
 
 # Add Android paths
 export ANDROID_HOME=$HOME/Android/Sdk
@@ -94,8 +94,8 @@ if hash hub 2>/dev/null; then
 fi
 
 # source nvm
-export NVM_DIR=$HOME/.nvm
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+# export NVM_DIR=$HOME/.nvm
+# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 
 # source fzf
 [ -f $HOME/.fzf.zsh ] && source $HOME/.fzf.zsh
