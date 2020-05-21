@@ -13,10 +13,11 @@ Plug 'vim-airline/vim-airline-themes' " themes for vim-airline
 " utilities
 " Plug 'ctrlpvim/ctrlp.vim' " fuzzy file finder, mapped to <leader>t
 Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] } | Plug 'Xuyuanp/nerdtree-git-plugin' | Plug 'ryanoasis/vim-devicons' " file drawer
-Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim' " fuzzy file finder and so much more
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' } " fuzzy file finder and so much more
+Plug 'junegunn/fzf.vim'
 Plug 'w0rp/ale' " Asynchronous Lint Engine
-Plug 'mileszs/ack.vim' " search inside files using ack. Same as command line ack utility, but use :Ack
-Plug 'rking/ag.vim' "Vim plugin for the_silver_searcher
+" Plug 'mileszs/ack.vim' " search inside files using ack. Same as command line ack utility, but use :Ack
+" Plug 'rking/ag.vim' "Vim plugin for the_silver_searcher
 Plug 'Raimondi/delimitMate' " automatic closing of quotes, parenthesis, brackets, etc.
 " Plug 'jiangmiao/auto-pairs' " automatic closing of quotes, parenthesis, brackets, etc.
 Plug 'tpope/vim-commentary' " comment stuff out
@@ -58,9 +59,8 @@ Plug 'othree/html5.vim', { 'for': 'html' } " html5 support
 " Plug 'digitaltoad/vim-jade', { 'for': ['jade', 'pug'] } " jade support
 " Plug 'juvenn/mustache.vim', { 'for': 'mustache' } " mustache support
 Plug 'stephpy/vim-yaml'
-Plug 'prettier/vim-prettier', {
-  \ 'do': 'yarn install',
-  \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue'] }
+Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
+" Plug 'craigemery/vim-autotag'
 
 " Dart
 Plug 'dart-lang/dart-vim-plugin' " Dart syntax highlight

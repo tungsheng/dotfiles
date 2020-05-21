@@ -37,6 +37,15 @@ alias cleanup="find . -name '*.DS_Store' -type f -ls -delete"
 # File size
 alias fs="stat -f \"%z bytes\""
 
+# Rubocop
+alias copchanges='git status --porcelain | cut -c4- | grep '\''.rb'\'' | xargs rubocop -a'
+
+# Ansible
+alias ap='ansible-playbook'
+
+# ctags
+alias ctags="`brew --prefix`/bin/ctags"
+
 # One of @janmoesen’s ProTip™s
 for method in GET HEAD POST PUT DELETE TRACE OPTIONS; do
     alias "$method"="lwp-request -m '$method'"

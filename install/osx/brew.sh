@@ -25,6 +25,7 @@ brew install hub
 brew install fzf
 brew install reattach-to-user-namespace
 brew install tmux
+brew install ctags
 brew install z
 brew install zsh
 brew install highlight

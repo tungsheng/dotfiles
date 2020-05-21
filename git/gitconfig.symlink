@@ -1,7 +1,7 @@
 # gitconfig
 [user]
 	name = Tony Lee
-	email = tungsheng@gmail.com
+	email = tlee3@tetrationanalytics.com
 [github]
     user = tungsheng
 [init]
@@ -166,3 +166,8 @@
 	trustExitCode = true
 [commit]
 	template = /Users/tonylee/.stCommitMsg
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process

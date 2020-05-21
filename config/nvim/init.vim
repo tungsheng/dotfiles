@@ -151,7 +151,7 @@ nmap L <Nop>
 " remap esc
 inoremap jk <esc>
 
-" wipout buffer
+" wipe out buffer
 nmap <silent> <leader>b :bw<cr>
 
 " current buffer only
@@ -165,6 +165,9 @@ nmap <leader>q :q<cr>
 
 " shortcut to save and quit
 nmap <leader>Q :wqa<cr>
+
+" jump to tag definition
+nmap <leader>d "zyiw:exe ':tag' @z<cr>
 
 " set paste toggle
 set pastetoggle=<leader>v
@@ -229,6 +232,12 @@ nnoremap <leader>ii :set cursorcolumn!<cr>
 nnoremap <C-e> 20<C-e>
 nnoremap <C-y> 20<C-y>
 
+" resize pane
+nnoremap <C-w>l 20<C-w>>
+nnoremap <C-w>h 20<C-w><
+nnoremap <C-w>k 20<C-w>+
+nnoremap <C-w>j 20<C-w>-
+
 " moving up and down work as you would expect
 nnoremap <silent> j gj
 nnoremap <silent> k gk
@@ -290,10 +299,9 @@ augroup END
 
 " Section Plugins {{{
 
-" FZF
-"""""""""""""""""""""""""""""""""""""
-
+"----------------------------------------------
 " Toggle NERDTree
+"----------------------------------------------
 nmap <silent> <leader>k :NERDTreeToggle<cr>
 " expand to the path of the file in the current buffer
 nmap <silent> <leader>y :NERDTreeFind<cr>
@@ -302,7 +310,15 @@ let NERDTreeShowHidden=1
 let NERDTreeDirArrowExpandable = '>'
 let NERDTreeDirArrowCollapsible = '-'
 
+
+"----------------------------------------------
+" FZF
+"----------------------------------------------
+
 let g:fzf_layout = { 'down': '~25%' }
+let g:ag_prg="ag --vimgrep --group --column --noheading --only-matching --nofilename --smart-case"
+let g:ag_working_path_mode='r'
+let g:ag_highlight=1
 
 if isdirectory(".git")
     " if in a git project, use :GFiles
@@ -312,6 +328,7 @@ else
     nmap <silent> <leader>t :FZF<cr>
 endif
 
+nmap <silent> <leader>a :Ag<cr>
 nmap <silent> <leader>r :Buffers<cr>
 nmap <silent> <leader>e :FZF<cr>
 nmap <leader><tab> <plug>(fzf-maps-n)
@@ -340,8 +357,9 @@ command! FZFMru call fzf#run({
 \  'down':    '40%'})
 
 
+"----------------------------------------------
 " Fugitive Shortcuts
-"""""""""""""""""""""""""""""""""""""
+"----------------------------------------------
 nmap <silent> <leader>gs :Gstatus<cr>
 nmap <leader>ge :Gedit<cr>
 nmap <silent><leader>gr :Gread<cr>
@@ -414,7 +432,7 @@ let g:go_snippet_engine = "neosnippet"
 " Error and warning signs.
 let g:ale_sign_error = '⤫'
 let g:ale_sign_warning = '⚠'
-let g:ale_fix_on_save = 1
+let g:ale_fix_on_save = 0
 let g:ale_fixers = {
 \   '*': ['remove_trailing_lines', 'trim_whitespace'],
 \   'javascript': ['prettier', 'eslint'],
@@ -440,11 +458,6 @@ function! Multiple_cursors_after()
     let b:deoplete_disable_auto_complete = 0
 endfunction
 
-
-"----------------------------------------------
-" Plugin: rking/ag.vim
-"----------------------------------------------
-let g:ag_working_path_mode="r"
 
 "----------------------------------------------
 " Plugin: zchee/deoplete-go
@@ -487,7 +500,7 @@ let g:neosnippet#snippets_directory='~/dotfiles/config/nvim/snippets'
 let g:prettier#quickfix_enabled = 0
 
 let g:prettier#autoformat = 0
-autocmd BufWritePre *.js,*.jsx,*.mjs,*.ts,*.tsx,*.css,*.less,*.scss,*.json,*.graphql,*.md,*.vue PrettierAsync
+autocmd BufWritePre *.js,*.jsx,*.mjs,*.ts,*.tsx,*.css,*.less,*.scss,*.json,*.graphql,*.md,*.vue,*.html PrettierAsync
 
 
 "----------------------------------------------
@@ -496,7 +509,7 @@ autocmd BufWritePre *.js,*.jsx,*.mjs,*.ts,*.tsx,*.css,*.less,*.scss,*.json,*.gra
 let dart_html_in_string=v:true
 let dart_corelib_highlight=v:false
 let dart_style_guide = 2
-let dart_format_on_save = 1
+let dart_format_on_save = 0
 
 "----------------------------------------------
 " Plugin: nanotech/jellybeans
