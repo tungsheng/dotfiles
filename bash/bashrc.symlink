@@ -1,0 +1,85 @@
+export DOTFILES=$HOME/dotfiles
+
+# z script
+. $DOTFILES/util/z.sh
+
+# completion
+[[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
+
+# git prompt
+if [ -f "$(brew --prefix)/opt/bash-git-prompt/share/gitprompt.sh" ]; then
+  __GIT_PROMPT_DIR=$(brew --prefix)/opt/bash-git-prompt/share
+  GIT_PROMPT_ONLY_IN_REPO=1
+  source "$(brew --prefix)/opt/bash-git-prompt/share/gitprompt.sh"
+fi
+
+# alias
+if [ -e $HOME/.bash_aliases ]; then
+    source $HOME/.bash_aliases
+fi
+
+# rvm 
+export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+export PATH="$PATH:$HOME/.rvm/bin"
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
+
+# Tunnel scripts
+tunnels() {
+  # echo Closing exising tunnels...
+  # lsof -t -i:8090 | xargs kill -9
+  # lsof -t -i:4242 | xargs kill -9
+  # lsof -t -i:7733 | xargs kill -9
+  # lsof -t -i:9196 | xargs kill -9
+  # lsof -t -i:9082 | xargs kill -9
+  # lsof -t -i:8080 | xargs kill -9
+  # lsof -t -i:8087 | xargs kill -9
+  # lsof -t -i:38017 | xargs kill -9
+
+  if [ $# -eq 1 ] ; then
+    echo Creating tunnels to orch-${1}.tetrationanalytics.com ...
+    ssh -N -C -vv -i ~/.ssh/id_rsa_tetter \
+    -L 9196:appserver-1:9196 \
+    -L 8090:druidHistoricalBroker-1:8090 \
+    -L 8889:orchestrator-1:8889 \
+    -L 9696:appserver-1:9696 \
+    -L 7733:appserver-1:7733 \
+    -L 4242:tsdbBosunGrafana-1:4242 \
+    -L 8080:happobat-1:8080 \
+    -L 8086:happobat-1:8086 \
+    -L 9082:adhoc-1:9082 \
+    -L 8120:adhoc-1:8120 \
+    -L 8087:happobat-1:8087 \
+    -L 38017:mongodb-2:27017 \
+    -L 8090:druid-broker.service.consul:8090 \
+    -L 4242:zk.service.consul:4242 \
+    tetter@orch-${1}.tetrationanalytics.com
+  fi
+}
+
+sync-() {
+#  echo Opening tunnels to $1.tetrationanalytics.com...
+#  {
+#    mdev-t $1
+#  } &> /dev/null
+  echo Getting scope sync password from orch-$1.tetrationanalytics.com...
+  pw_string=$(ssh -i ~/.ssh/id_rsa tetter@orch-${1}.tetrationanalytics.com << EOF
+    grep 'backup:' /local/deploy-ansible/playbooks/group_vars/${1}.site
+EOF
+  )
+  pw_string=$(echo $pw_string | cut -d ':' -f 2 | xargs)
+  echo Syncing mongodb to with $1.tetrationanalytics.com...
+  echo rake db:scope:dev_sync[$pw_string]
+  rake db:scope:dev_sync[$pw_string]
+}
+
+syncPlease() {
+  echo Getting scope sync password from $1...
+  pw_string=$(ssh tetter@orch-${1}.tetrationanalytics.com << EOF
+    grep 'backup:' /local/deploy-ansible/playbooks/group_vars/${1}.site
+EOF
+  )
+ pw_string=$(echo $pw_string | cut -d ':' -f 2 | xargs)
+ bin/rake db:scope:dev_sync\[$pw_string\] # remove backslashes if not in zsh
+}
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
