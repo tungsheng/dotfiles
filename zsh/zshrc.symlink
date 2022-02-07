@@ -52,16 +52,19 @@ for config ($ZSH/**/*.zsh) source $config
 PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm"
 
-# Use Java 11
-# export JAVA_HOME=$(/usr/libexec/java_home -v 11)
-# Use Java 1.8
-# export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
+# JAVA_HOME
+#export JAVA_HOME=$(/usr/libexec/java_home -v16.0.1)
+
+# Maven
+#export PATH="/Users/tlee3/Code/apache-maven-3.8.1/bin:$PATH"
+
+
 
 # Add Android paths
-export ANDROID_HOME=$HOME/Android/Sdk
-export PATH=$PATH:$ANDROID_HOME/tools
-export PATH=$PATH:$ANDROID_HOME/tools/bin
-export PATH=$PATH:$ANDROID_HOME/platform-tools
+# export ANDROID_HOME=$HOME/Android/Sdk
+# export PATH=$PATH:$ANDROID_HOME/tools
+# export PATH=$PATH:$ANDROID_HOME/tools/bin
+# export PATH=$PATH:$ANDROID_HOME/platform-tools
 
 # Add GO related paths
 export GOPATH=$HOME/go
@@ -74,8 +77,8 @@ export FLUTTERPATH=$HOME/flutter
 export PATH=$FLUTTERPATH/bin:$PATH
 
 # add android SDK path
-export ANDROID_HOME=/Users/tonylee/Library/Android/sdk
-export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
+# export ANDROID_HOME=/Users/tonylee/Library/Android/sdk
+# export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
 
 # add /usr/local/sbin
 if [[ -d /usr/local/sbin ]]; then
@@ -98,8 +101,9 @@ if hash hub 2>/dev/null; then
 fi
 
 # source nvm
-# export NVM_DIR=$HOME/.nvm
-# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # source fzf
 [ -f $HOME/.fzf.zsh ] && source $HOME/.fzf.zsh
