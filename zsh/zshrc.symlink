@@ -2,10 +2,6 @@ export DOTFILES=$HOME/dotfiles
 export ZSH=$DOTFILES/zsh
 export ZPLUG=$HOME/.zplug
 
-echo '##################'
-echo 'test'
-echo '##################'
-
 source $ZPLUG/init.zsh
 
 zplug "mafredri/zsh-async", from:github
@@ -16,14 +12,14 @@ zplug "zsh-users/zsh-syntax-highlighting"
 zplug 'zsh-users/zsh-completions'
 
 # Install plugins if there are plugins that have not been installed
-if ! zplug check --verbose; then
+if ! zplug check; then
     printf "Install? [y/N]: "
     if read -q; then
         echo; zplug install
     fi
 fi
 
-zplug load --verbose
+zplug load
 echo -e "\n"
 
 zstyle ':completion:*:*:git:*' script $DOTFILES/zsh/git-completion.bash
@@ -34,7 +30,7 @@ fpath=($DOTFILES/zsh/functions $fpath)
 autoload -U compinit add-zsh-hook
 compinit
 
-export EDITOR='nvim'
+export EDITOR='vim'
 
 # display how long all tasks over 10 seconds take
 export REPORTTIME=5
