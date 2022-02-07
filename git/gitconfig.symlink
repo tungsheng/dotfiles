@@ -139,6 +139,7 @@
     pager = less -FXRS -x2
     editor = vim
     whitespace = cr-at-eol
+	ignorecase = false
 [rerere]
     enabled = true
 [gitsh]

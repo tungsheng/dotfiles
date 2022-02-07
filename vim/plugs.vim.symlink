@@ -1,4 +1,4 @@
-call plug#begin('~/.config/nvim/plugged')
+call plug#begin('~/.vim/plugged')
 
 " colorschemes
 Plug 'flazz/vim-colorschemes'
@@ -47,8 +47,6 @@ Plug 'sickill/vim-pasta' " context-aware pasting
 Plug 'junegunn/goyo.vim', { 'on': 'Goyo' } " distraction-free writing
 Plug 'junegunn/limelight.vim', { 'on': 'Limelight' } " focus tool. Good for presentating with vim
 
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-Plug 'nsf/gocode', { 'rtp': 'nvim', 'do': '~/.config/nvim/plugged/gocode/nvim/symlink.sh' }  " Go auto completion
 Plug 'zchee/deoplete-go', { 'do': 'make'}      " Go auto completion
 " Plug 'zchee/deoplete-jedi'                     " Go auto completion
 

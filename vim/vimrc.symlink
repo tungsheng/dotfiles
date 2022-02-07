@@ -37,7 +37,6 @@ set path+=**
 " Section User Interface {{{
 
 " switch cursor to line when in insert mode, and block when not
-" let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
 
 if &term =~ '256color'
     " disable background color erase
@@ -461,13 +460,6 @@ let g:ale_fixers = {
 " Enable integration with airline.
 let g:airline#extensions#ale#enabled = 1
 
-"----------------------------------------------
-" Plugin: Shougo/deoplete.nvim
-"----------------------------------------------
-if has('nvim')
-    " Enable deoplete on startup
-    let g:deoplete#enable_at_startup = 1
-endif
 
 " Disable deoplete when in multi cursor mode
 function! Multiple_cursors_before()
@@ -508,9 +500,6 @@ xmap <C-k>     <Plug>(neosnippet_expand_target)
 if has('conceal')
   set conceallevel=2 concealcursor=niv
 endif
-
-" Use custom snippets
-let g:neosnippet#snippets_directory='~/dotfiles/config/nvim/snippets'
 
 
 "----------------------------------------------

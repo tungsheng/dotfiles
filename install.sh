@@ -20,7 +20,7 @@ if [ "$(uname)" == "Darwin" ]; then
     source $DOTFILES/install/osx/brew.sh
     # source $DOTFILES/install/osx/osx.sh
     source $DOTFILES/install/osx/nvm.sh
-    source $DOTFILES/install/osx/shlink.sh
+    # source $DOTFILES/install/osx/shlink.sh
     source $DOTFILES/install/osx/link.sh
 elif [ "$(uname)" == "Linux" ]; then
     # TODO: need hardening
@@ -31,8 +31,12 @@ fi
 echo "creating vim directories"
 mkdir -p ~/.vim-tmp
 
-echo "Configuring zsh as default shell"
-chsh -s $(which zsh)
+echo "install vim jellybean"
+mkdir -p ~/.vim/colors
+cd ~/.vim/colors
+curl -O https://raw.githubusercontent.com/nanotech/jellybeans.vim/master/colors/jellybeans.vim
 
+# echo "Configuring zsh as default shell"
+# chsh -s $(which zsh)
 
 echo "Done."

@@ -21,6 +21,7 @@ brew install watchman
 
 # development tools
 brew install git
+brew install git-lfs
 brew install hub
 brew install fzf
 brew install reattach-to-user-namespace
@@ -29,9 +30,12 @@ brew install ctags
 brew install z
 brew install zsh
 brew install highlight
+brew install ansible
+brew install vagrant
 
 # install neovim
-brew install neovim
+# brew install neovim
+brew install vim
 
 echo -ne "Installing zplug...\n"
 hash zplug 2>/dev/null || git clone https://github.com/zplug/zplug $HOME/.zplug

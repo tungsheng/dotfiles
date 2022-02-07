@@ -1,1 +1,0 @@
-/Users/tlee3/.config/nvim/plugged/gocode/nvim/autoload/gocomplete.vim
