@@ -22,13 +22,13 @@ elif [ "$(uname)" == "Linux" ]; then
     source $DOTFILES/install/debian/init.sh
 fi
 
-echo "creating vim directories"
-mkdir -p ~/.vim-tmp
+# echo "creating vim directories"
+# mkdir -p ~/.vim-tmp
 
-echo "install vim jellybean"
-mkdir -p ~/.vim/colors
-cd ~/.vim/colors
-curl -O https://raw.githubusercontent.com/nanotech/jellybeans.vim/master/colors/jellybeans.vim
+# echo "install vim jellybean"
+# mkdir -p ~/.vim/colors
+# cd ~/.vim/colors
+# curl -O https://raw.githubusercontent.com/nanotech/jellybeans.vim/master/colors/jellybeans.vim
 
 # echo "Configuring zsh as default shell"
 # chsh -s $(which zsh)
