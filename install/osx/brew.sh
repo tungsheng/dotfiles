@@ -27,15 +27,25 @@ brew install fzf
 brew install reattach-to-user-namespace
 brew install tmux
 brew install ctags
+brew install n
 brew install z
 brew install zsh
 brew install highlight
 brew install ansible
-brew install vagrant
+# brew install vagrant
 
-# install neovim
-# brew install neovim
-brew install vim
+brew install --cask macdown
 
 echo -ne "Installing zplug...\n"
 hash zplug 2>/dev/null || git clone https://github.com/zplug/zplug $HOME/.zplug
+
+
+echo -ne "Installing node...\n"
+sudo n 14.0.0
+
+echo -ne "Installing neovim...\n"
+brew install neovim
+brew tap homebrew/cask-fonts
+brew install --cask font-hack-nerd-font
+brew install fd
+brew install ripgrep

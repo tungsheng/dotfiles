@@ -8,7 +8,7 @@ else # OS X `ls`
     colorflag="-G"
 fi
 
-# alias vim="nvim"
+alias nv="nvim"
 
 # Filesystem aliases
 alias ..='cd ..'
@@ -42,9 +42,6 @@ alias copchanges='git status --porcelain | cut -c4- | grep '\''.rb'\'' | xargs r
 
 # Ansible
 alias ap='ansible-playbook'
-
-# ctags
-alias ctags="`brew --prefix`/bin/ctags"
 
 # One of @janmoesen’s ProTip™s
 for method in GET HEAD POST PUT DELETE TRACE OPTIONS; do
