@@ -43,6 +43,8 @@ alias copchanges='git status --porcelain | cut -c4- | grep '\''.rb'\'' | xargs r
 # Ansible
 alias ap='ansible-playbook'
 
+alias luamake=/Users/tonylee/Code/lua-language-server/3rd/luamake/luamake
+
 # One of @janmoesen’s ProTip™s
 for method in GET HEAD POST PUT DELETE TRACE OPTIONS; do
     alias "$method"="lwp-request -m '$method'"
