@@ -1,7 +1,7 @@
 require('user.opts')
 require('user.keymaps')
-require('user.color')
 require('user.plugins')
+require('user.color')
 require('user.telescope')
 require('user.lsp')
 require('user.files')
