@@ -15,7 +15,6 @@ if [ "$(uname)" == "Darwin" ]; then
     echo -e "\n\nRunning on OSX"
     source $DOTFILES/install/osx/brew.sh
     source $DOTFILES/install/osx/link.sh
-    source $DOTFILES/install/osx/nvim.sh
 elif [ "$(uname)" == "Linux" ]; then
     # TODO: need hardening
     echo -e "\n\nRunning on Linux"

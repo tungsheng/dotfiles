@@ -4,28 +4,27 @@ echo -e "\nCreating symlinks"
 echo "=============================="
 linkables=$( find -H "$DOTFILES" -maxdepth 3 -name '*.symlink' )
 for file in $linkables ; do
+    echo "Creating symlink for $file"
     target="$HOME/.$( basename $file '.symlink' )"
-    if [ -e $target ]; then
-        echo "~${target#$HOME} already exists... Skipping."
-    else
-        echo "Creating symlink for $file"
-        ln -s $file $target
-    fi
+    ln -sf $file $target
 done
 
 echo -e "\n\ninstalling to ~/.config"
 echo "=============================="
-if [ ! -d $HOME/.config ]; then
+if [ ! -d $HOME/.config/nvim/lua/user ]; then
     echo "Creating ~/.config"
-    mkdir -p $HOME/.config
+    mkdir -p $HOME/.config/nvim/lua/user
 fi
 # configs=$( find -path "$DOTFILES/config.symlink" -maxdepth 1 )
-for config in $DOTFILES/config/*; do
-    target="$HOME/.config/$( basename $config )"
-    if [ -e $target ]; then
-        echo "~${target#$HOME} already exists... Skipping."
-    else
-        echo "Creating symlink for $config"
-        ln -s $config $target
-    fi
+
+init=$( find -H "$DOTFILES/config/nvim" -maxdepth 1 -name '*.symlink' )
+echo "Creating symlink for $init"
+target="$HOME/.config/nvim/$( basename $init '.symlink' )"
+ln -sf $init $target
+
+LUA="lua/user"
+for lua in $DOTFILES/config/nvim/$LUA/*; do
+    echo "Creating symlink for $lua"
+    target="$HOME/.config/nvim/$LUA/$( basename $lua '.symlink' )"
+    ln -sf $lua $target
 done
