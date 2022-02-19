@@ -37,3 +37,7 @@ vim.opt.shortmess:append "c"
 for k, v in pairs(options) do
   vim.opt[k] = v
 end
+
+
+vim.g.mapleader = ' '                      -- sets global variables
+vim.g.blamer_delay = 500                   -- git blame

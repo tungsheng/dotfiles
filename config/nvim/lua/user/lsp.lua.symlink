@@ -20,9 +20,13 @@ cmp.setup({
 		end,
 	},
 	mapping = {
-		["<C-u>"] = cmp.mapping.scroll_docs(-4),
-		["<C-d>"] = cmp.mapping.scroll_docs(4),
+		["<C-k>"] = cmp.mapping.select_next_item(),
+		["<C-j>"] = cmp.mapping.select_prev_item(),
+		["<C-l>"] = cmp.mapping.scroll_docs(-4),
+		["<C-h>"] = cmp.mapping.scroll_docs(4),
 		["<C-Space>"] = cmp.mapping.complete(),
+    ["<CR>"] = cmp.mapping.confirm({ select = true }),
+    ["<ESC>"] = cmp.mapping.abort(),
 	},
 
 	sources = {
@@ -40,11 +44,15 @@ end
 
 require("lspconfig").bashls.setup(config())
 
+require("lspconfig").angularls.setup(config())
+
 require("lspconfig").tsserver.setup(config())
 
 require("lspconfig").graphql.setup(config())
 
 require("lspconfig").cssls.setup(config())
+
+require("lspconfig").solargraph.setup(config())
 
 require("lspconfig").gopls.setup(config({
 	cmd = { "gopls", "serve" },
