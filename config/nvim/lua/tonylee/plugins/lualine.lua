@@ -1,11 +1,10 @@
-local setup, lualine = pcall(require, 'lualine')
+local setup, lualine = pcall(require, "lualine")
 if not setup then
-  return
+	return
 end
 
-
 lualine.setup({
-  options = {
-    theme = 'jellybeans'
-  },
+	options = {
+		theme = "jellybeans",
+	},
 })
