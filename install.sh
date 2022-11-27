@@ -4,10 +4,6 @@ export DOTFILES=$HOME/dotfiles
 
 echo "Installing dotfiles..."
 
-echo "Installing colors..."
-tic -x color/xterm-256color-italic.terminfo
-tic -x color/tmux-256color-italic.terminfo
-
 [ -d "${HOME}/bin" ] || mkdir ~/bin
 
 echo $(uname)

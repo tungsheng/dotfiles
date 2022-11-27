@@ -28,10 +28,6 @@ else
     echo "tmux FAILED TO INSTALL!!!" >> $log_file
 fi
 
-echo "Install color...\n"
-tic -x $DOTFILES/color/xterm-256color-italic.terminfo
-tic -x $DOTFILES/color/tmux-256color-italic.terminfo
-
 # source $DOTFILES/install/debian/nvm.sh
 # source $DOTFILES/install/debian/golang.sh
 # source $DOTFILES/install/debian/docker.sh

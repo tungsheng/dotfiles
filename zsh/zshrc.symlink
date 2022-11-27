@@ -35,9 +35,6 @@ export EDITOR='vim'
 # display how long all tasks over 10 seconds take
 export REPORTTIME=5
 
-[[ -e $HOME/.terminfo ]] && export TERMINFO_DIRS=$HOME/.terminfo:/usr/share/terminfo
-[ -z "$TMUX" ] && export TERM=xterm-256color-italic
-
 # source all .zsh files inside of the zsh/ directory
 for config ($ZSH/**/*.zsh) source $config
 
