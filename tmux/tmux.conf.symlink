@@ -26,6 +26,9 @@ bind -r m resize-pane -Z
 
 set -g mouse on
 
+# address vim mode switching delay (http://superuser.com/a/252717/65504)
+set -s escape-time 0
+
 # Quick session switching back and forth.
 bind-key Space switch-client -l
 
@@ -39,6 +42,16 @@ set -g history-limit 10000
 # make window/pane index start with 1
 set -g base-index 1
 setw -g pane-base-index 1
+
+# swap windows
+bind-key -n M-Left swap-window -t -1
+bind-key -n M-Right swap-window -t +1
+
+# navigate windows
+unbind n
+unbind p
+bind-key -n <Alt-h> select-window -t -1
+bind-key -n <Alt-l> select-window -t +1
 
 set-option -g set-titles on
 set-option -g set-titles-string "#T - #W"
