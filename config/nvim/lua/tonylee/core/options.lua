@@ -1,4 +1,5 @@
 local opt = vim.opt
+local autocmd = vim.api.nvim_create_autocmd
 
 -- line numbers
 opt.relativenumber = true
@@ -31,5 +32,11 @@ opt.clipboard:append("unnamedplus")
 -- split window
 opt.splitright = true
 opt.splitbelow = true
+
+-- auto read
+autocmd({ "BufEnter", "CursorHold", "CursorHoldI" }, {
+	command = "if mode() != 'c' | checktime | endif",
+	pattern = { "*" },
+})
 
 opt.iskeyword:append("-")
