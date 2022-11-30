@@ -36,8 +36,8 @@ bind-key Space switch-client -l
 set -g history-limit 10000
 
 # Activity Monitoring
-# setw -g monitor-activity off
-# set -g visual-activity off
+setw -g monitor-activity off
+set -g visual-activity off
 
 # make window/pane index start with 1
 set -g base-index 1
