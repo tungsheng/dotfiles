@@ -48,8 +48,6 @@ bind-key -n M-Left swap-window -t -1
 bind-key -n M-Right swap-window -t +1
 
 # navigate windows
-unbind n
-unbind p
 bind-key -n <Alt-h> select-window -t -1
 bind-key -n <Alt-l> select-window -t +1
 
