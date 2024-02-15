@@ -22,7 +22,7 @@ mason_lspconfig.setup({
 		"html",
 		"cssls",
 		"cssmodules_ls",
-		"sumneko_lua",
+		"lua_ls",
 		"solargraph",
 		"angularls",
 		"jsonls",

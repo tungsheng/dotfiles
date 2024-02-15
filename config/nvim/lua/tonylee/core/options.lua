@@ -36,7 +36,6 @@ opt.splitbelow = true
 -- auto read
 autocmd({ "BufEnter", "CursorHold", "CursorHoldI" }, {
 	command = "if mode() != 'c' | checktime | endif",
-	pattern = { "*" },
 })
 
 opt.iskeyword:append("-")
