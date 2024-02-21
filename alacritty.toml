@@ -1,0 +1,17 @@
+import = ["~/.config/alacritty/themes/themes/gruvbox_dark.toml"]
+
+[shell]
+program = "/bin/bash"
+args = ["-l"]
+# args = ["-lc", "/opt/homebrew/bin/tmux attach || /opt/homebrew/bin/tmux "]
+
+[window]
+padding = { x = 5, y = 5 }
+dynamic_padding = true
+
+[font]
+normal = { family = "Hurmit Nerd Font" }
+size = 12
+
+[env]
+term = "xterm-256color"

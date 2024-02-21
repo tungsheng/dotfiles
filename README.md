@@ -1,22 +1,16 @@
-# Dotfiles [WIP]
+# Dotfiles
 
-Tony's dotfiles. Including config setup and server setup.
+Tony's dotfiles for Alacritty, Bash, Tmux and Neovim. The minimalism config style is influenced by Mischa's dotfiles.
 
-## Getting Started
 
-### Installing
+# Setup
 
-Step 1: clone this repo to your computer or server.
+## macOS
 
-```
-$ git clone https://github.com/tungsheng/dotfiles.git
-```
-
-Step 2: run installation script
-
-```
-$ cd dotfiles
-$ ./install.sh
+```bash
+$ git clone https://github.com/tungsheng/dotfiles.git $HOME/
+$ cd $HOME/dotfiles
+$ ./setup
 ```
 
 ## License
@@ -25,6 +19,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
-* [Christoomey Dotfiles](https://github.com/christoomey/dotfiles)
-* [Nicknisi Dotfiles](https://github.com/nicknisi/dotfiles)
-* [Neovim Setup For Go](https://hackernoon.com/my-neovim-setup-for-go-7f7b6e805876)
+* [Mischa Dotfiles](https://github.com/mischavandenburg/dotfiles)
+* [LazyVim](https://github.com/LazyVim/starter)
