@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# If Mac
+if [[ "$OSTYPE" == "darwin"* ]]; then
+	# Install homebrew
+	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+	# Install font-hurmit-nerd-font
+	brew tap homebrew/cask-fonts && brew install --cask font-hurmit-nerd-font
+
+	# Install neovim & dependencies
+	brew install neovim
+	brew install fd
+	brew install ripgrep
+
+	# LazyVim setup
+	mv ~/.config/nvim{,.bak}
+	mv ~/.local/share/nvim{,.bak}
+	mv ~/.local/state/nvim{,.bak}
+	mv ~/.cache/nvim{,.bak}
+	git clone https://github.com/LazyVim/starter ~/.config/nvim
+	rm -rf ~/.config/nvim/.git
+fi
+
+# Install bash git-prompt
+# http://stackoverflow.com/questions/12870928/mac-bash-git-ps1-command-not-found
+curl -o ~/.git-prompt.sh https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+echo 'source ~/.git-prompt.sh' >>~/.bashrc
+
+# Install config symbolic links
+ln -sf "$PWD/.bash_profile" "$HOME"/.bash_profile
+ln -sf "$PWD/.bashrc" "$HOME"/.bashrc
+ln -sf "$PWD/.tmux.conf" "$HOME"/.tmux.conf
+ln -sf "$PWD/nvim" "$HOME"/.config/nvim
+ln -sf "$PWD/alacritty.toml" "$HOME"/.config/alacritty/alacritty.toml
+
+# Install alacritty themes
+mkdir -p "$HOME"/.config/alacritty/themes
+git clone https://github.com/alacritty/alacritty-theme "$HOME"/.config/alacritty/themes
