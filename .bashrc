@@ -26,7 +26,8 @@ alias ll='ls -la'
 alias la='ls -lathr'
 
 alias ga="git add"
-alias gc="git co"
+alias gb="git branch"
+alias gc="git checkout"
 alias gcm="git commit -m"
 alias gl="git pull"
 alias gp="git push"
