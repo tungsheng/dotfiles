@@ -48,8 +48,8 @@ bind-key -n M-Left swap-window -t -1
 bind-key -n M-Right swap-window -t +1
 
 # navigate windows
-bind-key -n <Alt-h> select-window -t -1
-bind-key -n <Alt-l> select-window -t +1
+bind-key -n M-h select-window -t -1
+bind-key -n M-l select-window -t +1
 
 set-option -g set-titles on
 set-option -g set-titles-string "#T - #W"
