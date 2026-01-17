@@ -74,6 +74,18 @@ stow .
 3. Open `nvim` to let Lazy.nvim install plugins
 4. Run `tmux` and press `Ctrl+Space I` to install tmux plugins
 
+## Uninstall
+
+```shell
+cd ~/dotfiles
+./setup uninstall
+```
+
+This will:
+- Remove all dotfile symlinks
+- Optionally remove Alacritty themes, Zinit, Neovim data, and tmux plugins
+- **Note:** Installed packages (brew/dnf/apt) are not removed
+
 ## Structure
 
 ```

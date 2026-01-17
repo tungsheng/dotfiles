@@ -4,6 +4,90 @@ set -e
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Show usage
+usage() {
+    echo "Usage: $0 [install|uninstall]"
+    echo ""
+    echo "Commands:"
+    echo "  install    Install dotfiles and dependencies (default)"
+    echo "  uninstall  Remove dotfiles symlinks"
+    exit 1
+}
+
+# Uninstall function
+uninstall() {
+    echo "Uninstalling dotfiles from $DOTFILES_DIR"
+
+    if ! command -v stow &>/dev/null; then
+        echo "Error: stow is required for uninstall. Please install it first."
+        exit 1
+    fi
+
+    # Remove symlinks with stow
+    echo "Removing symlinks with stow..."
+    cd "$DOTFILES_DIR"
+    stow --target="$HOME" --delete . 2>/dev/null || true
+
+    echo ""
+    read -p "Remove Alacritty themes? [y/N] " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        rm -rf "$HOME/.config/alacritty/themes"
+        echo "Removed Alacritty themes"
+    fi
+
+    read -p "Remove git-prompt.sh? [y/N] " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        rm -f "$HOME/.git-prompt.sh"
+        echo "Removed git-prompt.sh"
+    fi
+
+    read -p "Remove Zinit and zsh plugins? [y/N] " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        rm -rf "${XDG_DATA_HOME:-$HOME/.local/share}/zinit"
+        echo "Removed Zinit"
+    fi
+
+    read -p "Remove Neovim data (plugins, cache)? [y/N] " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        rm -rf "$HOME/.local/share/nvim"
+        rm -rf "$HOME/.local/state/nvim"
+        rm -rf "$HOME/.cache/nvim"
+        echo "Removed Neovim data"
+    fi
+
+    read -p "Remove tmux plugins? [y/N] " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        rm -rf "$HOME/.tmux/plugins"
+        echo "Removed tmux plugins"
+    fi
+
+    echo ""
+    echo "Dotfiles uninstalled successfully!"
+    echo "Note: Installed packages (via brew/dnf/apt) were not removed."
+    exit 0
+}
+
+# Parse command
+case "${1:-install}" in
+    install)
+        ;;
+    uninstall)
+        uninstall
+        ;;
+    -h|--help|help)
+        usage
+        ;;
+    *)
+        echo "Unknown command: $1"
+        usage
+        ;;
+esac
+
 echo "Installing dotfiles from $DOTFILES_DIR"
 
 # macOS setup

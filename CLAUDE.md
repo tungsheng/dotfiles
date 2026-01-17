@@ -9,14 +9,14 @@ This is a dotfiles repository managed with GNU Stow. It contains configuration f
 ## Key Commands
 
 ```shell
-# Install dotfiles (macOS - installs Homebrew dependencies + creates symlinks)
+# Install dotfiles (auto-detects OS and installs dependencies)
 ./setup
+
+# Uninstall dotfiles (removes symlinks, prompts for cleanup)
+./setup uninstall
 
 # Create/update symlinks manually
 stow --target="$HOME" --restow .
-
-# Linux dependencies (manual install required)
-sudo apt install stow neovim fd-find ripgrep fzf zoxide tmux
 ```
 
 ## Architecture
