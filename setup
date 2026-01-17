@@ -1,39 +1,60 @@
 #!/bin/bash
 
-# If Mac
+set -e
+
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+echo "Installing dotfiles from $DOTFILES_DIR"
+
+# macOS setup
 if [[ "$OSTYPE" == "darwin"* ]]; then
-	# Install homebrew
-	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    # Install Homebrew if not present
+    if ! command -v brew &>/dev/null; then
+        echo "Installing Homebrew..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    fi
 
-	# Install font-hurmit-nerd-font
-	brew tap homebrew/cask-fonts && brew install --cask font-hurmit-nerd-font
+    # Install dependencies from Brewfile
+    if [[ -f "$DOTFILES_DIR/Brewfile" ]]; then
+        echo "Installing Homebrew dependencies..."
+        brew bundle --file="$DOTFILES_DIR/Brewfile"
+    fi
 
-	# Install neovim & dependencies
-	brew install neovim
-	brew install fd
-	brew install ripgrep
+# Linux setup
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    echo "Linux detected. Please install stow and other dependencies manually:"
+    echo "  sudo apt install stow neovim fd-find ripgrep fzf zoxide"
+    echo "  # or equivalent for your distribution"
 
-	# LazyVim setup
-	mv ~/.config/nvim{,.bak}
-	mv ~/.local/share/nvim{,.bak}
-	mv ~/.local/state/nvim{,.bak}
-	mv ~/.cache/nvim{,.bak}
-	git clone https://github.com/LazyVim/starter ~/.config/nvim
-	rm -rf ~/.config/nvim/.git
+    if ! command -v stow &>/dev/null; then
+        echo "Error: stow is required. Please install it first."
+        exit 1
+    fi
 fi
 
 # Install bash git-prompt
-# http://stackoverflow.com/questions/12870928/mac-bash-git-ps1-command-not-found
-curl -o ~/.git-prompt.sh https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
-echo 'source ~/.git-prompt.sh' >>~/.bashrc
+if [[ ! -f "$HOME/.git-prompt.sh" ]]; then
+    echo "Installing git-prompt..."
+    curl -o "$HOME/.git-prompt.sh" https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+fi
 
-# Install config symbolic links
-ln -sf "$PWD/.bash_profile" "$HOME"/.bash_profile
-ln -sf "$PWD/.bashrc" "$HOME"/.bashrc
-ln -sf "$PWD/.tmux.conf" "$HOME"/.tmux.conf
-ln -sf "$PWD/nvim" "$HOME"/.config/nvim
-ln -sf "$PWD/alacritty.toml" "$HOME"/.config/alacritty/alacritty.toml
+# Install alacritty themes if not present
+if [[ ! -d "$HOME/.config/alacritty/themes" ]]; then
+    echo "Installing Alacritty themes..."
+    mkdir -p "$HOME/.config/alacritty/themes"
+    git clone https://github.com/alacritty/alacritty-theme "$HOME/.config/alacritty/themes"
+fi
 
-# Install alacritty themes
-mkdir -p "$HOME"/.config/alacritty/themes
-git clone https://github.com/alacritty/alacritty-theme "$HOME"/.config/alacritty/themes
+# Use stow to create symlinks
+echo "Creating symlinks with stow..."
+cd "$DOTFILES_DIR"
+stow --target="$HOME" --restow .
+
+echo "Dotfiles installed successfully!"
+echo ""
+echo "Next steps:"
+echo "  1. Restart your terminal or run: source ~/.zshrc"
+echo "  2. Run 'p10k configure' to set up Powerlevel10k prompt"
+echo "  3. Open nvim to let Lazy.nvim install plugins"
+echo "  4. Run 'tmux' and press 'prefix + I' to install tmux plugins"

@@ -1,0 +1,15 @@
+# Git
+\.git
+\.gitignore
+\.gitmodules
+
+# Documentation
+README\.md
+LICENSE
+
+# Scripts and setup
+setup
+Brewfile
+
+# macOS
+\.DS_Store
