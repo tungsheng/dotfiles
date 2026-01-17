@@ -1,4 +1,6 @@
 return {
+  { import = "nvchad.blink.lazyspec" },
+
   { "christoomey/vim-tmux-navigator", event = "VeryLazy" },
 
   {
