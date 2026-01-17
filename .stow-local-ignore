@@ -8,13 +8,17 @@ README\.md
 LICENSE
 CLAUDE\.md
 KEYBINDINGS\.md
+CONTRIBUTING\.md
 
 # Claude Code
 \.claude
 
 # Scripts and setup
 setup
-Brewfile
+
+# External resources (cloned by setup)
+\.config/alacritty/themes
+\.config/tmux/plugins
 
 # macOS
 \.DS_Store

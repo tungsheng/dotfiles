@@ -84,7 +84,6 @@ dotfiles/
 │   └── gh/           # GitHub CLI
 ├── .zshrc            # Zsh config
 ├── .bashrc           # Bash config
-├── Brewfile          # macOS dependencies
 └── setup             # Install script
 ```
 
@@ -103,11 +102,16 @@ See [KEYBINDINGS.md](KEYBINDINGS.md) for complete reference.
 ## Commands
 
 ```shell
-./setup            # Install
-./setup uninstall  # Remove
-./setup health     # Check status
-./setup --dry-run  # Preview
+./setup              # Install
+./setup uninstall    # Remove
+./setup health       # Check status
+./setup --dry-run    # Preview
+./setup --verbose    # Detailed output
 ```
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development guide.
 
 ## License
 
