@@ -7,6 +7,9 @@
 # Alacritty themes (cloned separately via setup)
 .config/alacritty/themes
 
+# Tmux plugins (installed via TPM)
+.config/tmux/plugins
+
 # Backup/swap files
 *~
 *.swp

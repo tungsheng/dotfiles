@@ -151,12 +151,12 @@ install_deps() {
         if has_cmd dnf; then
             log_info "Detected RHEL/Fedora"
             run sudo dnf install -y epel-release 2>/dev/null || true
-            run sudo dnf install -y stow neovim fd-find ripgrep fzf tmux git curl zsh
+            run sudo dnf install -y stow neovim fd-find ripgrep fzf tmux git curl zsh unzip tar gzip
             has_cmd zoxide || run curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
         elif has_cmd apt; then
             log_info "Detected Debian/Ubuntu"
             run sudo apt update
-            run sudo apt install -y stow neovim fd-find ripgrep fzf zoxide tmux git curl zsh
+            run sudo apt install -y stow neovim fd-find ripgrep fzf zoxide tmux git curl zsh unzip
         else
             log_warn "Unknown distro - install manually: stow neovim fd-find ripgrep fzf zoxide tmux git curl zsh"
             has_cmd stow || { log_error "stow required"; exit 1; }
@@ -165,7 +165,7 @@ install_deps() {
     fi
 }
 
-# Install extras (git-prompt, themes)
+# Install extras (git-prompt, themes, plugin managers)
 install_extras() {
     # Git prompt for bash
     if ! has_path "$HOME/.git-prompt.sh"; then
@@ -179,6 +179,13 @@ install_extras() {
         run git clone --depth 1 -q https://github.com/alacritty/alacritty-theme "$HOME/.config/alacritty/themes"
     fi
     log_success "Alacritty themes ready"
+
+    # TPM (Tmux Plugin Manager)
+    if ! has_path "$HOME/.tmux/plugins/tpm"; then
+        run mkdir -p "$HOME/.tmux/plugins"
+        run git clone --depth 1 -q https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+    fi
+    log_success "TPM ready"
 }
 
 # Create symlinks
