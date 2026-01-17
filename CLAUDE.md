@@ -4,50 +4,52 @@ Context for Claude Code when working with this repository.
 
 ## Overview
 
-Dotfiles repository using GNU Stow for symlink management. Supports macOS, Debian/Ubuntu, and RHEL/Fedora/Alma.
+Dotfiles repository using GNU Stow. Supports macOS, Debian/Ubuntu, and RHEL/Fedora/Alma.
 
 ## Commands
 
 ```shell
-./setup              # Install (auto-detects OS)
-./setup uninstall    # Remove symlinks
+./setup              # Install
+./setup uninstall    # Remove
 ./setup health       # Check status
-./setup --dry-run    # Preview changes
+./setup --dry-run    # Preview
 ./setup --verbose    # Detailed output
 ```
 
-## Architecture
+## Structure
 
 ```
 dotfiles/
-├── setup                    # Install script (all config at top)
-├── .stow-local-ignore       # Excluded from symlinks
-├── .zshrc / .bashrc         # Shell configs
-└── .config/
-    ├── nvim/                # Neovim (NvChad + Lazy.nvim)
-    ├── tmux/                # Tmux (TPM plugins)
-    ├── alacritty/           # Terminal (Tokyo Night theme)
-    └── shell/aliases.sh     # Shared aliases
+├── .zshrc                   # Zsh config
+├── .bashrc                  # Bash config
+├── .config/
+│   ├── nvim/                # Neovim (NvChad + Lazy.nvim)
+│   ├── tmux/                # Tmux (TPM)
+│   ├── alacritty/           # Terminal (Tokyo Night)
+│   ├── gh/                  # GitHub CLI
+│   └── shell/aliases.sh     # Shared aliases
+├── setup                    # Install script
+└── .stow-local-ignore       # Stow exclusions
 ```
 
-## Key Patterns
+## Setup Script Patterns
 
-**Dependencies** defined in `setup` as `cmd|brew|dnf|apt`:
+**Dependencies** - `cmd|brew|dnf|apt`:
 ```bash
 DEPS=(
     "nvim|neovim|neovim|neovim"  # cmd differs from package
-    "fd|fd|fd-find|fd-find"      # Package name differs by OS
+    "fd|fd|fd-find|fd-find"      # Package name differs
     "zoxide|zoxide|-|zoxide"     # Use - if unavailable
     "-||-git|git"                # Use - to skip health check
 )
 ```
 
-**Managed files** tracked for backup/health:
+**Managed files** - tracked for backup/health:
 ```bash
 MANAGED_FILES=(.zshrc .bashrc .config/nvim ...)
 ```
 
-**Stow ignores** in `.stow-local-ignore` (regex patterns)
+**Stow ignores** - regex patterns in `.stow-local-ignore`
 
 ## Tools
 
@@ -60,6 +62,7 @@ MANAGED_FILES=(.zshrc .bashrc .config/nvim ...)
 ## Conventions
 
 - Shared aliases: `.config/shell/aliases.sh`
-- Neovim customizations: `lua/plugins/init.lua`, `lua/mappings.lua`
+- Neovim plugins: `lua/plugins/init.lua`
+- Neovim keybindings: `lua/mappings.lua`
 - Tmux prefix: `Ctrl+Space`
-- Cross-tool navigation: `Ctrl+h/j/k/l` (vim-tmux-navigator)
+- Cross-tool navigation: `Ctrl+h/j/k/l`

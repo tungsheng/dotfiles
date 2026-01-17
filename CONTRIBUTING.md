@@ -2,54 +2,52 @@
 
 Developer guide for maintaining and extending this dotfiles repository.
 
-## Quick Reference
+## Commands
 
 ```shell
 ./setup              # Install
-./setup --dry-run    # Preview changes
-./setup health       # Check status
 ./setup uninstall    # Remove
+./setup health       # Check status
+./setup --dry-run    # Preview
 ./setup --verbose    # Detailed output
 ```
 
-## Project Structure
+## Structure
 
 ```
 dotfiles/
-├── setup                    # Main install script
-├── .stow-local-ignore       # Files excluded from symlinks
-├── .zshrc                   # Zsh configuration
-├── .bashrc                  # Bash configuration
+├── .zshrc                   # Zsh config
+├── .bashrc                  # Bash config
+├── .bash_profile            # Bash login config
 ├── .config/
 │   ├── nvim/                # Neovim (NvChad)
-│   ├── tmux/                # Tmux configuration
+│   ├── tmux/                # Tmux config
 │   ├── alacritty/           # Terminal emulator
 │   ├── gh/                  # GitHub CLI
-│   └── shell/
-│       └── aliases.sh       # Shared shell aliases
-└── docs/
-    ├── README.md            # User documentation
-    ├── KEYBINDINGS.md       # Keybinding reference
-    ├── CONTRIBUTING.md      # This file
-    └── CLAUDE.md            # AI assistant context
+│   └── shell/aliases.sh     # Shared aliases
+├── setup                    # Install script
+├── .stow-local-ignore       # Stow exclusions
+├── .gitignore               # Git exclusions
+├── README.md                # User guide
+├── KEYBINDINGS.md           # Key reference
+├── CONTRIBUTING.md          # This file
+└── CLAUDE.md                # AI context
 ```
 
-## Setup Script Architecture
+## Setup Script
 
-The `setup` script is organized into sections:
+### Architecture
 
-| Section | Description |
-|---------|-------------|
-| **Configuration** | Data arrays at top for easy editing |
-| **Logging** | Consistent output formatting |
-| **Helpers** | Utility functions |
-| **Commands** | `cmd_install`, `cmd_uninstall`, `cmd_health` |
-| **Install Helpers** | OS-specific installation logic |
-| **Main** | Argument parsing and dispatch |
+| Section | Lines | Description |
+|---------|-------|-------------|
+| Configuration | 1-55 | Data arrays (deps, files, extras) |
+| Logging | 56-95 | Output formatting functions |
+| Helpers | 97-146 | Utility functions |
+| Commands | 148-313 | `cmd_health`, `cmd_uninstall`, `cmd_install` |
+| Install Helpers | 315-404 | OS-specific installation |
+| Main | 406-432 | Argument parsing |
 
 ### Configuration Arrays
-
-All configurable data is at the top of the script:
 
 ```bash
 # Dependencies: cmd|brew|dnf|apt (use - to skip)
@@ -57,9 +55,9 @@ DEPS=(
     "stow|stow|stow|stow"
     "nvim|neovim|neovim|neovim"  # cmd differs from package
     "fd|fd|fd-find|fd-find"      # Package name differs
-    "rg|ripgrep|ripgrep|ripgrep" # cmd differs from package
+    "rg|ripgrep|ripgrep|ripgrep"
     "zoxide|zoxide|-|zoxide"     # Not in DNF repos
-    "-||-git|git"                # Linux only (skip health check)
+    "-||-git|git"                # Linux only
 )
 
 # macOS fonts
@@ -83,152 +81,109 @@ CLEANUPS=(
 
 ### Logging Functions
 
-| Function | Purpose | Example Output |
-|----------|---------|----------------|
-| `log_header` | Script banner | `dotfiles v1.0.0` |
-| `log_info` | Action starting | `:: Installing packages...` |
-| `log_success` | Success | `✓  Symlinks created` |
-| `log_warn` | Warning | `!  File exists but not symlinked` |
-| `log_error` | Error | `✗  stow not found` |
-| `log_dim` | Secondary info | `   OS: macos` |
-| `log_step` | Step header | `[1/4] Backup existing configs` |
-| `log_result` | Summary | `Results: 12 passed 0 failed` |
+| Function | Output |
+|----------|--------|
+| `log_header` | `dotfiles v1.0.0` |
+| `log_info` | `:: Installing...` |
+| `log_success` | `✓  Done` |
+| `log_warn` | `!  Warning` |
+| `log_error` | `✗  Error` |
+| `log_dim` | `   (secondary)` |
+| `log_step` | `[1/4] Step` |
+| `log_result` | `Results: N passed` |
 
 ## Common Tasks
 
-### Add a New Dependency
+### Add a Dependency
 
-1. Add to `DEPS` array in `setup`:
-   ```bash
-   DEPS=(
-       ...
-       "cmd|brew-pkg|dnf-pkg|apt-pkg"
-   )
-   ```
-2. First column is the **command name** (for health check)
-3. Use `-` to skip: unavailable package manager or skip health check
-4. Example: `"rg|ripgrep|ripgrep|ripgrep"` - command is `rg`, package is `ripgrep`
+```bash
+# In setup, add to DEPS array:
+"cmd|brew-pkg|dnf-pkg|apt-pkg"
 
-### Add a New Dotfile
+# Examples:
+"rg|ripgrep|ripgrep|ripgrep"  # cmd differs from package
+"zoxide|zoxide|-|zoxide"       # Not in DNF
+"-||-git|git"                  # Linux only
+```
 
-1. Place file in correct location (root or `.config/`)
-2. Add to `MANAGED_FILES` array if it needs backup/health tracking
-3. Run `stow --restow .` to create symlink
+### Add a Dotfile
 
-### Add a New External Resource
+1. Place file in repo (root or `.config/`)
+2. Add to `MANAGED_FILES` if needed for backup/health
+3. Run `stow --restow .`
 
-1. Add to `EXTRAS` array:
-   ```bash
-   EXTRAS=(
-       ...
-       "$HOME/.new-file|https://example.com/file|curl|Display Name"
-   )
-   ```
-2. Type can be `curl` (single file) or `git` (repository)
+### Add an External Resource
 
-### Exclude a File from Stow
+```bash
+# In setup, add to EXTRAS array:
+"$HOME/path|https://url|type|Name"
 
-Add pattern to `.stow-local-ignore`:
+# type: curl (file) or git (repo)
+```
+
+### Exclude from Stow
+
+Add regex pattern to `.stow-local-ignore`:
 ```
 \.myfile
 mydir/
 ```
 
-### Add a macOS Font
-
-Add to `CASKS` array:
-```bash
-CASKS=(
-    ...
-    "font-new-font-nerd-font"
-)
-```
-
-## Shell Configuration
-
-### Aliases
-
-Shared aliases go in `.config/shell/aliases.sh` (sourced by both Zsh and Bash).
-
-Shell-specific aliases:
-- **Zsh**: Use OMZ plugins or add to `.zshrc`
-- **Bash**: Add to `.bashrc`
-
-### Zsh Plugins
-
-Managed by Zinit in `.zshrc`:
+### Add macOS Font
 
 ```bash
-# Regular plugins
-zinit light author/plugin-name
-
-# OMZ snippets
-zinit snippet OMZP::plugin-name
+# In setup, add to CASKS array:
+"font-name-nerd-font"
 ```
 
-## Neovim Configuration
+## Tool Configuration
 
-Based on NvChad. Custom configs in `.config/nvim/lua/`:
+### Zsh (`.zshrc`)
 
-| File | Purpose |
-|------|---------|
-| `chadrc.lua` | Theme, UI overrides |
-| `mappings.lua` | Custom keybindings |
-| `options.lua` | Editor options |
-| `plugins/init.lua` | Additional plugins |
-| `configs/*.lua` | Plugin configurations |
+- Plugin manager: Zinit
+- Prompt: Powerlevel10k
+- Plugins via: `zinit light author/plugin`
+- OMZ snippets via: `zinit snippet OMZP::name`
 
-### Add a Neovim Plugin
+### Neovim (`.config/nvim/`)
 
-Add to `plugins/init.lua`:
-```lua
-{
-    "author/plugin-name",
-    event = "VeryLazy",  -- Lazy load
-    config = function()
-        require("plugin-name").setup()
-    end,
-},
-```
+- Base: NvChad
+- Plugin manager: Lazy.nvim
+- Custom plugins: `lua/plugins/init.lua`
+- Keybindings: `lua/mappings.lua`
+- LSP config: `lua/configs/lspconfig.lua`
 
-## Tmux Configuration
+### Tmux (`.config/tmux/`)
 
-Config: `.config/tmux/tmux.conf`
+- Plugin manager: TPM
+- Add plugin: `set -g @plugin 'author/name'`
+- Install: `prefix I`
+- Prefix: `Ctrl+Space`
 
-Plugins managed by TPM. Add new plugin:
-```bash
-set -g @plugin 'author/plugin-name'
-```
+### Aliases (`.config/shell/aliases.sh`)
 
-Then press `prefix I` to install.
+Shared by Zsh and Bash. Shell-specific aliases go in respective rc files.
 
-## Testing Changes
+## Testing
 
 ```shell
-# Preview what setup will do
-./setup --dry-run
+./setup --dry-run    # Preview
+./setup health       # Verify
+./setup --verbose    # Debug
 
-# Check current installation status
-./setup health
-
-# Verbose output for debugging
-./setup --verbose
-
-# Test on fresh system (use VM or container)
+# Fresh system test
 docker run -it ubuntu:22.04 bash
 ```
 
 ## Code Style
 
-- **Bash**: Use `shellcheck` for linting
-- **Lua**: Use `stylua` for formatting (config in `.config/nvim/.stylua.toml`)
-- **Indentation**: 4 spaces for bash, 2 spaces for lua
-- **Comments**: Explain "why", not "what"
+- Bash: 4 spaces, shellcheck
+- Lua: 2 spaces, stylua
+- Comments: Explain "why" not "what"
 
-## Release Checklist
+## Release
 
-1. Update `VERSION` in `setup` script
+1. Update `VERSION` in setup
 2. Test on macOS and Linux
-3. Run `./setup health` to verify
-4. Update documentation if needed
-5. Commit with descriptive message
+3. Run `./setup health`
+4. Update docs if needed

@@ -77,14 +77,28 @@ stow .
 
 ```
 dotfiles/
+├── .zshrc                   # Zsh config
+├── .bashrc                  # Bash config
 ├── .config/
-│   ├── alacritty/    # Terminal config
-│   ├── nvim/         # Neovim (NvChad)
-│   ├── tmux/         # Tmux config
-│   └── gh/           # GitHub CLI
-├── .zshrc            # Zsh config
-├── .bashrc           # Bash config
-└── setup             # Install script
+│   ├── nvim/                # Neovim (NvChad)
+│   ├── tmux/                # Tmux config
+│   ├── alacritty/           # Terminal emulator
+│   ├── gh/                  # GitHub CLI
+│   └── shell/aliases.sh     # Shared aliases
+├── setup                    # Install script
+├── README.md                # This file
+├── KEYBINDINGS.md           # Key reference
+└── CONTRIBUTING.md          # Dev guide
+```
+
+## Commands
+
+```shell
+./setup              # Install
+./setup uninstall    # Remove
+./setup health       # Check status
+./setup --dry-run    # Preview
+./setup --verbose    # Detailed output
 ```
 
 ## Key Bindings
@@ -98,16 +112,6 @@ See [KEYBINDINGS.md](KEYBINDINGS.md) for complete reference.
 | Neovim | `Space` | Leader |
 | Neovim | `<leader>ff` | Find files |
 | Zsh | `Ctrl+r` | History search |
-
-## Commands
-
-```shell
-./setup              # Install
-./setup uninstall    # Remove
-./setup health       # Check status
-./setup --dry-run    # Preview
-./setup --verbose    # Detailed output
-```
 
 ## Contributing
 
