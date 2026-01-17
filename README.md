@@ -18,6 +18,9 @@ Tony's dotfiles for a modern terminal development environment.
 git clone https://github.com/tungsheng/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 
+# Preview what will be installed (dry run)
+./setup --dry-run
+
 # Run setup script (installs dependencies and creates symlinks)
 ./setup
 ```
@@ -104,16 +107,27 @@ dotfiles/
 
 ## Key Bindings
 
-### Tmux
+See [KEYBINDINGS.md](KEYBINDINGS.md) for complete reference.
 
-- **Prefix**: `Ctrl+Space`
-- **Pane navigation**: `prefix + h/j/k/l`
-- **Window navigation**: `Shift + Left/Right`
-- **Install plugins**: `prefix + I`
+### Quick Reference
 
-### Neovim
+| Tool | Key | Action |
+|------|-----|--------|
+| Tmux | `Ctrl+Space` | Prefix key |
+| Tmux | `Ctrl+h/j/k/l` | Navigate panes (seamless with vim) |
+| Tmux | `prefix I` | Install plugins |
+| Neovim | `Space` | Leader key |
+| Neovim | `<leader>ff` | Find files |
+| Neovim | `<leader>gs` | Git status (Neogit) |
+| Zsh | `Ctrl+r` | Fuzzy history search |
 
-See NvChad documentation for default keybindings.
+## Useful Commands
+
+```shell
+./setup health      # Check installation status
+./setup uninstall   # Remove dotfiles
+./setup --dry-run   # Preview changes
+```
 
 ## License
 

@@ -1,159 +1,248 @@
 #!/bin/bash
-
 set -e
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DRY_RUN=false
 
-# Show usage
-usage() {
-    echo "Usage: $0 [install|uninstall]"
-    echo ""
-    echo "Commands:"
-    echo "  install    Install dotfiles and dependencies (default)"
-    echo "  uninstall  Remove dotfiles symlinks"
-    exit 1
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+# Logging - consistent format: [symbol] message
+log_info()    { echo -e "${BLUE}::${NC} $1"; }
+log_success() { echo -e "${GREEN}✓${NC}  $1"; }
+log_warn()    { echo -e "${YELLOW}!${NC}  $1"; }
+log_error()   { echo -e "${RED}✗${NC}  $1" >&2; }
+log_step()    { echo -e "\n${BLUE}[$1]${NC} $2"; }
+
+# Run command or show what would run in dry-run mode
+run() {
+    if $DRY_RUN; then
+        log_warn "Would run: $*"
+    else
+        "$@"
+    fi
 }
 
-# Uninstall function
-uninstall() {
-    echo "Uninstalling dotfiles from $DOTFILES_DIR"
+# Check if command exists
+has_cmd() { command -v "$1" &>/dev/null; }
 
-    if ! command -v stow &>/dev/null; then
-        echo "Error: stow is required for uninstall. Please install it first."
-        exit 1
-    fi
+# Check if path exists (file or directory)
+has_path() { [[ -e "$1" ]]; }
 
-    # Remove symlinks with stow
-    echo "Removing symlinks with stow..."
-    cd "$DOTFILES_DIR"
-    stow --target="$HOME" --delete . 2>/dev/null || true
+# Usage
+usage() {
+    cat <<EOF
+Usage: $(basename "$0") [command] [options]
 
-    echo ""
-    read -p "Remove Alacritty themes? [y/N] " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        rm -rf "$HOME/.config/alacritty/themes"
-        echo "Removed Alacritty themes"
-    fi
+Commands:
+  install      Install dotfiles and dependencies (default)
+  uninstall    Remove dotfiles symlinks
+  health       Check installation status
 
-    read -p "Remove git-prompt.sh? [y/N] " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        rm -f "$HOME/.git-prompt.sh"
-        echo "Removed git-prompt.sh"
-    fi
-
-    read -p "Remove Zinit and zsh plugins? [y/N] " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        rm -rf "${XDG_DATA_HOME:-$HOME/.local/share}/zinit"
-        echo "Removed Zinit"
-    fi
-
-    read -p "Remove Neovim data (plugins, cache)? [y/N] " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        rm -rf "$HOME/.local/share/nvim"
-        rm -rf "$HOME/.local/state/nvim"
-        rm -rf "$HOME/.cache/nvim"
-        echo "Removed Neovim data"
-    fi
-
-    read -p "Remove tmux plugins? [y/N] " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        rm -rf "$HOME/.tmux/plugins"
-        echo "Removed tmux plugins"
-    fi
-
-    echo ""
-    echo "Dotfiles uninstalled successfully!"
-    echo "Note: Installed packages (via brew/dnf/apt) were not removed."
+Options:
+  --dry-run    Preview changes without applying
+  -h, --help   Show this help
+EOF
     exit 0
 }
 
-# Parse command
-case "${1:-install}" in
-    install)
-        ;;
-    uninstall)
-        uninstall
-        ;;
-    -h|--help|help)
-        usage
-        ;;
-    *)
-        echo "Unknown command: $1"
-        usage
-        ;;
+# Health check
+health_check() {
+    log_step "1/3" "Checking symlinks"
+    for f in .zshrc .bashrc .bash_profile; do
+        if [[ -L "$HOME/$f" ]]; then
+            log_success "$f"
+        elif [[ -f "$HOME/$f" ]]; then
+            log_warn "$f exists but not symlinked"
+        else
+            log_error "$f missing"
+        fi
+    done
+
+    log_step "2/3" "Checking dependencies"
+    for cmd in stow nvim tmux fzf zoxide rg fd git; do
+        has_cmd "$cmd" && log_success "$cmd" || log_error "$cmd missing"
+    done
+
+    log_step "3/3" "Checking plugins"
+    has_path "${XDG_DATA_HOME:-$HOME/.local/share}/zinit" && log_success "Zinit" || log_warn "Zinit not installed"
+    has_path "$HOME/.local/share/nvim/lazy" && log_success "Neovim plugins" || log_warn "Neovim plugins not installed"
+    has_path "$HOME/.tmux/plugins/tpm" && log_success "TPM" || log_warn "TPM not installed"
+    echo
+    exit 0
+}
+
+# Backup non-symlinked dotfiles
+backup_dotfiles() {
+    local dominated_files=(.zshrc .bashrc .bash_profile .config/nvim .config/tmux .config/alacritty)
+    local need_backup=false
+
+    for f in "${dominated_files[@]}"; do
+        [[ -e "$HOME/$f" && ! -L "$HOME/$f" ]] && need_backup=true && break
+    done
+
+    if $need_backup; then
+        local backup_dir="$HOME/.dotfiles-backup-$(date +%Y%m%d-%H%M%S)"
+        log_info "Backing up existing files to $backup_dir"
+        mkdir -p "$backup_dir"
+        for f in "${dominated_files[@]}"; do
+            [[ -e "$HOME/$f" && ! -L "$HOME/$f" ]] && cp -r "$HOME/$f" "$backup_dir/" 2>/dev/null && log_success "Backed up $f"
+        done
+    fi
+}
+
+# Uninstall
+uninstall() {
+    log_step "1/2" "Removing symlinks"
+    has_cmd stow || { log_error "stow required"; exit 1; }
+
+    cd "$DOTFILES_DIR"
+    run stow --target="$HOME" --delete .
+    log_success "Symlinks removed"
+
+    $DRY_RUN && { log_warn "Dry run - skipping cleanup"; exit 0; }
+
+    log_step "2/2" "Optional cleanup"
+    local cleanups=(
+        "$HOME/.config/alacritty/themes:Alacritty themes"
+        "$HOME/.git-prompt.sh:git-prompt.sh"
+        "${XDG_DATA_HOME:-$HOME/.local/share}/zinit:Zinit"
+        "$HOME/.local/share/nvim:Neovim plugins"
+        "$HOME/.tmux/plugins:tmux plugins"
+    )
+
+    for item in "${cleanups[@]}"; do
+        local path="${item%%:*}"
+        local name="${item##*:}"
+        if has_path "$path"; then
+            read -p "Remove $name? [y/N] " -n 1 -r
+            echo
+            [[ $REPLY =~ ^[Yy]$ ]] && rm -rf "$path" && log_success "Removed $name"
+        fi
+    done
+
+    # Also clean nvim cache/state
+    rm -rf "$HOME/.local/state/nvim" "$HOME/.cache/nvim" 2>/dev/null || true
+
+    echo
+    log_success "Uninstall complete"
+    log_warn "System packages were not removed"
+    exit 0
+}
+
+# Install dependencies based on OS
+install_deps() {
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        log_info "Detected macOS"
+        if ! has_cmd brew; then
+            run /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+        fi
+        log_success "Homebrew ready"
+
+        [[ -f "$DOTFILES_DIR/Brewfile" ]] && run brew bundle --file="$DOTFILES_DIR/Brewfile"
+        log_success "Dependencies installed"
+
+    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        if has_cmd dnf; then
+            log_info "Detected RHEL/Fedora"
+            run sudo dnf install -y epel-release 2>/dev/null || true
+            run sudo dnf install -y stow neovim fd-find ripgrep fzf tmux git curl zsh
+            has_cmd zoxide || run curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+        elif has_cmd apt; then
+            log_info "Detected Debian/Ubuntu"
+            run sudo apt update
+            run sudo apt install -y stow neovim fd-find ripgrep fzf zoxide tmux git curl zsh
+        else
+            log_warn "Unknown distro - install manually: stow neovim fd-find ripgrep fzf zoxide tmux git curl zsh"
+            has_cmd stow || { log_error "stow required"; exit 1; }
+        fi
+        log_success "Dependencies installed"
+    fi
+}
+
+# Install extras (git-prompt, themes)
+install_extras() {
+    # Git prompt for bash
+    if ! has_path "$HOME/.git-prompt.sh"; then
+        run curl -sS -o "$HOME/.git-prompt.sh" https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+    fi
+    log_success "git-prompt.sh ready"
+
+    # Alacritty themes
+    if ! has_path "$HOME/.config/alacritty/themes"; then
+        run mkdir -p "$HOME/.config/alacritty/themes"
+        run git clone --depth 1 -q https://github.com/alacritty/alacritty-theme "$HOME/.config/alacritty/themes"
+    fi
+    log_success "Alacritty themes ready"
+}
+
+# Create symlinks
+create_symlinks() {
+    cd "$DOTFILES_DIR"
+    if $DRY_RUN; then
+        stow --target="$HOME" --restow --no . 2>&1 | head -10
+        log_warn "Dry run - no symlinks created"
+    else
+        stow --target="$HOME" --restow .
+        log_success "Symlinks created"
+    fi
+}
+
+# Show completion message
+show_complete() {
+    echo
+    echo -e "${GREEN}Installation complete!${NC}"
+    echo
+    echo "Next steps:"
+    echo -e "  ${BLUE}1.${NC} source ~/.zshrc"
+    echo -e "  ${BLUE}2.${NC} p10k configure"
+    echo -e "  ${BLUE}3.${NC} nvim (plugins auto-install)"
+    echo -e "  ${BLUE}4.${NC} tmux, then Ctrl+Space I"
+    echo
+    echo -e "Run ${YELLOW}./setup health${NC} to verify installation"
+    echo
+}
+
+# Parse arguments
+COMMAND="install"
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        install)    COMMAND="install"; shift ;;
+        uninstall)  COMMAND="uninstall"; shift ;;
+        health)     COMMAND="health"; shift ;;
+        --dry-run|-n) DRY_RUN=true; shift ;;
+        -h|--help)  usage ;;
+        *) log_error "Unknown: $1"; usage ;;
+    esac
+done
+
+# Execute
+case "$COMMAND" in
+    health)    health_check ;;
+    uninstall) uninstall ;;
 esac
 
-echo "Installing dotfiles from $DOTFILES_DIR"
+# Install flow
+echo
+log_info "Installing dotfiles"
+$DRY_RUN && log_warn "Dry run mode"
 
-# macOS setup
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    # Install Homebrew if not present
-    if ! command -v brew &>/dev/null; then
-        echo "Installing Homebrew..."
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        eval "$(/opt/homebrew/bin/brew shellenv)"
-    fi
+log_step "1/4" "Backing up existing configs"
+$DRY_RUN || backup_dotfiles
+log_success "Backup complete"
 
-    # Install dependencies from Brewfile
-    if [[ -f "$DOTFILES_DIR/Brewfile" ]]; then
-        echo "Installing Homebrew dependencies..."
-        brew bundle --file="$DOTFILES_DIR/Brewfile"
-    fi
+log_step "2/4" "Installing dependencies"
+install_deps
 
-# Linux setup
-elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    if command -v dnf &>/dev/null; then
-        echo "RHEL/AlmaLinux/Fedora detected. Installing dependencies..."
-        sudo dnf install -y epel-release 2>/dev/null || true
-        sudo dnf install -y stow neovim fd-find ripgrep fzf tmux git curl zsh
+log_step "3/4" "Installing extras"
+install_extras
 
-        # Install zoxide (not in standard repos)
-        if ! command -v zoxide &>/dev/null; then
-            echo "Installing zoxide..."
-            curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
-        fi
-    elif command -v apt &>/dev/null; then
-        echo "Debian/Ubuntu detected. Installing dependencies..."
-        sudo apt update
-        sudo apt install -y stow neovim fd-find ripgrep fzf zoxide tmux git curl zsh
-    else
-        echo "Linux detected. Please install dependencies manually:"
-        echo "  stow neovim fd-find ripgrep fzf zoxide tmux git curl zsh"
+log_step "4/4" "Creating symlinks"
+create_symlinks
 
-        if ! command -v stow &>/dev/null; then
-            echo "Error: stow is required. Please install it first."
-            exit 1
-        fi
-    fi
-fi
-
-# Install bash git-prompt
-if [[ ! -f "$HOME/.git-prompt.sh" ]]; then
-    echo "Installing git-prompt..."
-    curl -o "$HOME/.git-prompt.sh" https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
-fi
-
-# Install alacritty themes if not present
-if [[ ! -d "$HOME/.config/alacritty/themes" ]]; then
-    echo "Installing Alacritty themes..."
-    mkdir -p "$HOME/.config/alacritty/themes"
-    git clone https://github.com/alacritty/alacritty-theme "$HOME/.config/alacritty/themes"
-fi
-
-# Use stow to create symlinks
-echo "Creating symlinks with stow..."
-cd "$DOTFILES_DIR"
-stow --target="$HOME" --restow .
-
-echo "Dotfiles installed successfully!"
-echo ""
-echo "Next steps:"
-echo "  1. Restart your terminal or run: source ~/.zshrc"
-echo "  2. Run 'p10k configure' to set up Powerlevel10k prompt"
-echo "  3. Open nvim to let Lazy.nvim install plugins"
-echo "  4. Run 'tmux' and press 'prefix + I' to install tmux plugins"
+show_complete
