@@ -23,13 +23,28 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 
 # Linux setup
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    echo "Linux detected. Please install stow and other dependencies manually:"
-    echo "  sudo apt install stow neovim fd-find ripgrep fzf zoxide"
-    echo "  # or equivalent for your distribution"
+    if command -v dnf &>/dev/null; then
+        echo "RHEL/AlmaLinux/Fedora detected. Installing dependencies..."
+        sudo dnf install -y epel-release 2>/dev/null || true
+        sudo dnf install -y stow neovim fd-find ripgrep fzf tmux git curl zsh
 
-    if ! command -v stow &>/dev/null; then
-        echo "Error: stow is required. Please install it first."
-        exit 1
+        # Install zoxide (not in standard repos)
+        if ! command -v zoxide &>/dev/null; then
+            echo "Installing zoxide..."
+            curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+        fi
+    elif command -v apt &>/dev/null; then
+        echo "Debian/Ubuntu detected. Installing dependencies..."
+        sudo apt update
+        sudo apt install -y stow neovim fd-find ripgrep fzf zoxide tmux git curl zsh
+    else
+        echo "Linux detected. Please install dependencies manually:"
+        echo "  stow neovim fd-find ripgrep fzf zoxide tmux git curl zsh"
+
+        if ! command -v stow &>/dev/null; then
+            echo "Error: stow is required. Please install it first."
+            exit 1
+        fi
     fi
 fi
 

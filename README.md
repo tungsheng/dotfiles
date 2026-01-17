@@ -25,13 +25,32 @@ cd ~/dotfiles
 ### Linux
 
 ```shell
-# Install dependencies (Debian/Ubuntu)
-sudo apt install stow neovim fd-find ripgrep fzf zoxide tmux
-
-# Clone and stow
+# Clone the repository
 git clone https://github.com/tungsheng/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-stow .
+
+# Run setup script (auto-detects distro and installs dependencies)
+./setup
+```
+
+#### Manual Installation by Distro
+
+**Debian/Ubuntu:**
+```shell
+sudo apt install -y stow neovim fd-find ripgrep fzf zoxide tmux zsh
+```
+
+**AlmaLinux/RHEL/CentOS 9:**
+```shell
+sudo dnf install -y epel-release
+sudo dnf install -y stow neovim fd-find ripgrep fzf tmux zsh
+# zoxide not in repos - install manually:
+curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+```
+
+**Fedora:**
+```shell
+sudo dnf install -y stow neovim fd-find ripgrep fzf zoxide tmux zsh
 ```
 
 ## Manual Installation

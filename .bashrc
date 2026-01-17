@@ -8,45 +8,41 @@
 # Set to superior editing mode
 set -o vi
 
-export BASH_SILENCE_DEPRECATION_WARNING=1
-source ~/.git-prompt.sh
+# Silence macOS bash deprecation warning
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    export BASH_SILENCE_DEPRECATION_WARNING=1
+fi
+
+# Load git prompt if available
+if [[ -f ~/.git-prompt.sh ]]; then
+    source ~/.git-prompt.sh
+fi
 
 # ======== PROMPT =========
 export PS1='\[\e[33m\]\u\[\e[0m\]@\[\e[34m\]\h\[\e[0m\]:\[\e[35m\]\W\[\e[0m\] $(__git_ps1 "(%s)") \n$ '
 
 # ======== ALIASES =========
-alias vim='nvim'
-alias v='nvim'
+source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/aliases.sh"
 
-alias ..="cd .."
-alias ...="cd ../.."
-alias ....="cd ../../.."
+# Git aliases (bash doesn't have OMZP::git like zsh)
+alias ga='git add'
+alias gb='git branch'
+alias gco='git checkout'
+alias gcm='git commit -m'
+alias gl='git pull'
+alias gp='git push'
+alias gd='git diff'
+alias gst='git status'
+alias gss='git stash save'
+alias gsp='git stash pop'
+alias gmv='git mv'
+alias grm='git rm'
+alias gundo='git reset --soft HEAD~1'
 
-alias ls='ls --color=auto'
-alias ll='ls -la'
-alias la='ls -lathr'
-
-alias ga="git add"
-alias gb="git branch"
-alias gc="git checkout"
-alias gcm="git commit -m"
-alias gl="git pull"
-alias gp="git push"
-alias gd="git diff"
-alias gss="git stash save"
-alias gsp="git stash pop"
-alias gmv="git mv"
-alias grm="git rm"
-alias grn="git-rename"
-alias gundo="git reset --soft HEAD~1"
-
-# ======== FUNCTIONS =========
-function g() {
-	if [[ $# > 0 ]]; then
-		# if there are arguments, send them to git
-		git $@
-	else
-		# otherwise, run git status
-		git status
-	fi
+g() {
+  if [[ $# -gt 0 ]]; then
+    git "$@"
+  else
+    git status
+  fi
 }

@@ -22,13 +22,11 @@ return {
   {
     "NeogitOrg/neogit",
     dependencies = {
-      "nvim-lua/plenary.nvim", -- required
-      "sindrets/diffview.nvim", -- optional - Diff integration
-
-      -- Only one of these is needed.
-      "nvim-telescope/telescope.nvim", -- optional
+      "nvim-lua/plenary.nvim",
+      "sindrets/diffview.nvim",
+      "nvim-telescope/telescope.nvim",
     },
-    lazy = false,
+    cmd = "Neogit",
     config = true,
   },
 
@@ -36,18 +34,15 @@ return {
     "polarmutex/git-worktree.nvim",
     version = "^2",
     dependencies = { "nvim-lua/plenary.nvim" },
-    enabled = true,
-    lazy = false,
+    event = "VeryLazy",
     config = function()
       require("telescope").load_extension "git_worktree"
-      -- vim.keymap.set("n", "W", function()
-      --   require("telescope").extensions.git_worktree.git_worktrees()
-      -- end, { desc = "Worktrees" })
     end,
   },
 
   {
     "nvim-telescope/telescope.nvim",
+    cmd = "Telescope",
     opts = {
       defaults = {
         file_ignore_patterns = {
