@@ -1,134 +1,114 @@
 # Dotfiles
 
-Tony's dotfiles for a modern terminal development environment.
+Modern terminal development environment with Zsh, Neovim, Tmux, and Alacritty.
 
-## What's Included
+## Prerequisites
 
-- **Zsh** - Shell with Zinit plugin manager and Powerlevel10k prompt
-- **Neovim** - NvChad-based configuration with LSP support
-- **Tmux** - Terminal multiplexer with vim-style navigation
-- **Alacritty** - GPU-accelerated terminal emulator
+**Git** is required to clone this repository:
+
+| OS | Command |
+|----|---------|
+| macOS | `xcode-select --install` |
+| Debian/Ubuntu | `sudo apt install git` |
+| Fedora | `sudo dnf install git` |
+| AlmaLinux/RHEL 9 | `sudo dnf install git` |
 
 ## Installation
 
-### macOS
-
 ```shell
-# Clone the repository
 git clone https://github.com/tungsheng/dotfiles.git ~/dotfiles
 cd ~/dotfiles
+./setup
+```
 
-# Preview what will be installed (dry run)
+The setup script auto-detects your OS and installs all dependencies.
+
+**Preview changes first:**
+```shell
 ./setup --dry-run
-
-# Run setup script (installs dependencies and creates symlinks)
-./setup
 ```
 
-### Linux
+### AlmaLinux/RHEL 9 Note
 
-```shell
-# Clone the repository
-git clone https://github.com/tungsheng/dotfiles.git ~/dotfiles
-cd ~/dotfiles
-
-# Run setup script (auto-detects distro and installs dependencies)
-./setup
-```
-
-#### Manual Installation by Distro
-
-**Debian/Ubuntu:**
-```shell
-sudo apt install -y stow neovim fd-find ripgrep fzf zoxide tmux zsh
-```
-
-**AlmaLinux/RHEL/CentOS 9:**
+EPEL repository is required for `stow`. If setup fails, run:
 ```shell
 sudo dnf install -y epel-release
-sudo dnf install -y stow neovim fd-find ripgrep fzf tmux zsh
-# zoxide not in repos - install manually:
-curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
-```
-
-**Fedora:**
-```shell
-sudo dnf install -y stow neovim fd-find ripgrep fzf zoxide tmux zsh
-```
-
-## Manual Installation
-
-If you prefer to install dependencies yourself:
-
-```shell
-# Install stow
-brew install stow  # macOS
-# or: sudo apt install stow  # Linux
-
-# Create symlinks
-cd ~/dotfiles
-stow .
+./setup
 ```
 
 ## Post-Installation
 
-1. Restart your terminal or run `source ~/.zshrc`
-2. Run `p10k configure` to set up Powerlevel10k prompt
-3. Open `nvim` to let Lazy.nvim install plugins
-4. Run `tmux` and press `Ctrl+Space I` to install tmux plugins
+1. Restart terminal or `source ~/.zshrc`
+2. Run `p10k configure` to customize prompt
+3. Open `nvim` - plugins install automatically
+4. In tmux, press `Ctrl+Space I` to install plugins
 
 ## Uninstall
 
 ```shell
-cd ~/dotfiles
 ./setup uninstall
 ```
 
-This will:
-- Remove all dotfile symlinks
-- Optionally remove Alacritty themes, Zinit, Neovim data, and tmux plugins
-- **Note:** Installed packages (brew/dnf/apt) are not removed
+Removes symlinks and optionally cleans up plugins/themes. System packages are not removed.
+
+## Manual Installation
+
+If you prefer to manage dependencies yourself:
+
+<details>
+<summary>Install stow manually by distro</summary>
+
+| OS | Command |
+|----|---------|
+| macOS | `brew install stow` |
+| Debian/Ubuntu | `sudo apt install stow` |
+| Fedora | `sudo dnf install stow` |
+| AlmaLinux/RHEL 9 | `sudo dnf install epel-release && sudo dnf install stow` |
+
+</details>
+
+Then create symlinks:
+```shell
+cd ~/dotfiles
+stow .
+```
 
 ## Structure
 
 ```
 dotfiles/
 ├── .config/
-│   ├── alacritty/     # Terminal emulator config
-│   ├── gh/            # GitHub CLI config
-│   ├── nvim/          # Neovim config (NvChad)
-│   └── tmux/          # Tmux config + plugins
-├── .zshrc             # Zsh configuration
-├── .bashrc            # Bash configuration
-├── .bash_profile      # Bash login config
-├── Brewfile           # Homebrew dependencies
-└── setup              # Installation script
+│   ├── alacritty/    # Terminal config
+│   ├── nvim/         # Neovim (NvChad)
+│   ├── tmux/         # Tmux config
+│   └── gh/           # GitHub CLI
+├── .zshrc            # Zsh config
+├── .bashrc           # Bash config
+├── Brewfile          # macOS dependencies
+└── setup             # Install script
 ```
 
 ## Key Bindings
 
 See [KEYBINDINGS.md](KEYBINDINGS.md) for complete reference.
 
-### Quick Reference
-
 | Tool | Key | Action |
 |------|-----|--------|
-| Tmux | `Ctrl+Space` | Prefix key |
-| Tmux | `Ctrl+h/j/k/l` | Navigate panes (seamless with vim) |
-| Tmux | `prefix I` | Install plugins |
-| Neovim | `Space` | Leader key |
+| Tmux | `Ctrl+Space` | Prefix |
+| Tmux | `Ctrl+h/j/k/l` | Navigate panes |
+| Neovim | `Space` | Leader |
 | Neovim | `<leader>ff` | Find files |
-| Neovim | `<leader>gs` | Git status (Neogit) |
-| Zsh | `Ctrl+r` | Fuzzy history search |
+| Zsh | `Ctrl+r` | History search |
 
-## Useful Commands
+## Commands
 
 ```shell
-./setup health      # Check installation status
-./setup uninstall   # Remove dotfiles
-./setup --dry-run   # Preview changes
+./setup            # Install
+./setup uninstall  # Remove
+./setup health     # Check status
+./setup --dry-run  # Preview
 ```
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+[MIT](LICENSE)

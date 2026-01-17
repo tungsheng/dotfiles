@@ -6,7 +6,11 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 
 # Listing
-alias ls='ls --color=auto'
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    alias ls='ls -G'
+else
+    alias ls='ls --color=auto'
+fi
 alias ll='ls -la'
 alias la='ls -lathr'
 

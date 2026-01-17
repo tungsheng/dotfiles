@@ -29,6 +29,9 @@ zinit snippet OMZP::kubectl
 zinit snippet OMZP::kubectx
 zinit snippet OMZP::command-not-found
 
+# Docker CLI completions (must be before compinit)
+[[ -d "$HOME/.docker/completions" ]] && fpath=("$HOME/.docker/completions" $fpath)
+
 # Completions
 autoload -Uz compinit && compinit
 zinit cdreplay -q
@@ -74,11 +77,6 @@ nvm() {
 node() { nvm; node "$@"; }
 npm() { nvm; npm "$@"; }
 npx() { nvm; npx "$@"; }
-
-# Docker CLI completions
-if [[ -d "$HOME/.docker/completions" ]]; then
-    fpath=("$HOME/.docker/completions" $fpath)
-fi
 
 # Bun (lazy loaded for faster shell startup)
 export BUN_INSTALL="$HOME/.bun"

@@ -1,6 +1,3 @@
-# Taps
-tap "homebrew/cask-fonts"
-
 # CLI Tools
 brew "stow"
 brew "neovim"
