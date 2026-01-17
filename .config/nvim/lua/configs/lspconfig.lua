@@ -11,8 +11,7 @@ local util = require "lspconfig.util"
 local servers = {
   "html",
   "cssls",
-  "ts_ls",
-  "eslint",
+  "vtsls",
   "marksman",
   "dockerls",
   "bashls",

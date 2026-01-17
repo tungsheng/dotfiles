@@ -1,5 +1,10 @@
 return {
   {
+    "christoomey/vim-tmux-navigator",
+    event = "VeryLazy",
+  },
+
+  {
     "stevearc/conform.nvim",
     -- event = 'BufWritePre', -- uncomment for format on save
     opts = require "configs.conform",
@@ -67,6 +72,8 @@ return {
   			"vim", "lua", "vimdoc",
         "html", "css", "javascript",
         "typescript", "tsx",
+        "json", "yaml", "markdown",
+        "bash", "dockerfile",
   		},
   	},
   },

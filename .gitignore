@@ -1,3 +1,13 @@
+# macOS
 .DS_Store
+
+# Neovim
 .netrwhist
+
+# Alacritty themes (cloned separately via setup)
 .config/alacritty/themes
+
+# Backup/swap files
+*~
+*.swp
+*.bak

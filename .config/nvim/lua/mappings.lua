@@ -1,8 +1,13 @@
 require "nvchad.mappings"
-local lazy = {}
 
 local map = vim.keymap.set
--- local nomap = vim.keymap.del
+local del = vim.keymap.del
+
+-- Remove NvChad's window navigation mappings (vim-tmux-navigator handles these)
+del("n", "<C-h>")
+del("n", "<C-j>")
+del("n", "<C-k>")
+del("n", "<C-l>")
 
 -- map("n", ";", ":", { desc = "CMD enter command mode" })
 -- map("i", "jk", "<ESC>")

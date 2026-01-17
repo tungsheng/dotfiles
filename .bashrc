@@ -15,7 +15,8 @@ source ~/.git-prompt.sh
 export PS1='\[\e[33m\]\u\[\e[0m\]@\[\e[34m\]\h\[\e[0m\]:\[\e[35m\]\W\[\e[0m\] $(__git_ps1 "(%s)") \n$ '
 
 # ======== ALIASES =========
-alias v=nvim
+alias vim='nvim'
+alias v='nvim'
 
 alias ..="cd .."
 alias ...="cd ../.."
