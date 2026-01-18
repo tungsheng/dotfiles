@@ -1,50 +1,45 @@
 #!/bin/bash
 set -e
 
-# ==============================================================================
-# Configuration
-# ==============================================================================
+# --- Configuration ---
+# Core settings and data arrays for the setup script
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VERSION="1.0.0"
 DRY_RUN=false
 VERBOSE=false
 
-# ------------------------------------------------------------------------------
-# Dependencies: cmd|brew|dnf|apt (use - for unavailable/skip)
-# ------------------------------------------------------------------------------
+# Dependencies: cmd_name|brew_pkg|dnf_pkg|apt_pkg
+# Use "-" to skip a package manager (unavailable or not needed)
 DEPS=(
     "stow|stow|stow|stow"
     "nvim|neovim|neovim|neovim"
     "fd|fd|fd-find|fd-find"
     "rg|ripgrep|ripgrep|ripgrep"
     "fzf|fzf|fzf|fzf"
-    "zoxide|zoxide|-|zoxide"           # DNF: install via curl
+    "zoxide|zoxide|-|zoxide"        # Fedora: installed via curl
     "tmux|tmux|tmux|tmux"
-    "marksman|marksman|-|-"            # macOS only
-    "-||-git|git"                      # Linux only (skip on macOS)
+    "marksman|marksman|-|-"         # LSP for markdown, macOS only
+    "-||-git|git"                   # Linux only packages
     "-||-curl|curl"
     "-||-zsh|zsh"
     "-||-unzip|unzip"
 )
 
-# macOS fonts (casks)
-CASKS=(
-    "font-jetbrains-mono-nerd-font"
-    "font-hurmit-nerd-font"
-)
+# Nerd fonts for terminal/editor icons (macOS Homebrew casks)
+CASKS=("font-jetbrains-mono-nerd-font" "font-hurmit-nerd-font")
 
-# Files managed by stow (for backup/health check)
+# Files/directories managed by stow (used for backup and health checks)
 MANAGED_FILES=(.zshrc .bashrc .bash_profile .config/nvim .config/tmux .config/alacritty .config/gh .config/shell)
 
-# External resources: path|url|type|name
+# External resources: local_path|source_url|fetch_type|display_name
 EXTRAS=(
     "$HOME/.git-prompt.sh|https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh|curl|git-prompt.sh"
     "$HOME/.config/alacritty/themes|https://github.com/alacritty/alacritty-theme|git|Alacritty themes"
     "$HOME/.tmux/plugins/tpm|https://github.com/tmux-plugins/tpm|git|TPM"
 )
 
-# Cleanup paths for uninstall: path|display_name
+# Paths to clean on uninstall: path|display_name
 CLEANUPS=(
     "$HOME/.config/alacritty/themes|Alacritty themes"
     "$HOME/.git-prompt.sh|git-prompt.sh"
@@ -53,23 +48,25 @@ CLEANUPS=(
     "$HOME/.tmux/plugins|Tmux plugins"
 )
 
-# ==============================================================================
-# Logging
-# ==============================================================================
+# --- Logging ---
+# Colored output functions for consistent messaging
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
-DIM='\033[2m'
-BOLD='\033[1m'
-NC='\033[0m'
+RED='\033[0;31m' GREEN='\033[0;32m' YELLOW='\033[1;33m'
+BLUE='\033[0;34m' CYAN='\033[0;36m' DIM='\033[2m' BOLD='\033[1m' NC='\033[0m'
 
-log_header() {
+print_banner() {
     echo
-    echo -e "${BOLD}${BLUE}dotfiles${NC} ${DIM}v${VERSION}${NC}"
-    echo -e "${DIM}────────────────────────────────────${NC}"
+    echo -e "${BOLD}"
+    cat <<'EOF'
+       ██████╗   ██████╗  ████████╗ ███████╗ ██╗ ██╗     ███████╗ ███████╗
+       ██╔══██╗ ██╔═══██╗ ╚══██╔══╝ ██╔════╝ ██║ ██║     ██╔════╝ ██╔════╝
+       ██║  ██║ ██║   ██║    ██║    █████╗   ██║ ██║     █████╗   ███████╗
+       ██║  ██║ ██║   ██║    ██║    ██╔══╝   ██║ ██║     ██╔══╝   ╚════██║
+       ██████╔╝ ╚██████╔╝    ██║    ██║      ██║ ███████╗███████╗ ███████║
+       ╚═════╝   ╚═════╝     ╚═╝    ╚═╝      ╚═╝ ╚══════╝╚══════╝ ╚══════╝
+EOF
+    echo -e "${NC}${DIM}       v${VERSION}${NC}"
+    echo
 }
 
 log_info()    { echo -e "${BLUE}::${NC} $1"; }
@@ -77,171 +74,130 @@ log_success() { echo -e "${GREEN}✓${NC}  $1"; }
 log_warn()    { echo -e "${YELLOW}!${NC}  $1"; }
 log_error()   { echo -e "${RED}✗${NC}  $1" >&2; }
 log_dim()     { echo -e "${DIM}   $1${NC}"; }
-
-log_step() {
-    local step=$1 total=$2 title=$3
-    echo
-    echo -e "${BOLD}[${step}/${total}]${NC} ${title}"
-}
+log_step()    { echo; echo -e "${BOLD}[$1/$2]${NC} $3"; }
 
 log_result() {
-    local ok=$1 fail=$2 warn=${3:-0}
+    local passed=$1 failed=$2 warned=${3:-0}
     echo
-    echo -ne "${DIM}Results:${NC} "
-    [[ $ok -gt 0 ]] && echo -ne "${GREEN}${ok} passed${NC} "
-    [[ $fail -gt 0 ]] && echo -ne "${RED}${fail} failed${NC} "
-    [[ $warn -gt 0 ]] && echo -ne "${YELLOW}${warn} warnings${NC}"
+    echo -ne "${DIM}Result:${NC} "
+    [[ $passed -gt 0 ]] && echo -ne "${GREEN}${passed} passed${NC} "
+    [[ $failed -gt 0 ]] && echo -ne "${RED}${failed} failed${NC} "
+    [[ $warned -gt 0 ]] && echo -ne "${YELLOW}${warned} warnings${NC}"
     echo
 }
 
-# ==============================================================================
-# Helpers
-# ==============================================================================
+# --- Helpers ---
+# Utility functions used throughout the script
 
-run() {
-    if $DRY_RUN; then
-        log_dim "dry-run: $*"
-    else
-        $VERBOSE && log_dim "exec: $*"
-        "$@"
-    fi
+# Execute command, respecting dry-run and verbose modes
+run_cmd() {
+    if $DRY_RUN; then log_dim "dry-run: $*"
+    else $VERBOSE && log_dim "$ $*"; "$@"; fi
 }
 
+# Check if a command exists in PATH
 has_cmd() { command -v "$1" &>/dev/null; }
+
+# Check if a file or directory exists
 has_path() { [[ -e "$1" ]]; }
 
+# Detect current OS/distribution
 detect_os() {
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        echo "macos"
-    elif has_cmd dnf; then
-        echo "fedora"
-    elif has_cmd apt; then
-        echo "debian"
-    else
-        echo "unknown"
-    fi
+    [[ "$OSTYPE" == "darwin"* ]] && echo "macos" && return
+    has_cmd dnf && echo "fedora" && return
+    has_cmd apt && echo "debian" && return
+    echo "unknown"
 }
 
-usage() {
-    cat <<EOF
-${BOLD}Usage:${NC} $(basename "$0") [command] [options]
+# Extract package names from DEPS array for a specific package manager
+# Args: $1 = column index (2=brew, 3=dnf, 4=apt)
+get_packages() {
+    local col=$1 packages=()
+    for item in "${DEPS[@]}"; do
+        local pkg=$(echo "$item" | cut -d'|' -f"$col")
+        [[ "$pkg" != "-" ]] && packages+=("$pkg")
+    done
+    echo "${packages[@]}"
+}
 
-${BOLD}Commands:${NC}
-    install     Install dotfiles and dependencies (default)
-    uninstall   Remove dotfiles symlinks
-    health      Check installation status
-
-${BOLD}Options:${NC}
-    -n, --dry-run   Preview changes without applying
-    -v, --verbose   Show detailed output
-    -h, --help      Show this help
-
-${BOLD}Examples:${NC}
-    ./setup              # Install everything
-    ./setup --dry-run    # Preview install
-    ./setup health       # Check status
-    ./setup uninstall    # Remove dotfiles
-EOF
+print_usage() {
+    print_banner
+    echo -e "${BOLD}Usage:${NC} ./setup [command] [options]"
+    echo
+    echo -e "${BOLD}Commands:${NC}"
+    echo "    install     Install dotfiles and dependencies (default)"
+    echo "    uninstall   Remove symlinks and optionally clean up"
+    echo "    health      Check installation status"
+    echo
+    echo -e "${BOLD}Options:${NC}"
+    echo "    -n, --dry-run   Preview changes without applying"
+    echo "    -v, --verbose   Show detailed command output"
+    echo "    -h, --help      Show this help message"
     exit 0
 }
 
-# ==============================================================================
-# Commands
-# ==============================================================================
+# --- Commands ---
+# Main command implementations
 
 cmd_health() {
-    log_header
+    print_banner
     log_info "Running health check"
+    local passed=0 failed=0 warned=0
 
-    local ok=0 fail=0 warn=0
-
-    # Symlinks
     log_step 1 3 "Symlinks"
-    for f in "${MANAGED_FILES[@]}"; do
-        if [[ -L "$HOME/$f" ]]; then
-            log_success "$f"
-            ((++ok))
-        elif [[ -d "$HOME/$f" ]]; then
-            # Directory exists (stow creates dirs, symlinks files inside)
-            log_success "$f/"
-            ((++ok))
-        elif [[ -e "$HOME/$f" ]]; then
-            log_warn "$f exists but not symlinked"
-            ((++warn))
+    for file in "${MANAGED_FILES[@]}"; do
+        if [[ -L "$HOME/$file" || -d "$HOME/$file" ]]; then
+            log_success "$file"; ((++passed))
+        elif [[ -e "$HOME/$file" ]]; then
+            log_warn "$file exists but not symlinked"; ((++warned))
         else
-            log_error "$f missing"
-            ((++fail))
+            log_error "$file missing"; ((++failed))
         fi
     done
 
-    # Dependencies
     log_step 2 3 "Dependencies"
     for item in "${DEPS[@]}"; do
         IFS='|' read -r cmd _ _ _ <<< "$item"
-        [[ "$cmd" == "-" ]] && continue  # Skip platform-specific
-        if has_cmd "$cmd"; then
-            log_success "$cmd"
-            ((++ok))
-        else
-            log_error "$cmd not found"
-            ((++fail))
-        fi
+        [[ "$cmd" == "-" ]] && continue
+        has_cmd "$cmd" && { log_success "$cmd"; ((++passed)); } || { log_error "$cmd not found"; ((++failed)); }
     done
 
-    # Plugin managers
-    log_step 3 3 "Plugin managers"
+    log_step 3 3 "Plugin Managers"
     local plugins=(
-        "${XDG_DATA_HOME:-$HOME/.local/share}/zinit|Zinit"
-        "$HOME/.local/share/nvim/lazy|Neovim Lazy"
-        "$HOME/.tmux/plugins/tpm|TPM"
+        "${XDG_DATA_HOME:-$HOME/.local/share}/zinit|Zinit (zsh)"
+        "$HOME/.local/share/nvim/lazy|Lazy.nvim"
+        "$HOME/.tmux/plugins/tpm|TPM (tmux)"
     )
     for item in "${plugins[@]}"; do
         local path="${item%%|*}" name="${item##*|}"
-        if has_path "$path"; then
-            log_success "$name"
-            ((++ok))
-        else
-            log_warn "$name not installed"
-            ((++warn))
-        fi
+        has_path "$path" && { log_success "$name"; ((++passed)); } || { log_warn "$name not installed"; ((++warned)); }
     done
 
-    log_result $ok $fail $warn
+    log_result $passed $failed $warned
 }
 
 cmd_uninstall() {
-    log_header
+    print_banner
     log_info "Uninstalling dotfiles"
     $DRY_RUN && log_warn "Dry run mode - no changes will be made"
 
-    has_cmd stow || { log_error "stow is required but not installed"; exit 1; }
+    has_cmd stow || { log_error "stow is required"; exit 1; }
 
     log_step 1 2 "Removing symlinks"
     cd "$DOTFILES_DIR"
-    run stow --target="$HOME" --delete .
-    $DRY_RUN && log_success "Symlinks ready to remove" || log_success "Symlinks removed"
+    run_cmd stow --target="$HOME" --delete .
+    log_success "Symlinks removed"
 
-    if $DRY_RUN; then
-        log_step 2 2 "Cleanup (skipped in dry-run)"
-        return
-    fi
+    if $DRY_RUN; then log_step 2 2 "Cleanup (skipped in dry-run)"; return; fi
 
-    log_step 2 2 "Optional cleanup"
-    log_dim "Press y to remove, n to skip"
-    echo
+    log_step 2 2 "Cleanup (optional)"
     for item in "${CLEANUPS[@]}"; do
         local path="${item%%|*}" name="${item##*|}"
         if has_path "$path"; then
             read -p "   Remove $name? [y/N] " -n 1 -r; echo
-            if [[ $REPLY =~ ^[Yy]$ ]]; then
-                rm -rf "$path"
-                log_success "Removed $name"
-            else
-                log_dim "Skipped $name"
-            fi
+            [[ $REPLY =~ ^[Yy]$ ]] && { rm -rf "$path"; log_success "Removed $name"; } || log_dim "Kept $name"
         fi
     done
-
     rm -rf "$HOME/.local/state/nvim" "$HOME/.cache/nvim" 2>/dev/null || true
 
     echo
@@ -250,81 +206,63 @@ cmd_uninstall() {
 }
 
 cmd_install() {
-    log_header
+    print_banner
     local os=$(detect_os)
     log_info "Installing dotfiles"
-    log_dim "OS: $os | Dir: $DOTFILES_DIR"
+    log_dim "Detected OS: $os"
     $DRY_RUN && log_warn "Dry run mode - no changes will be made"
 
-    # Step 1: Backup
+    # Backup existing configs before overwriting
     log_step 1 4 "Backup existing configs"
     local backed_up=0
     if ! $DRY_RUN; then
-        local need_backup=false
-        for f in "${MANAGED_FILES[@]}"; do
-            [[ -e "$HOME/$f" && ! -L "$HOME/$f" ]] && need_backup=true && break
+        for file in "${MANAGED_FILES[@]}"; do
+            if [[ -e "$HOME/$file" && ! -L "$HOME/$file" ]]; then
+                local backup_dir="$HOME/.dotfiles-backup-$(date +%Y%m%d-%H%M%S)"
+                [[ ! -d "$backup_dir" ]] && mkdir -p "$backup_dir" && log_dim "Backup dir: $backup_dir"
+                cp -r "$HOME/$file" "$backup_dir/"
+                log_success "Backed up $file"
+                ((++backed_up))
+            fi
         done
-        if $need_backup; then
-            local backup_dir="$HOME/.dotfiles-backup-$(date +%Y%m%d-%H%M%S)"
-            log_dim "Backup directory: $backup_dir"
-            mkdir -p "$backup_dir"
-            for f in "${MANAGED_FILES[@]}"; do
-                if [[ -e "$HOME/$f" && ! -L "$HOME/$f" ]]; then
-                    cp -r "$HOME/$f" "$backup_dir/"
-                    log_success "Backed up $f"
-                    ((++backed_up))
-                fi
-            done
-        fi
     fi
     [[ $backed_up -eq 0 ]] && log_success "No backup needed"
 
-    # Step 2: Dependencies
+    # Install system packages
     log_step 2 4 "Install dependencies"
     install_deps "$os"
 
-    # Step 3: Extras
+    # Install external resources (themes, plugins)
     log_step 3 4 "Install extras"
     install_extras
 
-    # Step 4: Symlinks
+    # Create symlinks via stow
     log_step 4 4 "Create symlinks"
     cd "$DOTFILES_DIR"
     if $DRY_RUN; then
-        log_dim "stow --target=\$HOME --restow ."
-        log_success "Symlinks ready (dry-run)"
+        log_dim "Would run: stow --target=\$HOME --restow ."
+        log_success "Ready to create symlinks"
     else
         stow --target="$HOME" --restow .
         log_success "Symlinks created"
     fi
 
-    # Done
+    # Post-install instructions
     echo
     echo -e "${GREEN}${BOLD}Installation complete!${NC}"
     echo
     echo -e "${BOLD}Next steps:${NC}"
     echo -e "  ${CYAN}1.${NC} source ~/.zshrc"
-    echo -e "  ${CYAN}2.${NC} p10k configure"
-    echo -e "  ${CYAN}3.${NC} nvim ${DIM}(plugins auto-install)${NC}"
-    echo -e "  ${CYAN}4.${NC} tmux, then ${BOLD}Ctrl+Space I${NC}"
+    echo -e "  ${CYAN}2.${NC} p10k configure ${DIM}(customize prompt)${NC}"
+    echo -e "  ${CYAN}3.${NC} nvim ${DIM}(plugins install automatically)${NC}"
+    echo -e "  ${CYAN}4.${NC} tmux, then ${BOLD}Ctrl+Space I${NC} ${DIM}(install plugins)${NC}"
     echo
-    echo -e "${DIM}Run ./setup health to verify${NC}"
+    log_dim "Run ./setup health to verify installation"
     echo
 }
 
-# ==============================================================================
-# Install Helpers
-# ==============================================================================
-
-get_packages() {
-    local col=$1
-    local packages=()
-    for item in "${DEPS[@]}"; do
-        local pkg=$(echo "$item" | cut -d'|' -f"$col")
-        [[ "$pkg" != "-" ]] && packages+=("$pkg")
-    done
-    echo "${packages[@]}"
-}
+# --- Install Helpers ---
+# Functions that support the install command
 
 install_deps() {
     local os=$1
@@ -333,46 +271,42 @@ install_deps() {
         macos)
             if ! has_cmd brew; then
                 log_info "Installing Homebrew..."
-                run /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+                run_cmd /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
                 eval "$(/opt/homebrew/bin/brew shellenv)"
             fi
             log_success "Homebrew ready"
 
             log_info "Installing packages..."
-            local packages=($(get_packages 2))
-            run brew install --quiet "${packages[@]}"
+            run_cmd brew install --quiet $(get_packages 2)
 
             log_info "Installing fonts..."
-            for cask in "${CASKS[@]}"; do
-                run brew install --quiet --cask "$cask"
-            done
+            run_cmd brew install --quiet --cask "${CASKS[@]}"
             ;;
 
         fedora)
             log_info "Installing EPEL repository..."
-            run sudo dnf install -y epel-release 2>/dev/null || true
+            run_cmd sudo dnf install -y epel-release 2>/dev/null || true
 
             log_info "Installing packages..."
-            local packages=($(get_packages 3))
-            run sudo dnf install -y "${packages[@]}"
+            run_cmd sudo dnf install -y $(get_packages 3)
 
+            # zoxide not in EPEL, install via official script
             if ! has_cmd zoxide; then
                 log_info "Installing zoxide..."
-                run curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+                run_cmd curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
             fi
             ;;
 
         debian)
             log_info "Updating package index..."
-            run sudo apt update
+            run_cmd sudo apt update
 
             log_info "Installing packages..."
-            local packages=($(get_packages 4))
-            run sudo apt install -y "${packages[@]}"
+            run_cmd sudo apt install -y $(get_packages 4)
             ;;
 
         *)
-            log_warn "Unknown OS - please install dependencies manually"
+            log_warn "Unknown OS - install dependencies manually"
             log_dim "Required: stow neovim fd ripgrep fzf zoxide tmux git curl zsh"
             has_cmd stow || { log_error "stow is required"; exit 1; }
             return
@@ -386,47 +320,36 @@ install_extras() {
     for item in "${EXTRAS[@]}"; do
         IFS='|' read -r path url type name <<< "$item"
         if has_path "$path"; then
-            log_success "$name (exists)"
+            log_success "$name (already exists)"
         else
             log_info "Installing $name..."
             case "$type" in
-                curl)
-                    run curl -sS -o "$path" "$url"
-                    ;;
-                git)
-                    run mkdir -p "$(dirname "$path")"
-                    run git clone --depth 1 -q "$url" "$path"
-                    ;;
+                curl) run_cmd curl -sS -o "$path" "$url" ;;
+                git)  run_cmd mkdir -p "$(dirname "$path")"
+                      run_cmd git clone --depth 1 -q "$url" "$path" ;;
             esac
-            log_success "$name"
+            log_success "$name installed"
         fi
     done
 }
 
-# ==============================================================================
-# Main
-# ==============================================================================
+# --- Main ---
+# Entry point and argument parsing
 
 main() {
     local command="install"
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            install)      command="install"; shift ;;
-            uninstall)    command="uninstall"; shift ;;
-            health)       command="health"; shift ;;
+            install|uninstall|health) command="$1"; shift ;;
             -n|--dry-run) DRY_RUN=true; shift ;;
             -v|--verbose) VERBOSE=true; shift ;;
-            -h|--help)    usage ;;
-            *)            log_error "Unknown option: $1"; usage ;;
+            -h|--help)    print_usage ;;
+            *)            log_error "Unknown option: $1"; print_usage ;;
         esac
     done
 
-    case "$command" in
-        install)   cmd_install ;;
-        uninstall) cmd_uninstall ;;
-        health)    cmd_health ;;
-    esac
+    cmd_$command
 }
 
 main "$@"
