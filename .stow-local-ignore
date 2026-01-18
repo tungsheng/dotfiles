@@ -13,10 +13,10 @@ CONTRIBUTING\.md
 # Claude Code
 \.claude
 
-# Scripts and setup
-setup
+# Scripts
+dot
 
-# External resources (cloned by setup)
+# External resources (cloned by dot)
 \.config/alacritty/themes
 \.config/tmux/plugins
 

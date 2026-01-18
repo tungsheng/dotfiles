@@ -9,11 +9,12 @@ Dotfiles repository using GNU Stow. Supports macOS, Debian/Ubuntu, and RHEL/Fedo
 ## Commands
 
 ```shell
-./setup              # Install
-./setup uninstall    # Remove
-./setup health       # Check status
-./setup --dry-run    # Preview
-./setup --verbose    # Detailed output
+./dot                 # Show help
+./dot install         # Install dotfiles
+./dot uninstall       # Remove symlinks
+./dot health          # Check status
+./dot install -n      # Preview (dry-run)
+./dot install -v      # Verbose output
 ```
 
 ## Structure
@@ -28,19 +29,19 @@ dotfiles/
 │   ├── alacritty/           # Terminal (Tokyo Night)
 │   ├── gh/                  # GitHub CLI
 │   └── shell/aliases.sh     # Shared aliases
-├── setup                    # Install script
+├── dot                      # Install script (bash 3.2+)
 └── .stow-local-ignore       # Stow exclusions
 ```
 
-## Setup Script Patterns
+## Script Patterns
 
 **Dependencies** - `cmd|brew|dnf|apt`:
 ```bash
 DEPS=(
     "nvim|neovim|neovim|neovim"  # cmd differs from package
-    "fd|fd|fd-find|fd-find"      # Package name differs
-    "zoxide|zoxide|-|zoxide"     # Use - if unavailable
-    "-||-git|git"                # Use - to skip health check
+    "fd|fd|fd-find|fd-find"      # package name varies by OS
+    "zoxide|zoxide|-|zoxide"     # use - if unavailable
+    "-||-git|git"                # use - to skip health check
 )
 ```
 

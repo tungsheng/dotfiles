@@ -2,76 +2,64 @@
 
 Modern terminal development environment with Zsh, Neovim, Tmux, and Alacritty.
 
+## Quick Start
+
+```shell
+git clone https://github.com/tungsheng/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+./dot install
+```
+
+The script auto-detects your OS and installs all dependencies.
+
+**Preview first:**
+```shell
+./dot install -n
+```
+
 ## Prerequisites
 
-**Git** is required to clone this repository:
+Git is required to clone this repository:
 
 | OS | Command |
 |----|---------|
 | macOS | `xcode-select --install` |
 | Debian/Ubuntu | `sudo apt install git` |
-| Fedora | `sudo dnf install git` |
-| AlmaLinux/RHEL 9 | `sudo dnf install git` |
+| Fedora/RHEL/Alma | `sudo dnf install git` |
 
-## Installation
+### RHEL/AlmaLinux 9
 
-```shell
-git clone https://github.com/tungsheng/dotfiles.git ~/dotfiles
-cd ~/dotfiles
-./setup
-```
-
-The setup script auto-detects your OS and installs all dependencies.
-
-**Preview changes first:**
-```shell
-./setup --dry-run
-```
-
-### AlmaLinux/RHEL 9 Note
-
-EPEL repository is required for `stow`. If setup fails, run:
+EPEL repository is required. If install fails:
 ```shell
 sudo dnf install -y epel-release
-./setup
+./dot install
 ```
 
 ## Post-Installation
 
-1. Restart terminal or `source ~/.zshrc`
+1. **Restart terminal** (or run `zsh`)
 2. Run `p10k configure` to customize prompt
-3. Open `nvim` - plugins install automatically
-4. In tmux, press `Ctrl+Space I` to install plugins
+3. Open `nvim` — plugins install automatically
+4. Open `tmux`, press `Ctrl+Space I` to install plugins
+
+## Commands
+
+```shell
+./dot                 # Show help
+./dot install         # Install dotfiles
+./dot uninstall       # Remove symlinks
+./dot health          # Check status
+./dot install -n      # Preview (dry-run)
+./dot install -v      # Verbose output
+```
 
 ## Uninstall
 
 ```shell
-./setup uninstall
+./dot uninstall
 ```
 
 Removes symlinks and optionally cleans up plugins/themes. System packages are not removed.
-
-## Manual Installation
-
-If you prefer to manage dependencies yourself:
-
-<details>
-<summary>Install stow manually by distro</summary>
-
-| OS | Command |
-|----|---------|
-| macOS | `brew install stow` |
-| Debian/Ubuntu | `sudo apt install stow` |
-| Fedora | `sudo dnf install stow` |
-| AlmaLinux/RHEL 9 | `sudo dnf install epel-release && sudo dnf install stow` |
-
-</details>
-
-Then create symlinks:
-```shell
-cd ~/dotfiles
-stow .
-```
 
 ## Structure
 
@@ -80,25 +68,14 @@ dotfiles/
 ├── .zshrc                   # Zsh config
 ├── .bashrc                  # Bash config
 ├── .config/
-│   ├── nvim/                # Neovim (NvChad)
-│   ├── tmux/                # Tmux config
-│   ├── alacritty/           # Terminal emulator
+│   ├── nvim/                # Neovim (Lazy.nvim)
+│   ├── tmux/                # Tmux (TPM)
+│   ├── alacritty/           # Terminal (Tokyo Night)
 │   ├── gh/                  # GitHub CLI
 │   └── shell/aliases.sh     # Shared aliases
-├── setup                    # Install script
-├── README.md                # This file
+├── dot                      # Install script
 ├── KEYBINDINGS.md           # Key reference
 └── CONTRIBUTING.md          # Dev guide
-```
-
-## Commands
-
-```shell
-./setup              # Install
-./setup uninstall    # Remove
-./setup health       # Check status
-./setup --dry-run    # Preview
-./setup --verbose    # Detailed output
 ```
 
 ## Key Bindings
@@ -113,9 +90,31 @@ See [KEYBINDINGS.md](KEYBINDINGS.md) for complete reference.
 | Neovim | `<leader>ff` | Find files |
 | Zsh | `Ctrl+r` | History search |
 
+## Manual Installation
+
+<details>
+<summary>If you prefer to manage dependencies yourself</summary>
+
+Install stow:
+
+| OS | Command |
+|----|---------|
+| macOS | `brew install stow` |
+| Debian/Ubuntu | `sudo apt install stow` |
+| Fedora | `sudo dnf install stow` |
+| RHEL/Alma | `sudo dnf install epel-release && sudo dnf install stow` |
+
+Then create symlinks:
+```shell
+cd ~/dotfiles
+stow .
+```
+
+</details>
+
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development guide.
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
