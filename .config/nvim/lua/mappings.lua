@@ -1,13 +1,9 @@
 require "nvchad.mappings"
 
 local map = vim.keymap.set
-local del = vim.keymap.del
 
--- Remove NvChad's window navigation (vim-tmux-navigator handles these)
-del("n", "<C-h>")
-del("n", "<C-j>")
-del("n", "<C-k>")
-del("n", "<C-l>")
+-- Note: vim-tmux-navigator provides <C-h/j/k/l> for pane navigation
+-- It automatically overrides NvChad's window mappings
 
 -- Git
 map("n", "<leader>gs", "<CMD>Neogit<CR>", { desc = "Git status" })
