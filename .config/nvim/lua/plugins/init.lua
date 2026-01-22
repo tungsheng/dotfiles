@@ -1,7 +1,7 @@
 return {
   { import = "nvchad.blink.lazyspec" },
 
-  { "christoomey/vim-tmux-navigator", lazy = false },  -- Load immediately for C-h/j/k/l navigation
+  { "christoomey/vim-tmux-navigator", event = "VeryLazy" },
 
   {
     "stevearc/conform.nvim",
