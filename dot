@@ -1,10 +1,11 @@
 #!/bin/bash
 # Dotfiles setup script - compatible with bash 3.2+ (macOS default)
 set -e
+trap 'echo; exit 130' INT
 
 # --- Configuration ---
 
-DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 VERSION="1.0.0"
 DRY_RUN=false
 VERBOSE=false
@@ -148,7 +149,7 @@ cmd_health() {
     echo
     echo -e " ${DIM}Current shell:${NC} $SHELL"
 
-    log_step 1 3 "Symlinks"
+    log_step 1 4 "Symlinks"
     for file in "${MANAGED_FILES[@]}"; do
         if [ -L "$HOME/$file" ] || [ -d "$HOME/$file" ]; then
             log_ok "$file"
@@ -162,7 +163,7 @@ cmd_health() {
         fi
     done
 
-    log_step 2 3 "Commands"
+    log_step 2 4 "Commands"
     for item in "${DEPS[@]}"; do
         IFS='|' read -r cmd _ _ _ <<EOF
 $item
@@ -177,7 +178,22 @@ EOF
         fi
     done
 
-    log_step 3 3 "Plugins"
+    log_step 3 4 "Fonts"
+    if has_cmd fc-list; then
+        for font in "JetBrainsMono Nerd Font" "Hurmit Nerd Font"; do
+            if fc-list | grep -qi "${font%% *}.*Nerd"; then
+                log_ok "$font"
+                ok=$((ok + 1))
+            else
+                log_warn "$font (not installed)"
+                warn=$((warn + 1))
+            fi
+        done
+    else
+        log_dim "fc-list not available, skipping font check"
+    fi
+
+    log_step 4 4 "Plugins"
     local plugins=(
         "${XDG_DATA_HOME:-$HOME/.local/share}/zinit|zinit"
         "$HOME/.local/share/nvim/lazy|lazy.nvim"
