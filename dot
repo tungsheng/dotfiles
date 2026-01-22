@@ -10,7 +10,12 @@ VERSION="1.1.0"
 DRY_RUN=false
 VERBOSE=false
 USE_SHELL=""
-STATE_FILE="$HOME/.dotfiles-state"
+
+# XDG Base Directories
+XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+STATE_DIR="$XDG_STATE_HOME/dotfiles"
+STATE_FILE="$STATE_DIR/state"
 
 # Dependencies table: command | brew | dnf | apt
 # - Use "-" to indicate package is unavailable for that package manager
@@ -38,18 +43,18 @@ MANAGED_FILES=(.zshrc .bashrc .bash_profile .config/nvim .config/tmux .config/al
 
 # Extras: path|url|type|name
 EXTRAS=(
-    "$HOME/.git-prompt.sh|https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh|curl|git-prompt"
+    "${XDG_DATA_HOME:-$HOME/.local/share}/git/git-prompt.sh|https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh|curl|git-prompt"
     "$HOME/.config/alacritty/themes|https://github.com/alacritty/alacritty-theme|git|alacritty-themes"
-    "$HOME/.tmux/plugins/tpm|https://github.com/tmux-plugins/tpm|git|tpm"
+    "$HOME/.config/tmux/plugins/tpm|https://github.com/tmux-plugins/tpm|git|tpm"
 )
 
 # Cleanup: path|name
 CLEANUPS=(
     "$HOME/.config/alacritty/themes|Alacritty themes"
-    "$HOME/.git-prompt.sh|git-prompt.sh"
+    "${XDG_DATA_HOME:-$HOME/.local/share}/git|git-prompt.sh"
     "${XDG_DATA_HOME:-$HOME/.local/share}/zinit|Zinit"
     "$HOME/.local/share/nvim|Neovim data"
-    "$HOME/.tmux/plugins|Tmux plugins"
+    "$HOME/.config/tmux/plugins|Tmux plugins"
 )
 
 # --- Output ---
@@ -280,7 +285,7 @@ cmd_health() {
     local plugins=(
         "${XDG_DATA_HOME:-$HOME/.local/share}/zinit|zinit"
         "$HOME/.local/share/nvim/lazy|lazy.nvim"
-        "$HOME/.tmux/plugins/tpm|tpm"
+        "$HOME/.config/tmux/plugins/tpm|tpm"
     )
     for item in "${plugins[@]}"; do
         local p="${item%%|*}" name="${item##*|}"
@@ -295,8 +300,8 @@ cmd_health() {
                     fi
                     ;;
                 tpm)
-                    if [ -d "$HOME/.tmux/plugins" ]; then
-                        count=$(find "$HOME/.tmux/plugins" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
+                    if [ -d "$HOME/.config/tmux/plugins" ]; then
+                        count=$(find "$HOME/.config/tmux/plugins" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
                         [ -n "$count" ] && [ "$count" != "0" ] && count="${DIM}($count plugins)${NC}"
                     fi
                     ;;
@@ -357,7 +362,7 @@ cmd_status() {
     fi
 
     # Tmux plugins
-    local tpm_dir="$HOME/.tmux/plugins"
+    local tpm_dir="$HOME/.config/tmux/plugins"
     if [ -d "$tpm_dir" ]; then
         local tmux_plugins
         tmux_plugins=$(find "$tpm_dir" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
@@ -440,7 +445,7 @@ cmd_install() {
         for file in "${MANAGED_FILES[@]}"; do
             if [ -e "$HOME/$file" ] && [ ! -L "$HOME/$file" ]; then
                 if [ -z "$backup_dir" ]; then
-                    backup_dir="$HOME/.dotfiles-backup-$(date +%Y%m%d-%H%M%S)"
+                    backup_dir="$STATE_DIR/backups/$(date +%Y%m%d-%H%M%S)"
                     mkdir -p "$backup_dir"
                     log_dim "Location: $backup_dir"
                 fi
@@ -477,6 +482,7 @@ cmd_install() {
 
     # Save state
     if ! "$DRY_RUN"; then
+        mkdir -p "$STATE_DIR"
         echo "installed=$(date +%Y-%m-%d\ %H:%M:%S)" > "$STATE_FILE"
         echo "os=$os" >> "$STATE_FILE"
         echo "shell=$USE_SHELL" >> "$STATE_FILE"
@@ -670,7 +676,8 @@ EOF
         else
             log_info "Cloning $name"
             case "$type" in
-                curl) run curl -sS -o "$p" "$url" ;;
+                curl) run mkdir -p "$(dirname "$p")"
+                      run curl -sS -o "$p" "$url" ;;
                 git)  run mkdir -p "$(dirname "$p")"
                       run git clone --depth 1 -q "$url" "$p" ;;
             esac

@@ -9,8 +9,8 @@ set -o vi
 # macOS: silence bash deprecation warning
 [[ "$OSTYPE" == "darwin"* ]] && export BASH_SILENCE_DEPRECATION_WARNING=1
 
-# Git prompt
-[[ -f ~/.git-prompt.sh ]] && source ~/.git-prompt.sh
+# Git prompt (XDG location)
+[[ -f "${XDG_DATA_HOME:-$HOME/.local/share}/git/git-prompt.sh" ]] && source "${XDG_DATA_HOME:-$HOME/.local/share}/git/git-prompt.sh"
 
 # Prompt
 PS1='\[\e[33m\]\u\[\e[0m\]@\[\e[34m\]\h\[\e[0m\]:\[\e[35m\]\W\[\e[0m\]$(__git_ps1 " (%s)") \n$ '

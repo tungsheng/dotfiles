@@ -45,9 +45,10 @@ bindkey '^p' history-search-backward
 bindkey '^n' history-search-forward
 bindkey '^[w' kill-region
 
-# History
+# History (XDG-compliant)
 HISTSIZE=5000
-HISTFILE=~/.zsh_history
+HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history"
+[[ -d "${HISTFILE%/*}" ]] || mkdir -p "${HISTFILE%/*}"
 SAVEHIST=$HISTSIZE
 setopt appendhistory sharehistory
 setopt hist_ignore_space hist_ignore_all_dups hist_find_no_dups
