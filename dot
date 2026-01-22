@@ -155,6 +155,7 @@ get_packages() {
         pkg=$(echo "$item" | cut -d'|' -f"$col" | tr -d ' ')
         [ -n "$pkg" ] && [ "$pkg" != "-" ] && echo -n "$pkg "
     done
+    true  # Ensure function returns 0 even if last iteration's condition failed
 }
 
 print_usage() {
@@ -531,6 +532,30 @@ print_install_summary() {
 
 # --- Install Helpers ---
 
+show_skipped_deps() {
+    local os="$1"
+    local col
+    case "$os" in
+        macos)  col=2 ;;
+        fedora) col=3 ;;
+        debian) col=4 ;;
+        *)      return ;;
+    esac
+
+    for item in "${DEPS[@]}"; do
+        local cmd pkg
+        cmd=$(echo "$item" | cut -d'|' -f1 | tr -d ' ')
+        pkg=$(echo "$item" | cut -d'|' -f"$col" | tr -d ' ')
+
+        # Skip if package is available or if it's an install-only dep
+        [ "$cmd" = "-" ] && continue
+        [ -n "$pkg" ] && [ "$pkg" != "-" ] && continue
+
+        track_skipped "$cmd" "not available for $os"
+    done
+    true  # Ensure function returns 0
+}
+
 install_deps() {
     local os="$1"
 
@@ -634,28 +659,6 @@ install_deps() {
     esac
 }
 
-show_skipped_deps() {
-    local os="$1"
-    local col
-    case "$os" in
-        macos)  col=2 ;;
-        fedora) col=3 ;;
-        debian) col=4 ;;
-        *)      return ;;
-    esac
-
-    for item in "${DEPS[@]}"; do
-        local cmd pkg
-        cmd=$(echo "$item" | cut -d'|' -f1 | tr -d ' ')
-        pkg=$(echo "$item" | cut -d'|' -f"$col" | tr -d ' ')
-
-        # Skip if package is available or if it's an install-only dep
-        [ "$cmd" = "-" ] && continue
-        [ -n "$pkg" ] && [ "$pkg" != "-" ] && continue
-
-        track_skipped "$cmd" "not available for $os"
-    done
-}
 
 install_extras() {
     for item in "${EXTRAS[@]}"; do
