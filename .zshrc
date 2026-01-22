@@ -66,17 +66,47 @@ source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/aliases.sh"
 eval "$(fzf --zsh)"
 eval "$(zoxide init --cmd cd zsh)"
 
-# NVM (lazy loaded for faster shell startup)
-export NVM_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/nvm"
+# NVM setup (supports both ~/.nvm and XDG locations)
+# Detect NVM directory (prefer XDG, fallback to traditional)
+if [[ -d "${XDG_DATA_HOME:-$HOME/.local/share}/nvm" ]]; then
+  export NVM_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/nvm"
+elif [[ -d "$HOME/.nvm" ]]; then
+  export NVM_DIR="$HOME/.nvm"
+fi
+
+# Add default node to PATH immediately (for tools like Mason)
+# This avoids full NVM load while ensuring npm is available
+if [[ -n "$NVM_DIR" && -d "$NVM_DIR/versions/node" ]]; then
+  # Try to resolve default version (handles aliases like lts/*, default, etc.)
+  _nvm_resolve_default() {
+    local alias_file="$NVM_DIR/alias/default"
+    local version=""
+    if [[ -f "$alias_file" ]]; then
+      version=$(cat "$alias_file")
+      # If it's an alias (like lts/*), try to resolve it
+      while [[ -f "$NVM_DIR/alias/$version" ]]; do
+        version=$(cat "$NVM_DIR/alias/$version")
+      done
+    fi
+    # If still not a version, find the latest installed
+    if [[ ! -d "$NVM_DIR/versions/node/$version" ]]; then
+      version=$(ls -1 "$NVM_DIR/versions/node" 2>/dev/null | sort -V | tail -1)
+    fi
+    echo "$version"
+  }
+  _nvm_default=$(_nvm_resolve_default)
+  [[ -n "$_nvm_default" ]] && export PATH="$NVM_DIR/versions/node/$_nvm_default/bin:$PATH"
+  unset -f _nvm_resolve_default
+  unset _nvm_default
+fi
+
+# Lazy load full NVM (for nvm use, nvm install, etc.)
 nvm() {
-  unset -f nvm node npm npx
+  unset -f nvm
   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
   [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
   nvm "$@"
 }
-node() { nvm; node "$@"; }
-npm() { nvm; npm "$@"; }
-npx() { nvm; npx "$@"; }
 
 # Bun (lazy loaded for faster shell startup)
 export BUN_INSTALL="$HOME/.bun"

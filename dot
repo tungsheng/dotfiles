@@ -6,25 +6,30 @@ trap 'echo; exit 130' INT
 # --- Configuration ---
 
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
-VERSION="1.0.0"
+VERSION="1.1.0"
 DRY_RUN=false
 VERBOSE=false
 USE_SHELL=""
+STATE_FILE="$HOME/.dotfiles-state"
 
-# Dependencies: cmd|brew|dnf|apt (use - to skip)
+# Dependencies table: command | brew | dnf | apt
+# - Use "-" to indicate package is unavailable for that package manager
+# - Use "-" for command to skip health check (install-only packages)
+#
+# Format: "command | brew-pkg | dnf-pkg | apt-pkg"
 DEPS=(
-    "stow|stow|stow|stow"
-    "nvim|neovim|neovim|neovim"
-    "fd|fd|fd-find|fd-find"
-    "rg|ripgrep|ripgrep|ripgrep"
-    "fzf|fzf|fzf|fzf"
-    "zoxide|zoxide|-|zoxide"
-    "tmux|tmux|tmux|tmux"
-    "marksman|marksman|-|-"
-    "-||-git|git"
-    "-||-curl|curl"
-    "-||-zsh|zsh"
-    "-||-unzip|unzip"
+    "stow     | stow      | stow      | stow"
+    "nvim     | neovim    | neovim    | neovim"
+    "fd       | fd        | fd-find   | fd-find"
+    "rg       | ripgrep   | ripgrep   | ripgrep"
+    "fzf      | fzf       | fzf       | fzf"
+    "zoxide   | zoxide    | -         | zoxide"       # Not in dnf repos
+    "tmux     | tmux      | tmux      | tmux"
+    "marksman | marksman  | -         | -"            # brew only
+    "-        |           | git       | git"          # Install-only (skip health check)
+    "-        |           | curl      | curl"
+    "-        |           | zsh       | zsh"
+    "-        |           | unzip     | unzip"
 )
 
 CASKS=("font-jetbrains-mono-nerd-font" "font-hurmit-nerd-font")
@@ -51,6 +56,40 @@ CLEANUPS=(
 
 RED='\033[0;31m' GREEN='\033[0;32m' YELLOW='\033[0;33m'
 BLUE='\033[0;34m' CYAN='\033[0;36m' DIM='\033[2m' BOLD='\033[1m' NC='\033[0m'
+
+# Install summary tracking
+INSTALLED_ITEMS=()
+SKIPPED_ITEMS=()
+
+track_installed() { INSTALLED_ITEMS+=("$1"); }
+track_skipped()   { SKIPPED_ITEMS+=("$1 ${DIM}($2)${NC}"); }
+
+# Spinner for long-running operations (bash 3.2 compatible)
+spin() {
+    local pid=$1 msg=$2
+    local chars='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
+    local i=0 len=${#chars}
+    while kill -0 "$pid" 2>/dev/null; do
+        printf "\r ${BLUE}%s${NC}  %s" "${chars:$i:1}" "$msg"
+        i=$(( (i + 1) % len ))
+        sleep 0.1
+    done
+    printf "\r"
+}
+
+# Run command with spinner
+run_with_spin() {
+    local msg="$1"
+    shift
+    if "$DRY_RUN"; then
+        log_dim "[dry-run] $*"
+        return 0
+    fi
+    "$@" >/dev/null 2>&1 &
+    local pid=$!
+    spin "$pid" "$msg"
+    wait "$pid"
+}
 
 print_banner() {
     echo -e "${BOLD}"
@@ -113,8 +152,8 @@ detect_os() {
 get_packages() {
     local col="$1"
     for item in "${DEPS[@]}"; do
-        pkg=$(echo "$item" | cut -d'|' -f"$col")
-        [ "$pkg" != "-" ] && echo -n "$pkg "
+        pkg=$(echo "$item" | cut -d'|' -f"$col" | tr -d ' ')
+        [ -n "$pkg" ] && [ "$pkg" != "-" ] && echo -n "$pkg "
     done
 }
 
@@ -126,6 +165,7 @@ print_usage() {
     echo "   install      Install dotfiles and dependencies"
     echo "   uninstall    Remove symlinks and optionally clean up"
     echo "   health       Check installation status"
+    echo "   status       Quick overview of installation state"
     echo
     echo -e " ${BOLD}Options${NC}"
     echo "   -n, --dry-run    Show what would be done"
@@ -135,27 +175,45 @@ print_usage() {
     echo -e " ${BOLD}Examples${NC}"
     echo "   ./dot install        Install everything"
     echo "   ./dot install -n     Preview install"
-    echo "   ./dot health         Check status"
+    echo "   ./dot status         Quick status"
+    echo "   ./dot health         Full health check"
 }
 
 # --- Commands ---
+
+get_cmd_version() {
+    local cmd="$1"
+    case "$cmd" in
+        nvim)    "$cmd" --version 2>/dev/null | head -1 | sed 's/NVIM v//' ;;
+        tmux)    "$cmd" -V 2>/dev/null | cut -d' ' -f2 ;;
+        zoxide)  "$cmd" --version 2>/dev/null | cut -d' ' -f2 ;;
+        fzf)     "$cmd" --version 2>/dev/null | cut -d' ' -f1 ;;
+        fd)      "$cmd" --version 2>/dev/null | cut -d' ' -f2 ;;
+        rg)      "$cmd" --version 2>/dev/null | head -1 | cut -d' ' -f2 ;;
+        stow)    "$cmd" --version 2>/dev/null | head -1 | awk '{print $NF}' ;;
+        *)       echo "" ;;
+    esac
+}
 
 cmd_health() {
     print_banner
     echo -e " ${BOLD}Health Check${NC}"
     local ok=0 fail=0 warn=0
+    local os
+    os=$(detect_os)
 
-    # Current shell
     echo
-    echo -e " ${DIM}Current shell:${NC} $SHELL"
+    echo -e " ${DIM}Shell: $SHELL${NC}"
+    echo -e " ${DIM}OS: $os${NC}"
 
+    # --- Symlinks ---
     log_step 1 4 "Symlinks"
     for file in "${MANAGED_FILES[@]}"; do
-        if [ -L "$HOME/$file" ] || [ -d "$HOME/$file" ]; then
+        if [ -L "$HOME/$file" ]; then
             log_ok "$file"
             ok=$((ok + 1))
         elif [ -e "$HOME/$file" ]; then
-            log_warn "$file (not symlinked)"
+            log_warn "$file ${DIM}(exists but not symlinked)${NC}"
             warn=$((warn + 1))
         else
             log_fail "$file"
@@ -163,21 +221,44 @@ cmd_health() {
         fi
     done
 
-    log_step 2 4 "Commands"
+    # --- Dependencies ---
+    log_step 2 4 "Dependencies"
     for item in "${DEPS[@]}"; do
-        IFS='|' read -r cmd _ _ _ <<EOF
-$item
-EOF
-        [ "$cmd" = "-" ] && continue
+        local cmd brew_pkg dnf_pkg apt_pkg
+        cmd=$(echo "$item" | cut -d'|' -f1 | tr -d ' ')
+        brew_pkg=$(echo "$item" | cut -d'|' -f2 | tr -d ' ')
+        dnf_pkg=$(echo "$item" | cut -d'|' -f3 | tr -d ' ')
+        apt_pkg=$(echo "$item" | cut -d'|' -f4 | tr -d ' ')
+
+        [ "$cmd" = "-" ] || [ -z "$cmd" ] && continue
+
         if has_cmd "$cmd"; then
-            log_ok "$cmd"
+            local ver
+            ver=$(get_cmd_version "$cmd")
+            if [ -n "$ver" ]; then
+                log_ok "$cmd ${DIM}$ver${NC}"
+            else
+                log_ok "$cmd"
+            fi
             ok=$((ok + 1))
         else
-            log_fail "$cmd"
+            # Show install hint based on OS
+            local hint=""
+            case "$os" in
+                macos)  [ "$brew_pkg" != "-" ] && [ -n "$brew_pkg" ] && hint="brew install $brew_pkg" ;;
+                fedora) [ "$dnf_pkg" != "-" ] && [ -n "$dnf_pkg" ] && hint="sudo dnf install $dnf_pkg" ;;
+                debian) [ "$apt_pkg" != "-" ] && [ -n "$apt_pkg" ] && hint="sudo apt install $apt_pkg" ;;
+            esac
+            if [ -n "$hint" ]; then
+                log_fail "$cmd ${DIM}(run: $hint)${NC}"
+            else
+                log_fail "$cmd ${DIM}(not available for $os)${NC}"
+            fi
             fail=$((fail + 1))
         fi
     done
 
+    # --- Fonts ---
     log_step 3 4 "Fonts"
     if has_cmd fc-list; then
         for font in "JetBrainsMono Nerd Font" "Hurmit Nerd Font"; do
@@ -185,7 +266,7 @@ EOF
                 log_ok "$font"
                 ok=$((ok + 1))
             else
-                log_warn "$font (not installed)"
+                log_warn "$font ${DIM}(not installed)${NC}"
                 warn=$((warn + 1))
             fi
         done
@@ -193,6 +274,7 @@ EOF
         log_dim "fc-list not available, skipping font check"
     fi
 
+    # --- Plugins ---
     log_step 4 4 "Plugins"
     local plugins=(
         "${XDG_DATA_HOME:-$HOME/.local/share}/zinit|zinit"
@@ -202,15 +284,100 @@ EOF
     for item in "${plugins[@]}"; do
         local p="${item%%|*}" name="${item##*|}"
         if has_path "$p"; then
-            log_ok "$name"
+            # Count plugins if possible
+            local count=""
+            case "$name" in
+                lazy.nvim)
+                    if [ -d "$p" ]; then
+                        count=$(find "$p" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
+                        [ -n "$count" ] && [ "$count" != "0" ] && count="${DIM}($count plugins)${NC}"
+                    fi
+                    ;;
+                tpm)
+                    if [ -d "$HOME/.tmux/plugins" ]; then
+                        count=$(find "$HOME/.tmux/plugins" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
+                        [ -n "$count" ] && [ "$count" != "0" ] && count="${DIM}($count plugins)${NC}"
+                    fi
+                    ;;
+            esac
+            log_ok "$name $count"
             ok=$((ok + 1))
         else
-            log_warn "$name (not installed)"
+            log_warn "$name ${DIM}(not installed)${NC}"
             warn=$((warn + 1))
         fi
     done
 
     log_summary "$ok" "$fail" "$warn"
+}
+
+cmd_status() {
+    local os
+    os=$(detect_os)
+
+    echo
+    echo -e " ${BOLD}Dotfiles Status${NC}"
+    echo -e " ${DIM}───────────────────────────────────────${NC}"
+
+    # Count symlinks
+    local symlinks_ok=0 symlinks_total=${#MANAGED_FILES[@]}
+    for file in "${MANAGED_FILES[@]}"; do
+        [ -L "$HOME/$file" ] && symlinks_ok=$((symlinks_ok + 1))
+    done
+    if [ "$symlinks_ok" -eq "$symlinks_total" ]; then
+        echo -e " ${GREEN}Symlinks${NC}     $symlinks_ok/$symlinks_total active"
+    else
+        echo -e " ${YELLOW}Symlinks${NC}     $symlinks_ok/$symlinks_total active"
+    fi
+
+    # Shell info
+    local shell_name="${SHELL##*/}"
+    local shell_info="$shell_name"
+    case "$shell_name" in
+        zsh)
+            if [ -d "${XDG_DATA_HOME:-$HOME/.local/share}/zinit" ]; then
+                shell_info="$shell_name ${DIM}(zinit loaded)${NC}"
+            fi
+            ;;
+        bash)
+            shell_info="$shell_name"
+            ;;
+    esac
+    echo -e " ${CYAN}Shell${NC}        $shell_info"
+
+    # Neovim plugins
+    local lazy_dir="$HOME/.local/share/nvim/lazy"
+    if [ -d "$lazy_dir" ]; then
+        local nvim_plugins
+        nvim_plugins=$(find "$lazy_dir" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
+        echo -e " ${CYAN}Neovim${NC}       lazy.nvim ${DIM}($nvim_plugins plugins)${NC}"
+    else
+        echo -e " ${DIM}Neovim${NC}       not configured"
+    fi
+
+    # Tmux plugins
+    local tpm_dir="$HOME/.tmux/plugins"
+    if [ -d "$tpm_dir" ]; then
+        local tmux_plugins
+        tmux_plugins=$(find "$tpm_dir" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
+        echo -e " ${CYAN}Tmux${NC}         tpm ${DIM}($tmux_plugins plugins)${NC}"
+    else
+        echo -e " ${DIM}Tmux${NC}         not configured"
+    fi
+
+    # OS
+    echo -e " ${CYAN}OS${NC}           $os"
+
+    # Last state file update
+    if [ -f "$STATE_FILE" ]; then
+        local last_sync
+        last_sync=$(stat -f "%Sm" -t "%Y-%m-%d %H:%M" "$STATE_FILE" 2>/dev/null || stat -c "%y" "$STATE_FILE" 2>/dev/null | cut -d'.' -f1)
+        echo -e " ${CYAN}Last sync${NC}    $last_sync"
+    fi
+
+    echo
+    echo -e " ${DIM}Run './dot health' for full check${NC}"
+    echo
 }
 
 cmd_uninstall() {
@@ -307,6 +474,17 @@ cmd_install() {
         log_ok "Created"
     fi
 
+    # Save state
+    if ! "$DRY_RUN"; then
+        echo "installed=$(date +%Y-%m-%d\ %H:%M:%S)" > "$STATE_FILE"
+        echo "os=$os" >> "$STATE_FILE"
+        echo "shell=$USE_SHELL" >> "$STATE_FILE"
+    fi
+
+    # Summary
+    echo
+    print_install_summary
+
     # Done
     echo
     echo -e " ${GREEN}${BOLD}Done!${NC}"
@@ -327,56 +505,125 @@ cmd_install() {
     echo
 }
 
+print_install_summary() {
+    if [ ${#INSTALLED_ITEMS[@]} -gt 0 ] || [ ${#SKIPPED_ITEMS[@]} -gt 0 ]; then
+        echo -e " ${BOLD}Summary${NC}"
+
+        if [ ${#INSTALLED_ITEMS[@]} -gt 0 ]; then
+            echo -ne " ${GREEN}Installed:${NC} "
+            local first=true
+            for item in "${INSTALLED_ITEMS[@]}"; do
+                "$first" || echo -n ", "
+                echo -n "$item"
+                first=false
+            done
+            echo
+        fi
+
+        if [ ${#SKIPPED_ITEMS[@]} -gt 0 ]; then
+            echo -e " ${YELLOW}Skipped:${NC}"
+            for item in "${SKIPPED_ITEMS[@]}"; do
+                echo -e "     ${DIM}-${NC} $item"
+            done
+        fi
+    fi
+}
+
 # --- Install Helpers ---
 
 install_deps() {
     local os="$1"
 
+    # Show packages that will be skipped on this OS
+    show_skipped_deps "$os"
+
     case "$os" in
         macos)
             if ! has_cmd brew; then
-                log_info "Installing Homebrew"
-                run /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-                eval "$(/opt/homebrew/bin/brew shellenv)"
+                log_info "Installing Homebrew..."
+                if "$DRY_RUN"; then
+                    log_dim "[dry-run] /bin/bash -c \"\$(curl ... install.sh)\""
+                else
+                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+                    eval "$(/opt/homebrew/bin/brew shellenv)"
+                fi
             fi
             log_ok "Homebrew"
 
-            log_info "Installing packages"
-            # shellcheck disable=SC2046
-            run brew install --quiet $(get_packages 2)
-            log_ok "Packages"
+            local pkgs
+            pkgs=$(get_packages 2)
+            if [ -n "$pkgs" ]; then
+                if "$DRY_RUN"; then
+                    log_dim "[dry-run] brew install $pkgs"
+                else
+                    run_with_spin "Installing packages..." brew install --quiet $pkgs
+                fi
+                log_ok "Packages"
+                track_installed "packages"
+            fi
 
-            log_info "Installing fonts"
-            run brew install --quiet --cask "${CASKS[@]}"
+            if "$DRY_RUN"; then
+                log_dim "[dry-run] brew install --cask ${CASKS[*]}"
+            else
+                run_with_spin "Installing fonts..." brew install --quiet --cask "${CASKS[@]}"
+            fi
             log_ok "Fonts"
+            track_installed "fonts"
             ;;
 
         fedora)
-            log_info "Adding EPEL"
-            run sudo dnf install -y epel-release 2>/dev/null || true
+            log_info "Adding EPEL..."
+            if "$DRY_RUN"; then
+                log_dim "[dry-run] sudo dnf install -y epel-release"
+            else
+                sudo dnf install -y epel-release 2>/dev/null || true
+            fi
             log_ok "EPEL"
 
-            log_info "Installing packages"
-            # shellcheck disable=SC2046
-            run sudo dnf install -y $(get_packages 3)
-            log_ok "Packages"
+            local pkgs
+            pkgs=$(get_packages 3)
+            if [ -n "$pkgs" ]; then
+                if "$DRY_RUN"; then
+                    log_dim "[dry-run] sudo dnf install -y $pkgs"
+                else
+                    run_with_spin "Installing packages..." sudo dnf install -y $pkgs
+                fi
+                log_ok "Packages"
+                track_installed "packages"
+            fi
 
             if ! has_cmd zoxide; then
-                log_info "Installing zoxide"
-                run curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+                log_info "Installing zoxide (not in dnf)..."
+                if "$DRY_RUN"; then
+                    log_dim "[dry-run] curl ... zoxide install.sh | bash"
+                else
+                    curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash >/dev/null 2>&1
+                fi
                 log_ok "zoxide"
+                track_installed "zoxide"
             fi
             ;;
 
         debian)
-            log_info "Updating apt"
-            run sudo apt update
+            log_info "Updating apt..."
+            if "$DRY_RUN"; then
+                log_dim "[dry-run] sudo apt update"
+            else
+                run_with_spin "Updating package lists..." sudo apt update
+            fi
             log_ok "Updated"
 
-            log_info "Installing packages"
-            # shellcheck disable=SC2046
-            run sudo apt install -y $(get_packages 4)
-            log_ok "Packages"
+            local pkgs
+            pkgs=$(get_packages 4)
+            if [ -n "$pkgs" ]; then
+                if "$DRY_RUN"; then
+                    log_dim "[dry-run] sudo apt install -y $pkgs"
+                else
+                    run_with_spin "Installing packages..." sudo apt install -y $pkgs
+                fi
+                log_ok "Packages"
+                track_installed "packages"
+            fi
             ;;
 
         *)
@@ -385,6 +632,29 @@ install_deps() {
             has_cmd stow || { log_fail "stow required"; exit 1; }
             ;;
     esac
+}
+
+show_skipped_deps() {
+    local os="$1"
+    local col
+    case "$os" in
+        macos)  col=2 ;;
+        fedora) col=3 ;;
+        debian) col=4 ;;
+        *)      return ;;
+    esac
+
+    for item in "${DEPS[@]}"; do
+        local cmd pkg
+        cmd=$(echo "$item" | cut -d'|' -f1 | tr -d ' ')
+        pkg=$(echo "$item" | cut -d'|' -f"$col" | tr -d ' ')
+
+        # Skip if package is available or if it's an install-only dep
+        [ "$cmd" = "-" ] && continue
+        [ -n "$pkg" ] && [ "$pkg" != "-" ] && continue
+
+        track_skipped "$cmd" "not available for $os"
+    done
 }
 
 install_extras() {
@@ -479,7 +749,7 @@ main() {
 
     while [ $# -gt 0 ]; do
         case "$1" in
-            install|uninstall|health) cmd="$1"; shift ;;
+            install|uninstall|health|status) cmd="$1"; shift ;;
             -n|--dry-run) DRY_RUN=true; shift ;;
             -v|--verbose) VERBOSE=true; shift ;;
             -h|--help) print_usage; exit 0 ;;
@@ -496,6 +766,7 @@ main() {
         install)   cmd_install ;;
         uninstall) cmd_uninstall ;;
         health)    cmd_health ;;
+        status)    cmd_status ;;
     esac
 }
 
