@@ -1,8 +1,8 @@
 # Dotfiles
 
-Modern terminal development environment with Zsh, Neovim, Tmux, and Alacritty.
+Modern terminal environment: Zsh, Neovim, Tmux, Alacritty.
 
-## Quick Start
+## Install
 
 ```shell
 git clone https://github.com/tungsheng/dotfiles.git ~/dotfiles
@@ -10,112 +10,67 @@ cd ~/dotfiles
 ./dot install
 ```
 
-The script auto-detects your OS and installs all dependencies.
-
-**Preview first:**
-```shell
-./dot install -n
-```
+Preview first: `./dot install -n`
 
 ## Prerequisites
-
-Git is required to clone this repository:
 
 | OS | Command |
 |----|---------|
 | macOS | `xcode-select --install` |
 | Debian/Ubuntu | `sudo apt install git` |
-| Fedora/RHEL/Alma | `sudo dnf install git` |
+| Fedora/RHEL | `sudo dnf install git` |
 
-### RHEL/AlmaLinux 9
+> **RHEL/Alma**: Run `sudo dnf install epel-release` first if install fails.
 
-EPEL repository is required. If install fails:
-```shell
-sudo dnf install -y epel-release
-./dot install
-```
+## Post-Install
 
-## Post-Installation
-
-1. **Restart terminal** (or run `zsh`)
-2. Run `p10k configure` to customize prompt
-3. Open `nvim` — plugins install automatically
-4. Open `tmux`, press `Ctrl+Space I` to install plugins
+1. Restart terminal (or run `zsh`)
+2. Run `p10k configure` for prompt setup
+3. Open `nvim` — plugins auto-install
+4. Open `tmux`, press `Ctrl+Space I` for plugins
 
 ## Commands
 
-```shell
-./dot                 # Show help
-./dot install         # Install dotfiles
-./dot uninstall       # Remove symlinks
-./dot health          # Check status
-./dot install -n      # Preview (dry-run)
-./dot install -v      # Verbose output
-```
-
-## Uninstall
-
-```shell
-./dot uninstall
-```
-
-Removes symlinks and optionally cleans up plugins/themes. System packages are not removed.
+| Command | Description |
+|---------|-------------|
+| `./dot install` | Install dotfiles |
+| `./dot install -n` | Preview (dry-run) |
+| `./dot uninstall` | Remove symlinks |
+| `./dot health` | Full status check |
+| `./dot status` | Quick overview |
 
 ## Structure
 
 ```
-dotfiles/
-├── .zshrc                   # Zsh config
-├── .bashrc                  # Bash config
-├── .config/
-│   ├── nvim/                # Neovim (Lazy.nvim)
-│   ├── tmux/                # Tmux (TPM)
-│   ├── alacritty/           # Terminal (Tokyo Night)
-│   ├── gh/                  # GitHub CLI
-│   └── shell/aliases.sh     # Shared aliases
-├── dot                      # Install script
-├── KEYBINDINGS.md           # Key reference
-└── CONTRIBUTING.md          # Dev guide
+.zshrc / .bashrc           Shell configs
+.config/nvim/              Neovim (Lazy.nvim)
+.config/tmux/              Tmux (TPM)
+.config/alacritty/         Terminal (Tokyo Night)
+.config/shell/aliases.sh   Shared aliases
 ```
 
 ## Key Bindings
 
-See [KEYBINDINGS.md](KEYBINDINGS.md) for complete reference.
-
-| Tool | Key | Action |
-|------|-----|--------|
+| Context | Key | Action |
+|---------|-----|--------|
 | Tmux | `Ctrl+Space` | Prefix |
-| Tmux | `Ctrl+h/j/k/l` | Navigate panes |
+| Cross-tool | `Ctrl+h/j/k/l` | Navigate panes |
 | Neovim | `Space` | Leader |
 | Neovim | `<leader>ff` | Find files |
-| Zsh | `Ctrl+r` | History search |
 
-## Manual Installation
+See [KEYBINDINGS.md](KEYBINDINGS.md) for complete reference.
+
+## Manual Install
 
 <details>
-<summary>If you prefer to manage dependencies yourself</summary>
+<summary>Using stow directly</summary>
 
-Install stow:
-
-| OS | Command |
-|----|---------|
-| macOS | `brew install stow` |
-| Debian/Ubuntu | `sudo apt install stow` |
-| Fedora | `sudo dnf install stow` |
-| RHEL/Alma | `sudo dnf install epel-release && sudo dnf install stow` |
-
-Then create symlinks:
 ```shell
-cd ~/dotfiles
-stow .
+# Install stow, then:
+cd ~/dotfiles && stow .
 ```
-
 </details>
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE) · [Developer Guide](DEVELOPER_GUIDE.md)
