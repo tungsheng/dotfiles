@@ -54,6 +54,17 @@ Seamless movement across Neovim splits and Tmux panes:
 | `<leader>th` | Change theme |
 | `<leader>ch` | Cheatsheet |
 
+### Terminal
+
+| Key | Action |
+|-----|--------|
+| `<leader>h` | Horizontal terminal |
+| `<leader>v` | Vertical terminal |
+| `<A-h>` | Toggle horizontal terminal |
+| `<A-v>` | Toggle vertical terminal |
+| `<A-i>` | Toggle floating terminal |
+| `ESC` | Exit terminal mode (to normal) |
+
 Run `:NvCheatsheet` for full NvChad bindings.
 
 ## Zsh
