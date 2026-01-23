@@ -30,10 +30,10 @@ Format: `"command | brew | dnf | apt"` — use `-` to skip.
 
 ```bash
 DEPS=(
-    "nvim|neovim|neovim|neovim"   # Same package name
-    "fd|fd|fd-find|fd-find"       # Different apt/dnf name
-    "zoxide|zoxide|-|zoxide"      # Not in dnf
-    "-||-git|git"                 # Linux only (no health check)
+    "nvim     | neovim    | neovim    | neovim"     # Same package name
+    "fd       | fd        | fd-find   | fd-find"    # Different apt/dnf name
+    "zoxide   | zoxide    | -         | zoxide"     # Not in dnf
+    "-        |           | git       | git"        # Linux only (no health check)
 )
 ```
 
@@ -52,7 +52,7 @@ External resources downloaded during install:
 ```bash
 # Format: "path|url|type|name"
 EXTRAS=(
-    "$HOME/.git-prompt.sh|https://...|curl|git-prompt"
+    "$XDG_DATA_HOME/git/git-prompt.sh|https://...|curl|git-prompt"
     "$HOME/.config/tmux/plugins/tpm|https://...|git|tpm"
 )
 ```
@@ -148,7 +148,8 @@ docker run -it fedora:latest bash
 
 ## Release
 
-1. Update `VERSION` in `dot`
+1. Update `VERSION` file
 2. Test on macOS and Linux
 3. Run `./dot health`
-4. Update docs if needed
+4. Tag release: `git tag -a v1.x.0 -m "v1.x.0 - Description"`
+5. Update `CHANGELOG.md`

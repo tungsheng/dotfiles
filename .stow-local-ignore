@@ -9,6 +9,11 @@ LICENSE
 CLAUDE\.md
 KEYBINDINGS\.md
 DEVELOPER_GUIDE\.md
+CHANGELOG\.md
+
+# Project metadata
+VERSION
+images
 
 # Claude Code
 \.claude

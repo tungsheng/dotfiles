@@ -50,7 +50,8 @@ Seamless movement across Neovim splits and Tmux panes:
 | `<leader>x` | Close buffer |
 | `Tab` / `S-Tab` | Next/prev buffer |
 | `<leader>gs` | Git status (Neogit) |
-| `<leader>gw` | Git worktrees |
+| `<leader>gw` | Git worktree list |
+| `<leader>ga` | Git worktree add |
 | `<leader>th` | Change theme |
 | `<leader>ch` | Cheatsheet |
 

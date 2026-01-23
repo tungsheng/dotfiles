@@ -35,13 +35,13 @@ dotfiles/
 
 ## Script Patterns
 
-**Dependencies** - `cmd|brew|dnf|apt`:
+**Dependencies** - `cmd | brew | dnf | apt`:
 ```bash
 DEPS=(
-    "nvim|neovim|neovim|neovim"  # cmd differs from package
-    "fd|fd|fd-find|fd-find"      # package name varies by OS
-    "zoxide|zoxide|-|zoxide"     # use - if unavailable
-    "-||-git|git"                # use - to skip health check
+    "nvim     | neovim    | neovim    | neovim"     # same package name
+    "fd       | fd        | fd-find   | fd-find"    # varies by OS
+    "zoxide   | zoxide    | -         | zoxide"     # use - if unavailable
+    "-        |           | git       | git"        # use - to skip health check
 )
 ```
 
@@ -51,6 +51,14 @@ MANAGED_FILES=(.zshrc .bashrc .config/nvim ...)
 ```
 
 **Stow ignores** - regex patterns in `.stow-local-ignore`
+
+## Versioning
+
+- Version from git tags (preferred) or `VERSION` file (fallback)
+- Format: `MAJOR.MINOR.PATCH` (semver)
+- Tag releases: `git tag -a v1.2.0 -m "v1.2.0 - Description"`
+- Update `VERSION` file when tagging
+- Changelog in `CHANGELOG.md`
 
 ## Tools
 

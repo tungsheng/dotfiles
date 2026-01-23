@@ -8,7 +8,19 @@ trap 'echo; exit 130' INT
 # ============================================================================
 
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
-VERSION="1.1.0"
+
+# Version: prefer git tag, fall back to VERSION file
+get_version() {
+    local ver
+    if ver=$(git -C "$DOTFILES_DIR" describe --tags --always 2>/dev/null); then
+        echo "${ver#v}"  # strip leading 'v'
+    elif [[ -f "$DOTFILES_DIR/VERSION" ]]; then
+        cat "$DOTFILES_DIR/VERSION" | tr -d '[:space:]'
+    else
+        echo "unknown"
+    fi
+}
+VERSION="$(get_version)"
 DRY_RUN=false
 VERBOSE=false
 USE_SHELL=""
