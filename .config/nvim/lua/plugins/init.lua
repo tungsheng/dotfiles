@@ -1,14 +1,18 @@
 return {
+  -- NvChad completion engine
   { import = "nvchad.blink.lazyspec" },
 
+  -- Seamless navigation between vim and tmux panes (Ctrl+h/j/k/l)
   { "christoomey/vim-tmux-navigator", event = "VeryLazy" },
 
+  -- Code formatting on save
   {
     "stevearc/conform.nvim",
     event = "BufWritePre",
     opts = require "configs.conform",
   },
 
+  -- LSP configuration
   {
     "neovim/nvim-lspconfig",
     version = "^1.0.0",
@@ -17,6 +21,7 @@ return {
     end,
   },
 
+  -- Git UI (magit-style)
   {
     "NeogitOrg/neogit",
     dependencies = {
@@ -28,6 +33,7 @@ return {
     config = true,
   },
 
+  -- Git worktree management via Telescope
   {
     "polarmutex/git-worktree.nvim",
     version = "^2",
@@ -38,6 +44,7 @@ return {
     end,
   },
 
+  -- Fuzzy finder with sensible ignore patterns
   {
     "nvim-telescope/telescope.nvim",
     cmd = "Telescope",
@@ -67,6 +74,7 @@ return {
     },
   },
 
+  -- Auto-close HTML/JSX tags
   {
     "windwp/nvim-ts-autotag",
     ft = {"javascript", "javascriptreact", "typescript", "typescriptreact"},
@@ -75,6 +83,7 @@ return {
     end,
   },
 
+  -- Syntax highlighting and code understanding
   {
     "nvim-treesitter/nvim-treesitter",
     opts = {

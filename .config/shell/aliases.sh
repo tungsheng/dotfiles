@@ -30,6 +30,10 @@ alias gl='git pull'
 alias gco='git checkout'
 alias gb='git branch'
 alias glog='git log --oneline --graph --decorate -10'
+alias gss='git stash'
+alias gsp='git stash pop'
+alias gundo='git reset --soft HEAD~1'
+alias g='git status'
 
 # Directories
 alias mkdir='mkdir -p'

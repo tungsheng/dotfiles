@@ -21,12 +21,6 @@ fi
 source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/aliases.sh"
 source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/nvm.sh"
 
-# Bash-specific git aliases (zsh uses OMZP::git)
-alias gss='git stash'
-alias gsp='git stash pop'
-alias gundo='git reset --soft HEAD~1'
-g() { [[ $# -gt 0 ]] && git "$@" || git status; }
-
 # Shell integrations
 command -v fzf >/dev/null && eval "$(fzf --bash)"
 command -v zoxide >/dev/null && eval "$(zoxide init --cmd cd bash)"
