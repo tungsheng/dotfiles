@@ -1,17 +1,14 @@
-# Only run on macOS
+# ~/.bash_profile - Login shell config (sources .bashrc)
 
-if [[ "$OSTYPE" == "darwin"* ]]; then
-	# needed for brew
-	eval "$(/opt/homebrew/bin/brew shellenv)"
-
-	# export TERM=alacritty
-	export TERM=xterm-256color
+# macOS: Homebrew
+if [[ "$OSTYPE" == darwin* ]]; then
+  if [[ -f /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  elif [[ -f /usr/local/bin/brew ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
+  export TERM=xterm-256color
 fi
 
-# if running bash
-if [ -n "$BASH_VERSION" ]; then
-	# include .bashrc if it exists
-	if [ -f "$HOME/.bashrc" ]; then
-		. "$HOME/.bashrc"
-	fi
-fi
+# Source .bashrc for interactive settings
+[[ -n "$BASH_VERSION" && -f "$HOME/.bashrc" ]] && source "$HOME/.bashrc"

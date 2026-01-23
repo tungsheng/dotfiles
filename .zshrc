@@ -3,8 +3,12 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# Homebrew (macOS)
-[[ -f "/opt/homebrew/bin/brew" ]] && eval "$(/opt/homebrew/bin/brew shellenv)"
+# Homebrew
+if [[ -f /opt/homebrew/bin/brew ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -f /usr/local/bin/brew ]]; then
+  eval "$(/usr/local/bin/brew shellenv)"
+fi
 
 # Zinit
 ZINIT_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git"
@@ -29,7 +33,7 @@ zinit snippet OMZP::kubectl
 zinit snippet OMZP::kubectx
 zinit snippet OMZP::command-not-found
 
-# Docker CLI completions (must be before compinit)
+# Docker completions (before compinit)
 [[ -d "$HOME/.docker/completions" ]] && fpath=("$HOME/.docker/completions" $fpath)
 
 # Completions
@@ -60,61 +64,17 @@ zstyle ':completion:*' menu no
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 
-# Shared aliases
+# Shared config
 source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/aliases.sh"
+source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/nvm.sh"
 
 # Shell integrations
-eval "$(fzf --zsh)"
-eval "$(zoxide init --cmd cd zsh)"
+command -v fzf >/dev/null && eval "$(fzf --zsh)"
+command -v zoxide >/dev/null && eval "$(zoxide init --cmd cd zsh)"
 
-# NVM setup (supports both ~/.nvm and XDG locations)
-# Detect NVM directory (prefer XDG, fallback to traditional)
-if [[ -d "${XDG_DATA_HOME:-$HOME/.local/share}/nvm" ]]; then
-  export NVM_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/nvm"
-elif [[ -d "$HOME/.nvm" ]]; then
-  export NVM_DIR="$HOME/.nvm"
-fi
-
-# Add default node to PATH immediately (for tools like Mason)
-# This avoids full NVM load while ensuring npm is available
-if [[ -n "$NVM_DIR" && -d "$NVM_DIR/versions/node" ]]; then
-  # Try to resolve default version (handles aliases like lts/*, default, etc.)
-  _nvm_resolve_default() {
-    local alias_file="$NVM_DIR/alias/default"
-    local version=""
-    if [[ -f "$alias_file" ]]; then
-      version=$(cat "$alias_file")
-      # If it's an alias (like lts/*), try to resolve it
-      while [[ -f "$NVM_DIR/alias/$version" ]]; do
-        version=$(cat "$NVM_DIR/alias/$version")
-      done
-    fi
-    # If still not a version, find the latest installed
-    if [[ ! -d "$NVM_DIR/versions/node/$version" ]]; then
-      version=$(ls -1 "$NVM_DIR/versions/node" 2>/dev/null | sort -V | tail -1)
-    fi
-    echo "$version"
-  }
-  _nvm_default=$(_nvm_resolve_default)
-  [[ -n "$_nvm_default" ]] && export PATH="$NVM_DIR/versions/node/$_nvm_default/bin:$PATH"
-  unset -f _nvm_resolve_default
-  unset _nvm_default
-fi
-
-# Lazy load full NVM (for nvm use, nvm install, etc.)
-nvm() {
-  unset -f nvm
-  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-  nvm "$@"
-}
-
-# Bun (lazy loaded for faster shell startup)
+# Bun
 export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-bun() {
-  unset -f bun bunx
-  [ -s "$BUN_INSTALL/_bun" ] && source "$BUN_INSTALL/_bun"
-  bun "$@"
-}
-bunx() { bun; bunx "$@"; }
+[[ -d "$BUN_INSTALL" ]] && export PATH="$BUN_INSTALL/bin:$PATH"
+
+# uv (Python)
+[[ -d "$HOME/.local/bin" ]] && export PATH="$HOME/.local/bin:$PATH"

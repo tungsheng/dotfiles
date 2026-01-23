@@ -32,7 +32,8 @@ DEPS=(
     "fzf      | fzf       | fzf       | fzf"
     "zoxide   | zoxide    | -         | zoxide"       # Not in dnf repos
     "tmux     | tmux      | tmux      | tmux"
-    "marksman | marksman  | -         | -"            # brew only
+    "uv       | uv        | -         | -"            # Python package manager
+    "marksman | marksman  | -         | -"            # Markdown LSP (brew only)
     "-        |           | git       | git"          # Install-only (skip health check)
     "-        |           | curl      | curl"
     "-        |           | zsh       | zsh"
@@ -41,11 +42,11 @@ DEPS=(
 
 CASKS=("font-jetbrains-mono-nerd-font" "font-hurmit-nerd-font")
 
-MANAGED_FILES=(.zshrc .bashrc .bash_profile .config/nvim .config/tmux .config/alacritty .config/gh .config/shell)
+MANAGED_FILES=(.zshrc .bashrc .bash_profile .config/nvim .config/tmux/tmux.conf .config/alacritty/alacritty.toml .config/gh .config/shell)
 
-# Extras: path|url|type|name
+# Extras: path|url|type|name (evaluated after XDG vars set)
 EXTRAS=(
-    "${XDG_DATA_HOME:-$HOME/.local/share}/git/git-prompt.sh|https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh|curl|git-prompt"
+    "$XDG_DATA_HOME/git/git-prompt.sh|https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh|curl|git-prompt"
     "$HOME/.config/alacritty/themes|https://github.com/alacritty/alacritty-theme|git|alacritty-themes"
     "$HOME/.config/tmux/plugins/tpm|https://github.com/tmux-plugins/tpm|git|tpm"
 )
@@ -53,9 +54,9 @@ EXTRAS=(
 # Cleanup: path|name
 CLEANUPS=(
     "$HOME/.config/alacritty/themes|Alacritty themes"
-    "${XDG_DATA_HOME:-$HOME/.local/share}/git|git-prompt.sh"
-    "${XDG_DATA_HOME:-$HOME/.local/share}/zinit|Zinit"
-    "$HOME/.local/share/nvim|Neovim data"
+    "$XDG_DATA_HOME/git|git-prompt.sh"
+    "$XDG_DATA_HOME/zinit|Zinit"
+    "$XDG_DATA_HOME/nvim|Neovim data"
     "$HOME/.config/tmux/plugins|Tmux plugins"
 )
 
@@ -158,12 +159,12 @@ detect_os() {
 }
 
 get_packages() {
-    local col="$1"
+    local col="$1" pkg result=""
     for item in "${DEPS[@]}"; do
         pkg=$(echo "$item" | cut -d'|' -f"$col" | tr -d ' ')
-        [ -n "$pkg" ] && [ "$pkg" != "-" ] && echo -n "$pkg "
+        [ -n "$pkg" ] && [ "$pkg" != "-" ] && result="$result$pkg "
     done
-    true  # Ensure function returns 0 even if last iteration's condition failed
+    echo "${result% }"  # trim trailing space
 }
 
 print_usage() {
@@ -202,6 +203,7 @@ get_cmd_version() {
         fd)      "$cmd" --version 2>/dev/null | cut -d' ' -f2 ;;
         rg)      "$cmd" --version 2>/dev/null | head -1 | cut -d' ' -f2 ;;
         stow)    "$cmd" --version 2>/dev/null | head -1 | awk '{print $NF}' ;;
+        uv)      "$cmd" --version 2>/dev/null | cut -d' ' -f2 ;;
         *)       echo "" ;;
     esac
 }
@@ -271,47 +273,53 @@ cmd_health() {
 
     # --- Fonts ---
     log_step 3 4 "Fonts"
-    if has_cmd fc-list; then
-        for font in "JetBrainsMono Nerd Font" "Hurmit Nerd Font"; do
-            if fc-list | grep -qi "${font%% *}.*Nerd"; then
-                log_ok "$font"
+    local font_dir="$HOME/Library/Fonts"
+    for font in "JetBrainsMono" "Hurmit"; do
+        if has_cmd fc-list; then
+            # Linux or macOS with fontconfig
+            if fc-list | grep -qi "${font}.*Nerd"; then
+                log_ok "$font Nerd Font"
                 ok=$((ok + 1))
             else
-                log_warn "$font ${DIM}(not installed)${NC}"
+                log_warn "$font Nerd Font ${DIM}(not installed)${NC}"
                 warn=$((warn + 1))
             fi
-        done
-    else
-        log_dim "fc-list not available, skipping font check"
-    fi
+        elif [ -d "$font_dir" ]; then
+            # macOS fallback: check font directory
+            if ls "$font_dir" 2>/dev/null | grep -qi "$font"; then
+                log_ok "$font Nerd Font"
+                ok=$((ok + 1))
+            else
+                log_warn "$font Nerd Font ${DIM}(not installed)${NC}"
+                warn=$((warn + 1))
+            fi
+        else
+            log_dim "Cannot verify fonts"
+            break
+        fi
+    done
 
     # --- Plugins ---
     log_step 4 4 "Plugins"
     local plugins=(
-        "${XDG_DATA_HOME:-$HOME/.local/share}/zinit|zinit"
-        "$HOME/.local/share/nvim/lazy|lazy.nvim"
+        "$XDG_DATA_HOME/zinit|zinit"
+        "$XDG_DATA_HOME/nvim/lazy|lazy.nvim"
         "$HOME/.config/tmux/plugins/tpm|tpm"
     )
     for item in "${plugins[@]}"; do
         local p="${item%%|*}" name="${item##*|}"
         if has_path "$p"; then
-            # Count plugins if possible
-            local count=""
-            case "$name" in
-                lazy.nvim)
-                    if [ -d "$p" ]; then
-                        count=$(find "$p" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
-                        [ -n "$count" ] && [ "$count" != "0" ] && count="${DIM}($count plugins)${NC}"
-                    fi
-                    ;;
-                tpm)
-                    if [ -d "$HOME/.config/tmux/plugins" ]; then
-                        count=$(find "$HOME/.config/tmux/plugins" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
-                        [ -n "$count" ] && [ "$count" != "0" ] && count="${DIM}($count plugins)${NC}"
-                    fi
-                    ;;
-            esac
-            log_ok "$name $count"
+            local count="" count_dir="$p"
+            # tpm counts from plugins dir, not tpm subdir
+            [ "$name" = "tpm" ] && count_dir="$HOME/.config/tmux/plugins"
+            if [ -d "$count_dir" ]; then
+                count=$(find "$count_dir" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
+            fi
+            if [ -n "$count" ] && [ "$count" != "0" ]; then
+                log_ok "$name ${DIM}($count plugins)${NC}"
+            else
+                log_ok "$name"
+            fi
             ok=$((ok + 1))
         else
             log_warn "$name ${DIM}(not installed)${NC}"
@@ -344,20 +352,13 @@ cmd_status() {
     # Shell info
     local shell_name="${SHELL##*/}"
     local shell_info="$shell_name"
-    case "$shell_name" in
-        zsh)
-            if [ -d "${XDG_DATA_HOME:-$HOME/.local/share}/zinit" ]; then
-                shell_info="$shell_name ${DIM}(zinit loaded)${NC}"
-            fi
-            ;;
-        bash)
-            shell_info="$shell_name"
-            ;;
-    esac
+    if [ "$shell_name" = "zsh" ] && [ -d "$XDG_DATA_HOME/zinit" ]; then
+        shell_info="$shell_name ${DIM}(zinit loaded)${NC}"
+    fi
     echo -e " ${CYAN}Shell${NC}        $shell_info"
 
     # Neovim plugins
-    local lazy_dir="$HOME/.local/share/nvim/lazy"
+    local lazy_dir="$XDG_DATA_HOME/nvim/lazy"
     if [ -d "$lazy_dir" ]; then
         local nvim_plugins
         nvim_plugins=$(find "$lazy_dir" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
@@ -395,18 +396,21 @@ cmd_uninstall() {
     print_banner
     echo -e " ${BOLD}Uninstall${NC}"
     "$DRY_RUN" && echo -e " ${DIM}Dry run - no changes will be made${NC}"
-    echo
 
     has_cmd stow || { log_fail "stow not found"; exit 1; }
 
     log_step 1 2 "Remove symlinks"
     cd "$DOTFILES_DIR"
-    run stow --target="$HOME" --delete .
+    if "$DRY_RUN"; then
+        log_dim "[dry-run] stow --target=\$HOME --delete ."
+    else
+        stow --target="$HOME" --delete .
+    fi
     log_ok "Symlinks removed"
 
     if "$DRY_RUN"; then
         log_step 2 2 "Cleanup"
-        log_dim "Skipped in dry-run"
+        log_dim "[dry-run] skipped"
         return
     fi
 
@@ -424,7 +428,7 @@ cmd_uninstall() {
             esac
         fi
     done
-    rm -rf "$HOME/.local/state/nvim" "$HOME/.cache/nvim" 2>/dev/null || true
+    rm -rf "$XDG_STATE_HOME/nvim" "${XDG_CACHE_HOME:-$HOME/.cache}/nvim" 2>/dev/null || true
 
     echo
     log_ok "Uninstall complete"
@@ -444,7 +448,7 @@ cmd_install() {
     log_step 1 5 "Backup"
     local backed_up=0
     if "$DRY_RUN"; then
-        log_dim "Skipped in dry-run"
+        log_dim "[dry-run] skipped"
     else
         local backup_dir=""
         for file in "${MANAGED_FILES[@]}"; do
@@ -522,7 +526,11 @@ print_install_summary() {
         echo -e " ${BOLD}Summary${NC}"
 
         if [ ${#INSTALLED_ITEMS[@]} -gt 0 ]; then
-            echo -ne " ${GREEN}Installed:${NC} "
+            if "$DRY_RUN"; then
+                echo -ne " ${GREEN}Ready:${NC} "
+            else
+                echo -ne " ${GREEN}Installed:${NC} "
+            fi
             local first=true
             for item in "${INSTALLED_ITEMS[@]}"; do
                 "$first" || echo -n ", "
@@ -566,7 +574,7 @@ show_skipped_deps() {
 
         track_skipped "$cmd" "not available for $os"
     done
-    true  # Ensure function returns 0
+    return 0
 }
 
 install_deps() {
@@ -583,7 +591,12 @@ install_deps() {
                     log_dim "[dry-run] /bin/bash -c \"\$(curl ... install.sh)\""
                 else
                     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-                    eval "$(/opt/homebrew/bin/brew shellenv)"
+                    # Apple Silicon or Intel Mac
+                    if [ -f /opt/homebrew/bin/brew ]; then
+                        eval "$(/opt/homebrew/bin/brew shellenv)"
+                    elif [ -f /usr/local/bin/brew ]; then
+                        eval "$(/usr/local/bin/brew shellenv)"
+                    fi
                 fi
             fi
             log_ok "Homebrew"
@@ -672,20 +685,23 @@ install_deps() {
     esac
 }
 
-
 install_extras() {
     for item in "${EXTRAS[@]}"; do
-        IFS='|' read -r p url type name <<EOF
-$item
-EOF
+        local p url type name
+        p="${item%%|*}"; item="${item#*|}"
+        url="${item%%|*}"; item="${item#*|}"
+        type="${item%%|*}"
+        name="${item##*|}"
+
         if has_path "$p"; then
             log_ok "$name"
         else
-            log_info "Cloning $name"
             case "$type" in
-                curl) run mkdir -p "$(dirname "$p")"
+                curl) log_info "Downloading $name"
+                      run mkdir -p "$(dirname "$p")"
                       run curl -sS -o "$p" "$url" ;;
-                git)  run mkdir -p "$(dirname "$p")"
+                git)  log_info "Cloning $name"
+                      run mkdir -p "$(dirname "$p")"
                       run git clone --depth 1 -q "$url" "$p" ;;
             esac
             log_ok "$name"
