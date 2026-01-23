@@ -2,6 +2,8 @@
 
 Modern terminal environment: Zsh, Neovim, Tmux, Alacritty.
 
+![Neovim + Tmux](images/nvim-tmux.png)
+
 ## Install
 
 ```shell
