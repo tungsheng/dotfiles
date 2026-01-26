@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.3.0 (2026-01-25)
+
+- Organize documentation into `docs/` folder
+- Improve docs consistency (keybinding notation, post-install steps)
+- Add dates to changelog entries
+- Update post-install messages in `dot` script
+
 ## v1.2.0 (2026-01-23)
 
 - Add `uv` Python package manager to dependencies
