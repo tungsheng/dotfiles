@@ -151,5 +151,5 @@ docker run -it fedora:latest bash
 1. Update `VERSION` file
 2. Test on macOS and Linux
 3. Run `./dot health`
-4. Tag release: `git tag -a v1.x.0 -m "v1.x.0 - Description"`
-5. Update `CHANGELOG.md`
+4. Update `CHANGELOG.md`
+5. Tag release: `git tag -a v1.x.0 -m "v1.x.0 - Description"`

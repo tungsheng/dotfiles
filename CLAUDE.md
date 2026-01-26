@@ -24,7 +24,7 @@ dotfiles/
 ├── .zshrc                   # Zsh config
 ├── .bashrc                  # Bash config
 ├── .config/
-│   ├── nvim/                # Neovim (NvChad + Lazy.nvim)
+│   ├── nvim/                # Neovim (Lazy.nvim)
 │   ├── tmux/                # Tmux (TPM)
 │   ├── alacritty/           # Terminal (Tokyo Night)
 │   ├── gh/                  # GitHub CLI
@@ -75,3 +75,7 @@ MANAGED_FILES=(.zshrc .bashrc .config/nvim ...)
 - Neovim keybindings: `lua/mappings.lua`
 - Tmux prefix: `Ctrl+Space`
 - Cross-tool navigation: `Ctrl+h/j/k/l`
+
+## Inspiration
+
+- [Dreams of Code](https://www.youtube.com/watch?v=DzNmUNvnB04)

@@ -1,6 +1,6 @@
 # Dotfiles
 
-Modern terminal environment: Zsh, Neovim, Tmux, Alacritty.
+Modern terminal environment: Zsh, Neovim, Tmux, Alacritty. Inspired by [Dreams of Code](https://www.youtube.com/watch?v=DzNmUNvnB04).
 
 ![Neovim + Tmux](images/nvim-tmux.png)
 
