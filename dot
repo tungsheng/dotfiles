@@ -522,14 +522,14 @@ cmd_install() {
     echo
     echo -e " ${BOLD}Next steps${NC}"
     if [ "$USE_SHELL" = "bash" ]; then
-        echo -e "   ${CYAN}1.${NC} Restart terminal"
-        echo -e "   ${CYAN}2.${NC} Open ${BOLD}nvim${NC} to install plugins"
-        echo -e "   ${CYAN}3.${NC} Open ${BOLD}tmux${NC}, press ${BOLD}Ctrl+Space I${NC}"
+        echo -e "   ${CYAN}1.${NC} Restart terminal (or run ${BOLD}bash${NC})"
+        echo -e "   ${CYAN}2.${NC} Open ${BOLD}nvim${NC} — plugins install automatically"
+        echo -e "   ${CYAN}3.${NC} Open ${BOLD}tmux${NC}, press ${BOLD}Ctrl+Space I${NC} for plugins"
     else
-        echo -e "   ${CYAN}1.${NC} Restart terminal"
-        echo -e "   ${CYAN}2.${NC} Run ${BOLD}p10k configure${NC}"
-        echo -e "   ${CYAN}3.${NC} Open ${BOLD}nvim${NC} to install plugins"
-        echo -e "   ${CYAN}4.${NC} Open ${BOLD}tmux${NC}, press ${BOLD}Ctrl+Space I${NC}"
+        echo -e "   ${CYAN}1.${NC} Restart terminal (or run ${BOLD}zsh${NC})"
+        echo -e "   ${CYAN}2.${NC} Run ${BOLD}p10k configure${NC} for prompt setup"
+        echo -e "   ${CYAN}3.${NC} Open ${BOLD}nvim${NC} — plugins install automatically"
+        echo -e "   ${CYAN}4.${NC} Open ${BOLD}tmux${NC}, press ${BOLD}Ctrl+Space I${NC} for plugins"
     fi
     echo
     log_dim "Verify: ./dot health"

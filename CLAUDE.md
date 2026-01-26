@@ -12,7 +12,7 @@ Dotfiles repository using GNU Stow. Supports macOS, Debian/Ubuntu, and RHEL/Fedo
 ./dot                 # Show help
 ./dot install         # Install dotfiles
 ./dot uninstall       # Remove symlinks
-./dot health          # Check status
+./dot health          # Full status check
 ./dot install -n      # Preview (dry-run)
 ./dot install -v      # Verbose output
 ```

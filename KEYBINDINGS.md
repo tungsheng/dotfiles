@@ -5,14 +5,14 @@
 Seamless movement across Neovim splits and Tmux panes:
 
 ```
-┌──────────────────────────────────────┐
-│  Tmux Pane      │  Tmux Pane         │
-│  ┌──────────┐   │                    │
-│  │ Vim Split│   │  Terminal          │
-│  ├──────────┤   │                    │
-│  │ Vim Split│   │                    │
-│  └──────────┘   │                    │
-└──────────────────────────────────────┘
+┌───────────────────────────────────────┐
+│  Tmux Pane       │  Tmux Pane         │
+│  ┌───────────┐   │                    │
+│  │ Vim Split │   │  Terminal          │
+│  ├───────────┤   │                    │
+│  │ Vim Split │   │                    │
+│  └───────────┘   │                    │
+└───────────────────────────────────────┘
        Ctrl+h/j/k/l moves everywhere
 ```
 
@@ -29,13 +29,13 @@ Seamless movement across Neovim splits and Tmux panes:
 
 | Key | Action |
 |-----|--------|
-| `prefix "` | Split horizontal |
-| `prefix %` | Split vertical |
-| `prefix z` | Zoom pane (toggle) |
+| `<prefix> "` | Split horizontal |
+| `<prefix> %` | Split vertical |
+| `<prefix> z` | Zoom pane (toggle) |
 | `Shift+←/→` | Prev/next window |
-| `prefix [` | Copy mode (vi) |
+| `<prefix> [` | Copy mode (vi) |
 | `v` / `y` | Select / yank (in copy mode) |
-| `prefix I` | Install plugins |
+| `<prefix> I` | Install plugins |
 
 ## Neovim
 
@@ -48,7 +48,7 @@ Seamless movement across Neovim splits and Tmux panes:
 | `<leader>fb` | Buffers |
 | `<leader>e` | File tree |
 | `<leader>x` | Close buffer |
-| `Tab` / `S-Tab` | Next/prev buffer |
+| `Tab` / `Shift+Tab` | Next/prev buffer |
 | `<leader>gs` | Git status (Neogit) |
 | `<leader>gw` | Git worktree list |
 | `<leader>ga` | Git worktree add |
@@ -61,10 +61,10 @@ Seamless movement across Neovim splits and Tmux panes:
 |-----|--------|
 | `<leader>h` | Horizontal terminal |
 | `<leader>v` | Vertical terminal |
-| `<A-h>` | Toggle horizontal terminal |
-| `<A-v>` | Toggle vertical terminal |
-| `<A-i>` | Toggle floating terminal |
-| `ESC` | Exit terminal mode (to normal) |
+| `Alt+h` | Toggle horizontal terminal |
+| `Alt+v` | Toggle vertical terminal |
+| `Alt+i` | Toggle floating terminal |
+| `Esc` | Exit terminal mode (to normal) |
 
 Run `:NvCheatsheet` for full NvChad bindings.
 
@@ -78,18 +78,18 @@ Run `:NvCheatsheet` for full NvChad bindings.
 
 ### Aliases
 
-```shell
-# Navigation
-..  ...  ....      # Up directories
+| Alias | Action |
+|-------|--------|
+| `..` `...` `....` | Up 1/2/3 directories |
+| `ll` | `ls -la` |
+| `la` | `ls -lathr` |
 
-# Listing
-ll                 # ls -la
-la                 # ls -lathr
+**Git aliases** (from OMZP::git plugin):
 
-# Git (OMZP::git)
-gst  ga  gc  gco   # status, add, commit, checkout
-gp   gl  gd        # push, pull, diff
-```
+| Alias | Action |
+|-------|--------|
+| `gst` `ga` `gc` `gco` | status, add, commit, checkout |
+| `gp` `gl` `gd` | push, pull, diff |
 
 Run `alias | grep git` for full list.
 

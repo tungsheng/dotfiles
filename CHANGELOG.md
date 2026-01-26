@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.2.0
+## v1.2.0 (2026-01-23)
 
 - Add `uv` Python package manager to dependencies
 - Add shared NVM script with XDG support
@@ -10,7 +10,7 @@
 - Refactor shell configs to reduce duplication
 - Update nvim packages and keybinding docs
 
-## v1.1.0
+## v1.1.0 (2026-01-23)
 
 - Add health check: font detection, plugin counts (Zinit, Lazy.nvim, TPM)
 - Add expanded shell aliases
@@ -18,7 +18,7 @@
 - Fix NVM path detection for Mason compatibility
 - Fix bash compatibility issues
 
-## v1.0.0
+## v1.0.0 (2026-01-23)
 
 - Initial release with GNU Stow
 - Add `dot` CLI: install, uninstall, health, status commands

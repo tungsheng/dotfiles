@@ -4,16 +4,6 @@ Modern terminal environment: Zsh, Neovim, Tmux, Alacritty. Inspired by [Dreams o
 
 ![Neovim + Tmux](images/nvim-tmux.png)
 
-## Install
-
-```shell
-git clone https://github.com/tungsheng/dotfiles.git ~/dotfiles
-cd ~/dotfiles
-./dot install
-```
-
-Preview first: `./dot install -n`
-
 ## Prerequisites
 
 | OS | Command |
@@ -24,12 +14,22 @@ Preview first: `./dot install -n`
 
 > **RHEL/Alma**: Run `sudo dnf install epel-release` first if install fails.
 
+## Install
+
+```shell
+git clone https://github.com/tungsheng/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+./dot install
+```
+
+Preview first: `./dot install -n`
+
 ## Post-Install
 
 1. Restart terminal (or run `zsh`)
 2. Run `p10k configure` for prompt setup
 3. Open `nvim` — plugins auto-install
-4. Open `tmux`, press `Ctrl+Space I` for plugins
+4. Open `tmux`, press `<prefix> I` to install plugins (`<prefix>` = `Ctrl+Space`)
 
 ## Commands
 
@@ -56,7 +56,7 @@ Preview first: `./dot install -n`
 | Context | Key | Action |
 |---------|-----|--------|
 | Tmux | `Ctrl+Space` | Prefix |
-| Cross-tool | `Ctrl+h/j/k/l` | Navigate panes |
+| Cross-tool | `Ctrl+h/j/k/l` | Navigate panes/splits |
 | Neovim | `Space` | Leader |
 | Neovim | `<leader>ff` | Find files |
 

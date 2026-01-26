@@ -93,7 +93,7 @@ CLEANUPS=(
 
 1. Place file in repo (root or `.config/`)
 2. Add to `MANAGED_FILES` if it needs backup/health tracking
-3. Run `stow --restow .`
+3. Run `./dot install` (or `stow .` directly)
 
 ### Add External Resource
 
@@ -148,8 +148,12 @@ docker run -it fedora:latest bash
 
 ## Release
 
-1. Update `VERSION` file
+1. Update `VERSION` file (in repo root)
 2. Test on macOS and Linux
 3. Run `./dot health`
 4. Update `CHANGELOG.md`
-5. Tag release: `git tag -a v1.x.0 -m "v1.x.0 - Description"`
+5. Tag and push:
+   ```shell
+   git tag -a v1.x.0 -m "v1.x.0 - Description"
+   git push origin v1.x.0
+   ```
