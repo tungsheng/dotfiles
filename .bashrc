@@ -17,6 +17,11 @@ else
   PS1='\[\e[33m\]\u\[\e[0m\]@\[\e[34m\]\h\[\e[0m\]:\[\e[35m\]\W\[\e[0m\] \n$ '
 fi
 
+# Safety aliases (interactive shell only)
+alias rm='rm -i'
+alias mv='mv -i'
+alias cp='cp -i'
+
 # Shared config
 source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/aliases.sh"
 source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/nvm.sh"

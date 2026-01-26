@@ -14,7 +14,10 @@ fi
 ZINIT_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git"
 if [[ ! -d "$ZINIT_HOME" ]]; then
   mkdir -p "$(dirname "$ZINIT_HOME")"
-  git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+  if ! git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"; then
+    echo "Failed to clone Zinit" >&2
+    return
+  fi
 fi
 source "${ZINIT_HOME}/zinit.zsh"
 
@@ -43,11 +46,10 @@ zinit cdreplay -q
 # Powerlevel10k config
 [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
 
-# Keybindings
-bindkey -e
+# Keybindings (vi mode)
+bindkey -v
 bindkey '^p' history-search-backward
 bindkey '^n' history-search-forward
-bindkey '^[w' kill-region
 
 # History (XDG-compliant)
 HISTSIZE=5000
@@ -63,6 +65,11 @@ zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 zstyle ':completion:*' menu no
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
+
+# Safety aliases (interactive shell only)
+alias rm='rm -i'
+alias mv='mv -i'
+alias cp='cp -i'
 
 # Shared config
 source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/aliases.sh"

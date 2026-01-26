@@ -286,30 +286,33 @@ cmd_health() {
     # --- Fonts ---
     log_step 3 4 "Fonts"
     local font_dir="$HOME/Library/Fonts"
-    for font in "JetBrainsMono" "Hurmit"; do
-        if has_cmd fc-list; then
-            # Linux or macOS with fontconfig
-            if fc-list | grep -qi "${font}.*Nerd"; then
+    local can_check_fonts=false
+    has_cmd fc-list && can_check_fonts=true
+    [[ -d "$font_dir" ]] && can_check_fonts=true
+
+    if [[ "$can_check_fonts" == "true" ]]; then
+        for font in "JetBrainsMono" "Hurmit"; do
+            if has_cmd fc-list; then
+                # Linux or macOS with fontconfig
+                if fc-list | grep -qi "${font}.*Nerd"; then
+                    log_ok "$font Nerd Font"
+                    ok=$((ok + 1))
+                else
+                    log_warn "$font Nerd Font ${DIM}(not installed)${NC}"
+                    warn=$((warn + 1))
+                fi
+            elif ls "$font_dir" 2>/dev/null | grep -qi "$font"; then
+                # macOS fallback: check font directory
                 log_ok "$font Nerd Font"
                 ok=$((ok + 1))
             else
                 log_warn "$font Nerd Font ${DIM}(not installed)${NC}"
                 warn=$((warn + 1))
             fi
-        elif [ -d "$font_dir" ]; then
-            # macOS fallback: check font directory
-            if ls "$font_dir" 2>/dev/null | grep -qi "$font"; then
-                log_ok "$font Nerd Font"
-                ok=$((ok + 1))
-            else
-                log_warn "$font Nerd Font ${DIM}(not installed)${NC}"
-                warn=$((warn + 1))
-            fi
-        else
-            log_dim "Cannot verify fonts"
-            break
-        fi
-    done
+        done
+    else
+        log_dim "Cannot verify fonts (no fc-list or font directory)"
+    fi
 
     # --- Plugins ---
     log_step 4 4 "Plugins"
