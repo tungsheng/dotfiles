@@ -60,7 +60,7 @@ Preview first: `./dot install -n`
 | Neovim | `Space` | Leader |
 | Neovim | `<leader>ff` | Find files |
 
-See [KEYBINDINGS.md](KEYBINDINGS.md) for complete reference.
+See [KEYBINDINGS.md](docs/KEYBINDINGS.md) for complete reference.
 
 ## Manual Install
 
@@ -75,4 +75,4 @@ cd ~/dotfiles && stow .
 
 ## License
 
-[MIT](LICENSE) · [Developer Guide](DEVELOPER_GUIDE.md)
+[MIT](LICENSE) · [Developer Guide](docs/DEVELOPER_GUIDE.md)

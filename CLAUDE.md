@@ -29,6 +29,7 @@ dotfiles/
 │   ├── alacritty/           # Terminal (Tokyo Night)
 │   ├── gh/                  # GitHub CLI
 │   └── shell/aliases.sh     # Shared aliases
+├── docs/                    # Documentation
 ├── dot                      # Install script (bash 3.2+)
 └── .stow-local-ignore       # Stow exclusions
 ```
@@ -58,7 +59,7 @@ MANAGED_FILES=(.zshrc .bashrc .config/nvim ...)
 - Format: `MAJOR.MINOR.PATCH` (semver)
 - Tag releases: `git tag -a v1.2.0 -m "v1.2.0 - Description"`
 - Update `VERSION` file when tagging
-- Changelog in `CHANGELOG.md`
+- Changelog in `docs/CHANGELOG.md`
 
 ## Tools
 
