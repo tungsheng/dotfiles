@@ -46,8 +46,8 @@ zinit cdreplay -q
 # Powerlevel10k config
 [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
 
-# Keybindings (vi mode)
-bindkey -v
+# Keybindings (emacs mode)
+bindkey -e
 bindkey '^p' history-search-backward
 bindkey '^n' history-search-forward
 

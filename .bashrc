@@ -6,8 +6,8 @@
 # macOS: silence bash deprecation warning
 [[ "$OSTYPE" == darwin* ]] && export BASH_SILENCE_DEPRECATION_WARNING=1
 
-# Vi mode
-set -o vi
+# Emacs mode
+set -o emacs
 
 # Git prompt (XDG location)
 if [[ -f "${XDG_DATA_HOME:-$HOME/.local/share}/git/git-prompt.sh" ]]; then
