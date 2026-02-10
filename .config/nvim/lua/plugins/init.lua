@@ -77,7 +77,7 @@ return {
   -- Auto-close HTML/JSX tags
   {
     "windwp/nvim-ts-autotag",
-    ft = {"javascript", "javascriptreact", "typescript", "typescriptreact"},
+    ft = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
     config = function()
       require("nvim-ts-autotag").setup()
     end,
@@ -88,11 +88,19 @@ return {
     "nvim-treesitter/nvim-treesitter",
     opts = {
       ensure_installed = {
-        "vim", "lua", "vimdoc",
-        "html", "css", "javascript",
-        "typescript", "tsx",
-        "json", "yaml", "markdown",
-        "bash", "dockerfile",
+        "vim",
+        "lua",
+        "vimdoc",
+        "html",
+        "css",
+        "javascript",
+        "typescript",
+        "tsx",
+        "json",
+        "yaml",
+        "markdown",
+        "bash",
+        "dockerfile",
       },
     },
   },

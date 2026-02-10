@@ -36,3 +36,6 @@ export BUN_INSTALL="$HOME/.bun"
 
 # uv (Python)
 [[ -d "$HOME/.local/bin" ]] && export PATH="$HOME/.local/bin:$PATH"
+
+# Source environment secrets (API keys)
+[ -f ~/.env.secrets ] && source ~/.env.secrets
