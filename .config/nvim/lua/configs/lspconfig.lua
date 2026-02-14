@@ -14,7 +14,7 @@ local function setup(server, opts)
 end
 
 -- Simple servers with default config
-local simple_servers = { "html", "cssls", "vtsls", "marksman", "dockerls", "bashls" }
+local simple_servers = { "html", "cssls", "vtsls", "marksman", "dockerls", "bashls", "ruff" }
 for _, lsp in ipairs(simple_servers) do
   setup(lsp)
 end

@@ -101,6 +101,10 @@ return {
         "markdown",
         "bash",
         "dockerfile",
+        "python",
+      },
+      indent = {
+        enable = true,
       },
     },
   },

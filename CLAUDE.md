@@ -28,6 +28,7 @@ dotfiles/
 │   ├── tmux/                # Tmux (TPM)
 │   ├── alacritty/           # Terminal (Tokyo Night)
 │   ├── gh/                  # GitHub CLI
+│   ├── ruff/                # Python linter/formatter
 │   └── shell/aliases.sh     # Shared aliases
 ├── docs/                    # Documentation
 ├── dot                      # Install script (bash 3.2+)
@@ -74,6 +75,7 @@ MANAGED_FILES=(.zshrc .bashrc .config/nvim ...)
 - Shared aliases: `.config/shell/aliases.sh`
 - Neovim plugins: `lua/plugins/init.lua`
 - Neovim keybindings: `lua/mappings.lua`
+- Neovim indentation: 2 spaces global, 4 spaces for Python (PEP 8)
 - Tmux prefix: `Ctrl+Space`
 - Cross-tool navigation: `Ctrl+h/j/k/l`
 
