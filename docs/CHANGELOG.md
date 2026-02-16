@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.4.3 (2026-02-16)
+
+- Fix CI workflow to only check our scripts (not zshrc/bashrc/third-party)
+- Fix useless cat warning (SC2002) in `dot` script
+
 ## v1.4.2 (2026-02-16)
 
 - Fix docs: add `./dot update` to README and developer guide
