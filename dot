@@ -302,7 +302,7 @@ cmd_health() {
                     log_warn "$font Nerd Font ${DIM}(not installed)${NC}"
                     warn=$((warn + 1))
                 fi
-            elif ls "$font_dir" 2>/dev/null | grep -qi "$font"; then
+            elif compgen -G "$font_dir/*${font}*" > /dev/null 2>&1; then
                 # macOS fallback: check font directory
                 log_ok "$font Nerd Font"
                 ok=$((ok + 1))
@@ -637,7 +637,7 @@ install_deps() {
             local pkgs
             pkgs=$(get_packages 2)
             if [ -n "$pkgs" ]; then
-                # shellcheck disable=SC2086 — intentional word splitting for package list
+                # shellcheck disable=SC2086 # intentional word splitting for package list
                 if "$DRY_RUN"; then
                     log_dim "[dry-run] brew install $pkgs"
                 else
