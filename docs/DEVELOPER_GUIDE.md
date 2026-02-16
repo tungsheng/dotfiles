@@ -64,6 +64,10 @@ Paths offered for removal during uninstall:
 ```bash
 CLEANUPS=(
     "$HOME/.config/alacritty/themes|Alacritty themes"
+    "$XDG_DATA_HOME/git|git-prompt.sh"
+    "$XDG_DATA_HOME/zinit|Zinit"
+    "$XDG_DATA_HOME/nvim|Neovim data"
+    "$HOME/.config/tmux/plugins|Tmux plugins"
 )
 ```
 
@@ -133,6 +137,7 @@ mydir/
 ```shell
 ./dot install -n     # Preview changes
 ./dot install -v     # Verbose output
+./dot update         # Pull latest + update plugins
 ./dot health         # Verify install
 
 # Fresh system test

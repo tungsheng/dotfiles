@@ -36,6 +36,7 @@ Preview first: `./dot install -n`
 | Command | Description |
 |---------|-------------|
 | `./dot install` | Install dotfiles |
+| `./dot update` | Pull latest + update plugins |
 | `./dot install -n` | Preview (dry-run) |
 | `./dot uninstall` | Remove symlinks |
 | `./dot health` | Full status check |
@@ -48,6 +49,8 @@ Preview first: `./dot install -n`
 .config/nvim/              Neovim (Lazy.nvim)
 .config/tmux/              Tmux (TPM)
 .config/alacritty/         Terminal (Tokyo Night)
+.config/gh/                GitHub CLI
+.config/ruff/              Python linter/formatter
 .config/shell/aliases.sh   Shared aliases
 ```
 

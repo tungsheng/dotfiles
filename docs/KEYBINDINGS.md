@@ -59,13 +59,9 @@ Seamless movement across Neovim splits and Tmux panes:
 
 | Key | Action |
 |-----|--------|
-| `<leader>h` | Horizontal terminal |
-| `<leader>v` | Vertical terminal |
-| `Alt+h` | Toggle horizontal terminal |
-| `Alt+v` | Toggle vertical terminal |
-| `Alt+i` | Toggle floating terminal |
 | `Esc` | Exit terminal mode (to normal) |
 
+NvChad provides additional terminal bindings (`<leader>h`, `<leader>v`, `Alt+h/v/i`).
 Run `:NvCheatsheet` for full NvChad bindings.
 
 ## Zsh
@@ -74,7 +70,7 @@ Run `:NvCheatsheet` for full NvChad bindings.
 |-----|--------|
 | `Ctrl+r` | Fuzzy history search (fzf) |
 | `Tab` | Fuzzy completion (fzf-tab) |
-| `Ctrl+p/n` | Prev/next history |
+| `Ctrl+p/n` | History prefix search (backward/forward) |
 
 ### Aliases
 

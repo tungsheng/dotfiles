@@ -7,6 +7,10 @@
 - Remove ruff from conform.nvim (ruff LSP already handles formatting)
 - Rename ruff config from `pyproject.toml` to `ruff.toml` (proper XDG format)
 - Fix `stat` operator precedence in `dot status` command
+- Fix docs: add `./dot update` to README and developer guide
+- Fix docs: add `.config/gh/` and `.config/ruff/` to README structure
+- Fix docs: expand CLEANUPS example to all 5 entries in developer guide
+- Fix docs: correct keybindings for NvChad terminal and Zsh history prefix search
 
 ## v1.4.0 (2026-02-16)
 
