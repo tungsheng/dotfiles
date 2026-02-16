@@ -1,5 +1,25 @@
 # Changelog
 
+## v1.4.0 (2026-02-16)
+
+### Added
+- `./dot update` command — pull latest, re-stow symlinks, update Zinit/Lazy.nvim/TPM plugins
+- ShellCheck CI workflow (`.github/workflows/lint.yml`)
+- Dependency skip optimization — skips package manager when all deps already installed
+
+### Fixed
+- `run_with_spin` now reports failures instead of silently exiting under `set -e`
+- Use safe array expansion for package installs (brew/dnf/apt)
+- Add `-f` flag to zoxide curl install to fail on HTTP errors
+
+### Removed
+- Dead `configs/neogit.lua` (306 lines, never imported)
+- Deprecated `configs/null-ls.lua` and `plugins/mason-null-ls.lua` (replaced by conform.nvim)
+
+### Security
+- Exclude `gh/hosts.yml` from stow (contains GitHub user identity)
+- Add warning comments for `~/.env.secrets` sourcing in `.zshrc` and `.bashrc`
+
 ## v1.3.0 (2026-01-25)
 
 - Organize documentation into `docs/` folder
