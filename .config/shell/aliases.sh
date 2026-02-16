@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Shared aliases - sourced by .zshrc and .bashrc
 
 # Navigation
