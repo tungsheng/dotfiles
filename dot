@@ -15,7 +15,7 @@ get_version() {
     if ver=$(git -C "$DOTFILES_DIR" describe --tags --always 2>/dev/null); then
         echo "${ver#v}"  # strip leading 'v'
     elif [[ -f "$DOTFILES_DIR/VERSION" ]]; then
-        cat "$DOTFILES_DIR/VERSION" | tr -d '[:space:]'
+        tr -d '[:space:]' < "$DOTFILES_DIR/VERSION"
     else
         echo "unknown"
     fi
