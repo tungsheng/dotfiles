@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.4.1 (2026-02-16)
+
+- Remove hardcoded `/bin/zsh` from Alacritty (use system default shell)
+- Add bash history settings (`HISTSIZE`, `HISTCONTROL=ignoreboth:erasedups`)
+- Remove ruff from conform.nvim (ruff LSP already handles formatting)
+- Rename ruff config from `pyproject.toml` to `ruff.toml` (proper XDG format)
+- Fix `stat` operator precedence in `dot status` command
+
 ## v1.4.0 (2026-02-16)
 
 ### Added
