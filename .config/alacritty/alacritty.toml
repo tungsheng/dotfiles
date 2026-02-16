@@ -4,9 +4,6 @@ import = [
   "~/.config/alacritty/themes/themes/tokyo-night.toml"
 ]
 
-[shell]
-program = "/bin/zsh"
-
 [window]
 padding = { x = 2, y = 2 }
 dynamic_padding = true

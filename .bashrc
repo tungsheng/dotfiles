@@ -9,6 +9,11 @@
 # Emacs mode
 set -o emacs
 
+# History
+HISTSIZE=5000
+HISTFILESIZE=5000
+HISTCONTROL=ignoreboth:erasedups
+
 # Git prompt (XDG location)
 if [[ -f "${XDG_DATA_HOME:-$HOME/.local/share}/git/git-prompt.sh" ]]; then
   source "${XDG_DATA_HOME:-$HOME/.local/share}/git/git-prompt.sh"

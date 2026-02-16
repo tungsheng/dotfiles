@@ -14,7 +14,7 @@ local options = {
     yaml = { "prettier" },
     sh = { "shfmt" },
     bash = { "shfmt" },
-    python = { "ruff_fix", "ruff_format", "ruff_organize_imports" },
+    python = {},  -- ruff LSP handles formatting and import sorting
   },
 
   -- format_on_save = {

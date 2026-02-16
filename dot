@@ -399,7 +399,8 @@ cmd_status() {
     # Last state file update
     if [ -f "$STATE_FILE" ]; then
         local last_sync
-        last_sync=$(stat -f "%Sm" -t "%Y-%m-%d %H:%M" "$STATE_FILE" 2>/dev/null || stat -c "%y" "$STATE_FILE" 2>/dev/null | cut -d'.' -f1)
+        last_sync=$(stat -f "%Sm" -t "%Y-%m-%d %H:%M" "$STATE_FILE" 2>/dev/null) || \
+            last_sync=$(stat -c "%y" "$STATE_FILE" 2>/dev/null | cut -d'.' -f1)
         echo -e " ${CYAN}Last sync${NC}    $last_sync"
     fi
 

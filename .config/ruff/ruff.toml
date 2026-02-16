@@ -1,8 +1,7 @@
-[tool.ruff]
 line-length = 88
 
-[tool.ruff.format]
+[format]
 indent-style = "space"
 
-[tool.ruff.lint]
+[lint]
 select = ["E", "F", "I"]  # Enable error, warning, and import sorting
