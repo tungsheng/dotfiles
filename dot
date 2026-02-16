@@ -110,7 +110,7 @@ run_with_spin() {
     "$@" >/dev/null 2>&1 &
     local pid=$!
     spin "$pid" "$msg"
-    wait "$pid"
+    wait "$pid" || { log_fail "$msg"; return 1; }
 }
 
 print_banner() {
@@ -185,6 +185,7 @@ print_usage() {
     echo
     echo -e " ${BOLD}Commands${NC}"
     echo "   install      Install dotfiles and dependencies"
+    echo "   update       Pull latest changes and update plugins"
     echo "   uninstall    Remove symlinks and optionally clean up"
     echo "   health       Check installation status"
     echo "   status       Quick overview of installation state"
@@ -592,11 +593,27 @@ show_skipped_deps() {
     return 0
 }
 
+all_deps_installed() {
+    for item in "${DEPS[@]}"; do
+        local cmd
+        cmd=$(echo "$item" | cut -d'|' -f1 | tr -d ' ')
+        [ "$cmd" = "-" ] || [ -z "$cmd" ] && continue
+        has_cmd "$cmd" || return 1
+    done
+    return 0
+}
+
 install_deps() {
     local os="$1"
 
     # Show packages that will be skipped on this OS
     show_skipped_deps "$os"
+
+    # Skip package manager if all dependencies are already installed
+    if all_deps_installed; then
+        log_ok "All dependencies already installed"
+        return
+    fi
 
     case "$os" in
         macos)
@@ -619,10 +636,12 @@ install_deps() {
             local pkgs
             pkgs=$(get_packages 2)
             if [ -n "$pkgs" ]; then
+                # shellcheck disable=SC2086 — intentional word splitting for package list
                 if "$DRY_RUN"; then
                     log_dim "[dry-run] brew install $pkgs"
                 else
-                    run_with_spin "Installing packages..." brew install --quiet $pkgs
+                    read -ra pkg_array <<< "$pkgs"
+                    run_with_spin "Installing packages..." brew install --quiet "${pkg_array[@]}"
                 fi
                 log_ok "Packages"
                 track_installed "packages"
@@ -652,7 +671,8 @@ install_deps() {
                 if "$DRY_RUN"; then
                     log_dim "[dry-run] sudo dnf install -y $pkgs"
                 else
-                    run_with_spin "Installing packages..." sudo dnf install -y $pkgs
+                    read -ra pkg_array <<< "$pkgs"
+                    run_with_spin "Installing packages..." sudo dnf install -y "${pkg_array[@]}"
                 fi
                 log_ok "Packages"
                 track_installed "packages"
@@ -663,7 +683,7 @@ install_deps() {
                 if "$DRY_RUN"; then
                     log_dim "[dry-run] curl ... zoxide install.sh | bash"
                 else
-                    curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash >/dev/null 2>&1
+                    curl -fsSL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash >/dev/null 2>&1
                 fi
                 log_ok "zoxide"
                 track_installed "zoxide"
@@ -685,7 +705,8 @@ install_deps() {
                 if "$DRY_RUN"; then
                     log_dim "[dry-run] sudo apt install -y $pkgs"
                 else
-                    run_with_spin "Installing packages..." sudo apt install -y $pkgs
+                    read -ra pkg_array <<< "$pkgs"
+                    run_with_spin "Installing packages..." sudo apt install -y "${pkg_array[@]}"
                 fi
                 log_ok "Packages"
                 track_installed "packages"
@@ -790,6 +811,76 @@ set_shell() {
     fi
 }
 
+cmd_update() {
+    print_banner
+    echo -e " ${BOLD}Update${NC}"
+    "$DRY_RUN" && echo -e " ${DIM}Dry run - no changes will be made${NC}"
+
+    # Step 1: Pull latest dotfiles
+    log_step 1 3 "Pull latest"
+    cd "$DOTFILES_DIR"
+    if "$DRY_RUN"; then
+        log_dim "[dry-run] git pull"
+    else
+        run_with_spin "Pulling latest changes..." git pull --ff-only || {
+            log_fail "Pull failed (merge conflicts?)"
+            log_dim "Resolve manually, then re-run ./dot update"
+            exit 1
+        }
+    fi
+    log_ok "Dotfiles up to date"
+
+    # Step 2: Re-stow symlinks
+    log_step 2 3 "Symlinks"
+    if "$DRY_RUN"; then
+        log_dim "[dry-run] stow --target=\$HOME --restow ."
+    else
+        stow --target="$HOME" --restow .
+    fi
+    log_ok "Symlinks refreshed"
+
+    # Step 3: Update plugins
+    log_step 3 3 "Plugins"
+
+    # Zinit
+    if has_cmd zsh; then
+        log_info "Updating Zinit plugins..."
+        if "$DRY_RUN"; then
+            log_dim "[dry-run] zinit update --all"
+        else
+            run_with_spin "Updating Zinit plugins..." zsh -ic "zinit update --all" || true
+        fi
+        log_ok "Zinit"
+    fi
+
+    # Lazy.nvim
+    if has_cmd nvim; then
+        log_info "Updating Neovim plugins..."
+        if "$DRY_RUN"; then
+            log_dim "[dry-run] nvim --headless '+Lazy! sync' +qa"
+        else
+            run_with_spin "Updating Neovim plugins..." nvim --headless "+Lazy! sync" +qa || true
+        fi
+        log_ok "Neovim"
+    fi
+
+    # TPM
+    local tpm_update="$HOME/.config/tmux/plugins/tpm/bin/update_plugins"
+    if [ -x "$tpm_update" ]; then
+        log_info "Updating Tmux plugins..."
+        if "$DRY_RUN"; then
+            log_dim "[dry-run] $tpm_update all"
+        else
+            run_with_spin "Updating Tmux plugins..." "$tpm_update" all || true
+        fi
+        log_ok "Tmux"
+    fi
+
+    echo
+    log_ok "Update complete"
+    echo
+}
+
 # ============================================================================
 # Main
 # ============================================================================
@@ -799,7 +890,7 @@ main() {
 
     while [ $# -gt 0 ]; do
         case "$1" in
-            install|uninstall|health|status) cmd="$1"; shift ;;
+            install|update|uninstall|health|status) cmd="$1"; shift ;;
             -n|--dry-run) DRY_RUN=true; shift ;;
             -v|--verbose) VERBOSE=true; shift ;;
             -h|--help) print_usage; exit 0 ;;
@@ -814,6 +905,7 @@ main() {
 
     case "$cmd" in
         install)   cmd_install ;;
+        update)    cmd_update ;;
         uninstall) cmd_uninstall ;;
         health)    cmd_health ;;
         status)    cmd_status ;;

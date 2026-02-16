@@ -87,4 +87,5 @@ export BUN_INSTALL="$HOME/.bun"
 [[ -d "$HOME/.local/bin" ]] && export PATH="$HOME/.local/bin:$PATH"
 
 # Source environment secrets (API keys)
+# WARNING: This file is sourced as shell code. Only put 'export VAR=value' lines in it.
 [ -f ~/.env.secrets ] && source ~/.env.secrets
