@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # NVM setup - shared between zsh and bash
 # Supports both ~/.nvm and XDG locations
 
@@ -23,7 +24,7 @@ if [[ -n "$NVM_DIR" && -d "$NVM_DIR/versions/node" ]]; then
     fi
     # Fallback to latest installed version
     if [[ ! -d "$NVM_DIR/versions/node/$version" ]]; then
-      version=$(ls -1 "$NVM_DIR/versions/node" 2>/dev/null | sort -V | tail -1)
+      version=$(find "$NVM_DIR/versions/node" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; 2>/dev/null | sort -V | tail -1)
     fi
     echo "$version"
   }
@@ -36,7 +37,9 @@ fi
 # Lazy load full NVM (for nvm use, nvm install, etc.)
 nvm() {
   unset -f nvm
+  # shellcheck source=/dev/null
   [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
+  # shellcheck source=/dev/null
   [[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
   nvm "$@"
 }

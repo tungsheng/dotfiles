@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.4.2 (2026-02-16)
+
+- Fix docs: add `./dot update` to README and developer guide
+- Fix docs: add `.config/gh/` and `.config/ruff/` to README structure
+- Fix docs: expand CLEANUPS example to all 5 entries in developer guide
+- Fix docs: correct keybindings for NvChad terminal and Zsh history prefix search
+- Fix shellcheck warnings: replace `ls | grep` with glob, fix directive syntax
+- Add `shellcheck shell=bash` directive to `aliases.sh` and `nvm.sh`
+- Replace `ls -1` with `find -exec basename` in `nvm.sh`
+
 ## v1.4.1 (2026-02-16)
 
 - Remove hardcoded `/bin/zsh` from Alacritty (use system default shell)
@@ -7,12 +17,6 @@
 - Remove ruff from conform.nvim (ruff LSP already handles formatting)
 - Rename ruff config from `pyproject.toml` to `ruff.toml` (proper XDG format)
 - Fix `stat` operator precedence in `dot status` command
-- Fix docs: add `./dot update` to README and developer guide
-- Fix docs: add `.config/gh/` and `.config/ruff/` to README structure
-- Fix docs: expand CLEANUPS example to all 5 entries in developer guide
-- Fix docs: correct keybindings for NvChad terminal and Zsh history prefix search
-- Fix shellcheck warnings: replace `ls | grep` with glob, fix directive syntax
-- Add `shellcheck shell=bash` directive to `aliases.sh`
 
 ## v1.4.0 (2026-02-16)
 
