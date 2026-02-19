@@ -45,7 +45,9 @@ DEPS=(
     "zoxide   | zoxide    | -         | zoxide"       # Not in dnf repos
     "tmux     | tmux      | tmux      | tmux"
     "uv       | uv        | -         | -"            # Python package manager
+    "ruff     | ruff      | ruff      | ruff"        # Python linter/formatter (LSP)
     "marksman | marksman  | -         | -"            # Markdown LSP (brew only)
+    "bash-language-server | bash-language-server | nodejs-bash-language-server | -"  # Bash LSP (apt: use Mason or npm)
     "-        |           | git       | git"          # Install-only (skip health check)
     "-        |           | curl      | curl"
     "-        |           | zsh       | zsh"

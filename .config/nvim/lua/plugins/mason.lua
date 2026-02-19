@@ -1,6 +1,8 @@
 return {
   {
     "williamboman/mason.nvim",
-    opts = {},
+    opts = {
+      ensure_installed = { "bash-language-server", "ruff" },
+    },
   },
 }

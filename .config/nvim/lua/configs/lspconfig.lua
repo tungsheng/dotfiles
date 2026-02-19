@@ -13,8 +13,19 @@ local function setup(server, opts)
   lspconfig[server].setup(vim.tbl_extend("force", defaults, opts or {}))
 end
 
--- Simple servers with default config
-local simple_servers = { "html", "cssls", "vtsls", "marksman", "dockerls", "bashls", "ruff" }
+-- Optional LSPs: only setup when the server binary is on PATH (avoids spawn errors)
+local optional_servers = {
+  bashls = "bash-language-server",
+  ruff = "ruff",
+}
+for server, executable in pairs(optional_servers) do
+  if vim.fn.executable(executable) == 1 then
+    setup(server)
+  end
+end
+
+-- Simple servers with default config (expected to be installed)
+local simple_servers = { "html", "cssls", "vtsls", "marksman", "dockerls" }
 for _, lsp in ipairs(simple_servers) do
   setup(lsp)
 end
