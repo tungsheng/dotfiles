@@ -28,8 +28,10 @@ USE_SHELL=""
 # XDG Base Directories
 XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 STATE_DIR="$XDG_STATE_HOME/dotfiles"
 STATE_FILE="$STATE_DIR/state"
+MASON_PKG_FILE="$DOTFILES_DIR/.config/nvim/mason-packages.txt"
 
 # Dependencies table: command | brew | dnf | apt
 # - Use "-" to indicate package is unavailable for that package manager
@@ -45,9 +47,6 @@ DEPS=(
     "zoxide   | zoxide    | -         | zoxide"       # Not in dnf repos
     "tmux     | tmux      | tmux      | tmux"
     "uv       | uv        | -         | -"            # Python package manager
-    "ruff     | ruff      | ruff      | ruff"        # Python linter/formatter (LSP)
-    "marksman | marksman  | -         | -"            # Markdown LSP (brew only)
-    "bash-language-server | bash-language-server | nodejs-bash-language-server | -"  # Bash LSP (apt: use Mason or npm)
     "-        |           | git       | git"          # Install-only (skip health check)
     "-        |           | curl      | curl"
     "-        |           | zsh       | zsh"
@@ -56,7 +55,7 @@ DEPS=(
 
 CASKS=("font-jetbrains-mono-nerd-font" "font-hurmit-nerd-font")
 
-MANAGED_FILES=(.zshrc .bashrc .bash_profile .config/nvim .config/tmux/tmux.conf .config/alacritty/alacritty.toml .config/gh .config/shell)
+MANAGED_FILES=(.zshrc .bashrc .bash_profile .config/nvim .config/tmux/tmux.conf .config/alacritty/alacritty.toml .config/gh .config/ruff .config/shell)
 
 # Extras: path|url|type|name (evaluated after XDG vars set)
 EXTRAS=(
@@ -165,6 +164,45 @@ run() {
 has_cmd()  { command -v "$1" >/dev/null 2>&1; }
 has_path() { [ -e "$1" ]; }
 
+list_mason_packages() {
+    [ -f "$MASON_PKG_FILE" ] || return 0
+    grep -Ev '^[[:space:]]*(#|$)' "$MASON_PKG_FILE"
+}
+
+count_mason_packages() {
+    list_mason_packages | wc -l | tr -d ' '
+}
+
+count_installed_mason_packages() {
+    local count=0 pkg
+    while IFS= read -r pkg; do
+        [ -z "$pkg" ] && continue
+        [ -d "$XDG_DATA_HOME/nvim/mason/packages/$pkg" ] && count=$((count + 1))
+    done < <(list_mason_packages)
+    echo "$count"
+}
+
+missing_mason_packages() {
+    local pkg
+    while IFS= read -r pkg; do
+        [ -z "$pkg" ] && continue
+        [ -d "$XDG_DATA_HOME/nvim/mason/packages/$pkg" ] || echo "$pkg"
+    done < <(list_mason_packages)
+}
+
+join_by_comma() {
+    local first=true item
+    for item in "$@"; do
+        [ -n "$item" ] || continue
+        if "$first"; then
+            first=false
+        else
+            printf ", "
+        fi
+        printf "%s" "$item"
+    done
+}
+
 detect_os() {
     case "$OSTYPE" in darwin*) echo "macos"; return ;; esac
     has_cmd dnf && echo "fedora" && return
@@ -235,7 +273,7 @@ cmd_health() {
     echo -e " ${DIM}OS: $os${NC}"
 
     # --- Symlinks ---
-    log_step 1 4 "Symlinks"
+    log_step 1 5 "Symlinks"
     for file in "${MANAGED_FILES[@]}"; do
         if [ -L "$HOME/$file" ]; then
             log_ok "$file"
@@ -250,7 +288,7 @@ cmd_health() {
     done
 
     # --- Dependencies ---
-    log_step 2 4 "Dependencies"
+    log_step 2 5 "Dependencies"
     for item in "${DEPS[@]}"; do
         local cmd brew_pkg dnf_pkg apt_pkg
         cmd=$(echo "$item" | cut -d'|' -f1 | tr -d ' ')
@@ -286,8 +324,40 @@ cmd_health() {
         fi
     done
 
+    # --- Neovim tools ---
+    log_step 3 5 "Neovim tools"
+    if has_cmd nvim; then
+        local total installed
+        total=$(count_mason_packages)
+        installed=$(count_installed_mason_packages)
+
+        if [ "$total" -eq 0 ]; then
+            log_warn "No Mason packages configured"
+            warn=$((warn + 1))
+        elif [ "$installed" -eq "$total" ]; then
+            log_ok "Mason packages ${DIM}($installed/$total installed)${NC}"
+            ok=$((ok + 1))
+        else
+            local missing=()
+            local pkg
+            while IFS= read -r pkg; do
+                [ -n "$pkg" ] && missing+=("$pkg")
+            done < <(missing_mason_packages)
+
+            log_fail "Mason packages ${DIM}($installed/$total installed)${NC}"
+            if [ ${#missing[@]} -gt 0 ]; then
+                log_dim "Missing: $(join_by_comma "${missing[@]}")"
+            fi
+            log_dim "Run: nvim --headless \"+MasonInstallAll\" +qa"
+            fail=$((fail + 1))
+        fi
+    else
+        log_warn "Neovim not installed"
+        warn=$((warn + 1))
+    fi
+
     # --- Fonts ---
-    log_step 3 4 "Fonts"
+    log_step 4 5 "Fonts"
     local font_dir="$HOME/Library/Fonts"
     local can_check_fonts=false
     has_cmd fc-list && can_check_fonts=true
@@ -297,7 +367,7 @@ cmd_health() {
         for font in "JetBrainsMono" "Hurmit"; do
             if has_cmd fc-list; then
                 # Linux or macOS with fontconfig
-                if fc-list | grep -qi "${font}.*Nerd"; then
+                if fc-list 2>/dev/null | grep -qi "${font}.*Nerd"; then
                     log_ok "$font Nerd Font"
                     ok=$((ok + 1))
                 else
@@ -318,7 +388,7 @@ cmd_health() {
     fi
 
     # --- Plugins ---
-    log_step 4 4 "Plugins"
+    log_step 5 5 "Plugins"
     local plugins=(
         "$XDG_DATA_HOME/zinit|zinit"
         "$XDG_DATA_HOME/nvim/lazy|lazy.nvim"
@@ -383,6 +453,18 @@ cmd_status() {
         echo -e " ${CYAN}Neovim${NC}       lazy.nvim ${DIM}($nvim_plugins plugins)${NC}"
     else
         echo -e " ${DIM}Neovim${NC}       not configured"
+    fi
+
+    local mason_total
+    mason_total=$(count_mason_packages)
+    if [ "$mason_total" -gt 0 ]; then
+        local mason_installed
+        mason_installed=$(count_installed_mason_packages)
+        if [ "$mason_installed" -eq "$mason_total" ]; then
+            echo -e " ${CYAN}Mason${NC}        ${mason_installed}/${mason_total} packages"
+        else
+            echo -e " ${YELLOW}Mason${NC}        ${mason_installed}/${mason_total} packages"
+        fi
     fi
 
     # Tmux plugins
@@ -464,7 +546,7 @@ cmd_install() {
     "$DRY_RUN" && echo -e " ${DIM}Dry run - no changes will be made${NC}"
 
     # Step 1: Backup
-    log_step 1 5 "Backup"
+    log_step 1 6 "Backup"
     local backed_up=0
     if "$DRY_RUN"; then
         log_dim "[dry-run] skipped"
@@ -477,7 +559,8 @@ cmd_install() {
                     mkdir -p "$backup_dir"
                     log_dim "Location: $backup_dir"
                 fi
-                cp -r "$HOME/$file" "$backup_dir/"
+                # Preserve symlinks inside managed directories; `cp -r` follows them on macOS.
+                cp -RP "$HOME/$file" "$backup_dir/"
                 log_ok "$file"
                 backed_up=$((backed_up + 1))
             fi
@@ -486,19 +569,19 @@ cmd_install() {
     fi
 
     # Step 2: Dependencies
-    log_step 2 5 "Dependencies"
+    log_step 2 6 "Dependencies"
     install_deps "$os"
 
     # Step 3: Shell
-    log_step 3 5 "Shell"
+    log_step 3 6 "Shell"
     choose_shell
 
     # Step 4: Extras
-    log_step 4 5 "Extras"
+    log_step 4 6 "Extras"
     install_extras
 
     # Step 5: Symlinks
-    log_step 5 5 "Symlinks"
+    log_step 5 6 "Symlinks"
     cd "$DOTFILES_DIR"
     if "$DRY_RUN"; then
         log_dim "[dry-run] stow --target=\$HOME --restow ."
@@ -507,6 +590,10 @@ cmd_install() {
         stow --target="$HOME" --restow .
         log_ok "Created"
     fi
+
+    # Step 6: Neovim
+    log_step 6 6 "Neovim"
+    bootstrap_neovim
 
     # Save state
     if ! "$DRY_RUN"; then
@@ -527,13 +614,15 @@ cmd_install() {
     echo -e " ${BOLD}Next steps${NC}"
     if [ "$USE_SHELL" = "bash" ]; then
         echo -e "   ${CYAN}1.${NC} Restart terminal (or run ${BOLD}bash${NC})"
-        echo -e "   ${CYAN}2.${NC} Open ${BOLD}nvim${NC} — plugins install automatically"
-        echo -e "   ${CYAN}3.${NC} Open ${BOLD}tmux${NC}, press ${BOLD}Ctrl+Space I${NC} for plugins"
+        echo -e "   ${CYAN}2.${NC} Open ${BOLD}nvim${NC}"
+        echo -e "   ${CYAN}3.${NC} If editor tools are missing, run ${BOLD}:MasonInstallAll${NC}"
+        echo -e "   ${CYAN}4.${NC} Open ${BOLD}tmux${NC}, press ${BOLD}Ctrl+Space I${NC} for plugins"
     else
         echo -e "   ${CYAN}1.${NC} Restart terminal (or run ${BOLD}zsh${NC})"
         echo -e "   ${CYAN}2.${NC} Run ${BOLD}p10k configure${NC} for prompt setup"
-        echo -e "   ${CYAN}3.${NC} Open ${BOLD}nvim${NC} — plugins install automatically"
-        echo -e "   ${CYAN}4.${NC} Open ${BOLD}tmux${NC}, press ${BOLD}Ctrl+Space I${NC} for plugins"
+        echo -e "   ${CYAN}3.${NC} Open ${BOLD}nvim${NC}"
+        echo -e "   ${CYAN}4.${NC} If editor tools are missing, run ${BOLD}:MasonInstallAll${NC}"
+        echo -e "   ${CYAN}5.${NC} Open ${BOLD}tmux${NC}, press ${BOLD}Ctrl+Space I${NC} for plugins"
     fi
     echo
     log_dim "Verify: ./dot health"
@@ -604,6 +693,59 @@ all_deps_installed() {
         has_cmd "$cmd" || return 1
     done
     return 0
+}
+
+bootstrap_neovim() {
+    if ! has_cmd nvim; then
+        if "$DRY_RUN"; then
+            local total
+            total=$(count_mason_packages)
+            log_dim "[dry-run] nvim --headless \"+Lazy! sync\" +qa"
+            log_ok "Neovim plugins"
+            track_installed "nvim-plugins"
+
+            if [ "$total" -gt 0 ]; then
+                log_dim "[dry-run] nvim --headless \"+MasonInstallAll\" +qa"
+                log_ok "Mason packages ${DIM}($total configured)${NC}"
+                track_installed "nvim-tools"
+            fi
+            return
+        fi
+
+        log_warn "Neovim bootstrap skipped"
+        log_dim "Install neovim first to bootstrap plugins and Mason packages"
+        return
+    fi
+
+    log_info "Syncing Neovim plugins"
+    if "$DRY_RUN"; then
+        log_dim "[dry-run] nvim --headless \"+Lazy! sync\" +qa"
+    elif run_with_spin "Syncing Neovim plugins..." nvim --headless "+Lazy! sync" +qa; then
+        :
+    else
+        log_warn "Neovim plugin bootstrap failed"
+        log_dim "Run: nvim --headless \"+Lazy! sync\" +qa"
+        return
+    fi
+    log_ok "Neovim plugins"
+    track_installed "nvim-plugins"
+
+    local total
+    total=$(count_mason_packages)
+    [ "$total" -eq 0 ] && return
+
+    log_info "Installing Mason packages"
+    if "$DRY_RUN"; then
+        log_dim "[dry-run] nvim --headless \"+MasonInstallAll\" +qa"
+    elif run_with_spin "Installing Mason packages..." nvim --headless "+MasonInstallAll" +qa; then
+        :
+    else
+        log_warn "Mason bootstrap failed"
+        log_dim "Run: nvim --headless \"+MasonInstallAll\" +qa"
+        return
+    fi
+    log_ok "Mason packages ${DIM}($total configured)${NC}"
+    track_installed "nvim-tools"
 }
 
 install_deps() {
@@ -864,7 +1006,17 @@ cmd_update() {
         else
             run_with_spin "Updating Neovim plugins..." nvim --headless "+Lazy! sync" +qa || true
         fi
-        log_ok "Neovim"
+        log_ok "Neovim plugins"
+
+        if [ "$(count_mason_packages)" -gt 0 ]; then
+            log_info "Syncing Mason packages..."
+            if "$DRY_RUN"; then
+                log_dim "[dry-run] nvim --headless '+MasonInstallAll' +qa"
+            else
+                run_with_spin "Syncing Mason packages..." nvim --headless "+MasonInstallAll" +qa || true
+            fi
+            log_ok "Mason"
+        fi
     fi
 
     # TPM

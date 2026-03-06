@@ -13,15 +13,36 @@ local function setup(server, opts)
   lspconfig[server].setup(vim.tbl_extend("force", defaults, opts or {}))
 end
 
+local function setup_optional(server, executable, opts)
+  if vim.fn.executable(executable) == 1 then
+    setup(server, opts)
+  end
+end
+
 -- Optional LSPs: only setup when the server binary is on PATH (avoids spawn errors)
 local optional_servers = {
-  bashls = "bash-language-server",
-  ruff = "ruff",
+  { server = "bashls", executable = "bash-language-server" },
+  { server = "ruff", executable = "ruff" },
+  {
+    server = "yamlls",
+    executable = "yaml-language-server",
+    opts = {
+      settings = {
+        yaml = {
+          schemaStore = {
+            enable = false,
+            url = "",
+          },
+          schemas = require("schemastore").yaml.schemas(),
+        },
+      },
+    },
+  },
+  { server = "terraformls", executable = "terraform-ls" },
+  { server = "helm_ls", executable = "helm_ls" },
 }
-for server, executable in pairs(optional_servers) do
-  if vim.fn.executable(executable) == 1 then
-    setup(server)
-  end
+for _, config in ipairs(optional_servers) do
+  setup_optional(config.server, config.executable, config.opts)
 end
 
 -- Simple servers with default config (expected to be installed)

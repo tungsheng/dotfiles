@@ -28,8 +28,9 @@ Preview first: `./dot install -n`
 
 1. Restart terminal (or run `zsh`)
 2. Run `p10k configure` for prompt setup
-3. Open `nvim` — plugins auto-install
-4. Open `tmux`, press `<prefix> I` to install plugins (`<prefix>` = `Ctrl+Space`)
+3. `./dot install` bootstraps Neovim plugins and Mason tools automatically
+4. Open `nvim` — if editor tools are missing, run `:MasonInstallAll`
+5. Open `tmux`, press `<prefix> I` to install plugins (`<prefix>` = `Ctrl+Space`)
 
 ## Commands
 

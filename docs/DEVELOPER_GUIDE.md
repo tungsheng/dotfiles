@@ -93,6 +93,12 @@ CLEANUPS=(
 "newcmd|brew-pkg|dnf-pkg|apt-pkg"
 ```
 
+### Add a Mason Package
+
+1. Add the package id to `.config/nvim/mason-packages.txt`
+2. Update Neovim LSP/formatter/parser config if needed
+3. Run `nvim --headless "+MasonInstallAll" +qa`
+
 ### Add a Dotfile
 
 1. Place file in repo (root or `.config/`)
@@ -130,6 +136,8 @@ mydir/
 - **Neovim plugins**: `lua/plugins/init.lua`
 - **Neovim keybindings**: `lua/mappings.lua`
 - **Neovim LSP**: `lua/configs/lspconfig.lua`
+- **Neovim filetypes**: `lua/configs/filetypes.lua`
+- **Neovim Mason packages**: `mason-packages.txt`
 - **Shared aliases**: `.config/shell/aliases.sh`
 
 ## Testing

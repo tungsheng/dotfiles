@@ -6,6 +6,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install ShellCheck
-        run: sudo apt-get install -y shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
       - name: Run ShellCheck
         run: shellcheck dot .config/shell/aliases.sh .config/shell/nvm.sh
+
+  lua-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Lua
+        run: sudo apt-get update && sudo apt-get install -y lua5.1
+      - name: Check Neovim Lua syntax
+        run: find .config/nvim -name '*.lua' -print0 | xargs -0 -n1 luac5.1 -p
+
+  dot-dry-run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install zsh
+        run: sudo apt-get update && sudo apt-get install -y zsh
+      - name: Run installer dry-run
+        run: ./dot install -n

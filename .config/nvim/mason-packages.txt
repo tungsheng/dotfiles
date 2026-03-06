@@ -1,0 +1,17 @@
+# Mason package ids. Keep this file in sync with the Neovim LSP/formatter setup.
+bash-language-server
+ruff
+html-lsp
+css-lsp
+vtsls
+marksman
+dockerfile-language-server
+json-lsp
+emmet-ls
+eslint-lsp
+yaml-language-server
+terraform-ls
+helm-ls
+prettier
+shfmt
+stylua
