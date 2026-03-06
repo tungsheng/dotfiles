@@ -1,5 +1,6 @@
 local configs = require "nvchad.configs.lspconfig"
 local lspconfig = require "lspconfig"
+local util = lspconfig.util
 
 -- Common options for all servers
 local defaults = {
@@ -17,6 +18,10 @@ local function setup_optional(server, executable, opts)
   if vim.fn.executable(executable) == 1 then
     setup(server, opts)
   end
+end
+
+local function terraform_root_dir(fname)
+  return util.root_pattern(".terraform", ".terraform.lock.hcl", ".git")(fname) or util.path.dirname(fname)
 end
 
 -- Optional LSPs: only setup when the server binary is on PATH (avoids spawn errors)
@@ -38,7 +43,14 @@ local optional_servers = {
       },
     },
   },
-  { server = "terraformls", executable = "terraform-ls" },
+  {
+    server = "terraformls",
+    executable = "terraform-ls",
+    opts = {
+      root_dir = terraform_root_dir,
+      single_file_support = true,
+    },
+  },
   { server = "helm_ls", executable = "helm_ls" },
 }
 for _, config in ipairs(optional_servers) do
@@ -68,5 +80,5 @@ setup("jsonls", {
 
 -- ESLint
 setup("eslint", {
-  root_dir = lspconfig.util.root_pattern(".git", "package.json"),
+  root_dir = util.root_pattern(".git", "package.json"),
 })

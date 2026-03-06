@@ -7,6 +7,11 @@ local function is_helm_chart_template(path)
 end
 
 vim.filetype.add {
+  extension = {
+    tf = "terraform",
+    tfvars = "terraform-vars",
+    tfbackend = "terraform-vars",
+  },
   pattern = {
     [".*/templates/.*%.ya?ml"] = function(path)
       if is_helm_chart_template(path) then
