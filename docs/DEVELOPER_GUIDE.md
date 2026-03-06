@@ -24,7 +24,7 @@ The `dot` script (bash 3.2+) is organized into sections:
 
 ## Configuration Arrays
 
-### Dependencies
+### Dependencies (`DEPS`)
 
 Format: `"command | brew | dnf | apt"` — use `-` to skip.
 
@@ -37,7 +37,7 @@ DEPS=(
 )
 ```
 
-### Managed Files
+### Managed Files (`MANAGED_FILES`)
 
 Files backed up before install and checked by `health`:
 
@@ -45,7 +45,7 @@ Files backed up before install and checked by `health`:
 MANAGED_FILES=(.zshrc .bashrc .config/nvim ...)
 ```
 
-### Extras
+### Extras (`EXTRAS`)
 
 External resources downloaded during install:
 
@@ -57,7 +57,7 @@ EXTRAS=(
 )
 ```
 
-### Cleanups
+### Cleanups (`CLEANUPS`)
 
 Paths offered for removal during uninstall:
 
@@ -71,6 +71,10 @@ CLEANUPS=(
 )
 ```
 
+### Mason Packages (`.config/nvim/mason-packages.txt`)
+
+List one Mason package id per line. Blank lines and `#` comments are ignored.
+
 ## Logging
 
 | Function | Output | Use |
@@ -80,7 +84,7 @@ CLEANUPS=(
 | `log_warn` | ` ! ` | Warning |
 | `log_info` | ` → ` | Action starting |
 | `log_dim` | `   ` | Secondary info |
-| `log_step` | `[1/5]` | Progress |
+| `log_step` | `[step/total]` | Progress |
 
 ## Common Tasks
 
@@ -103,7 +107,8 @@ CLEANUPS=(
 
 1. Place file in repo (root or `.config/`)
 2. Add to `MANAGED_FILES` if it needs backup/health tracking
-3. Run `./dot install` (or `stow .` directly)
+3. Run `./dot install -n` to preview changes
+4. Run `./dot install` (or `stow .` directly)
 
 ### Add External Resource
 
@@ -133,11 +138,11 @@ mydir/
 
 ### Key Files
 
-- **Neovim plugins**: `lua/plugins/init.lua`
-- **Neovim keybindings**: `lua/mappings.lua`
-- **Neovim LSP**: `lua/configs/lspconfig.lua`
-- **Neovim filetypes**: `lua/configs/filetypes.lua`
-- **Neovim Mason packages**: `mason-packages.txt`
+- **Neovim plugins**: `.config/nvim/lua/plugins/init.lua`
+- **Neovim keybindings**: `.config/nvim/lua/mappings.lua`
+- **Neovim LSP**: `.config/nvim/lua/configs/lspconfig.lua`
+- **Neovim filetypes**: `.config/nvim/lua/configs/filetypes.lua`
+- **Neovim Mason packages**: `.config/nvim/mason-packages.txt`
 - **Shared aliases**: `.config/shell/aliases.sh`
 
 ## Testing
@@ -146,6 +151,7 @@ mydir/
 ./dot install -n     # Preview changes
 ./dot install -v     # Verbose output
 ./dot update         # Pull latest + update plugins
+./dot status         # Quick overview
 ./dot health         # Verify install
 
 # Fresh system test

@@ -1,6 +1,6 @@
--- This file needs to have same structure as nvconfig.lua 
+-- Keep this file aligned with NvChad's nvconfig.lua structure:
 -- https://github.com/NvChad/ui/blob/v2.5/lua/nvconfig.lua
--- Please read that file to know all available options :( 
+-- It documents the available top-level config keys.
 
 ---@type ChadrcConfig
 local M = {}
@@ -23,12 +23,12 @@ local function read_mason_packages()
 end
 
 M.base46 = {
-	theme = "catppuccin",
+  theme = "catppuccin",
 
-	-- hl_override = {
-	-- 	Comment = { italic = true },
-	-- 	["@comment"] = { italic = true },
-	-- },
+  -- hl_override = {
+  --   Comment = { italic = true },
+  --   ["@comment"] = { italic = true },
+  -- },
 }
 
 M.mason = {

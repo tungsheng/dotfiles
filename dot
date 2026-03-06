@@ -24,6 +24,10 @@ VERSION="$(get_version)"
 DRY_RUN=false
 VERBOSE=false
 USE_SHELL=""
+INSTALL_STEPS=6
+HEALTH_STEPS=5
+UPDATE_STEPS=3
+UNINSTALL_STEPS=2
 
 # XDG Base Directories
 XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
@@ -85,7 +89,7 @@ INSTALLED_ITEMS=()
 SKIPPED_ITEMS=()
 
 track_installed() { INSTALLED_ITEMS+=("$1"); }
-track_skipped()   { SKIPPED_ITEMS+=("$1 ${DIM}($2)${NC}"); }
+track_skipped()   { SKIPPED_ITEMS+=("$1 ($2)"); }
 
 # Spinner for long-running operations (bash 3.2 compatible)
 spin() {
@@ -164,6 +168,51 @@ run() {
 has_cmd()  { command -v "$1" >/dev/null 2>&1; }
 has_path() { [ -e "$1" ]; }
 
+parse_dep_entry() {
+    local item="$1"
+    IFS='|' read -r DEP_CMD DEP_BREW DEP_DNF DEP_APT <<< "$item"
+    DEP_CMD="${DEP_CMD// /}"
+    DEP_BREW="${DEP_BREW// /}"
+    DEP_DNF="${DEP_DNF// /}"
+    DEP_APT="${DEP_APT// /}"
+}
+
+dep_pkg_for_os() {
+    case "$1" in
+        macos)  echo "$DEP_BREW" ;;
+        fedora) echo "$DEP_DNF" ;;
+        debian) echo "$DEP_APT" ;;
+        *)      echo "" ;;
+    esac
+}
+
+parse_path_entry() {
+    ENTRY_PATH="${1%%|*}"
+    ENTRY_NAME="${1##*|}"
+}
+
+parse_extra_entry() {
+    local item="$1"
+    EXTRA_PATH="${item%%|*}"; item="${item#*|}"
+    EXTRA_URL="${item%%|*}"; item="${item#*|}"
+    EXTRA_TYPE="${item%%|*}"
+    EXTRA_NAME="${item##*|}"
+}
+
+count_child_dirs() {
+    [ -d "$1" ] || { echo ""; return; }
+    find "$1" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' '
+}
+
+run_nvim_headless_task() {
+    local command="$1" label="$2"
+    if "$DRY_RUN"; then
+        log_dim "[dry-run] nvim --headless \"$command\" +qa"
+        return 0
+    fi
+    run_with_spin "$label" nvim --headless "$command" +qa
+}
+
 list_mason_packages() {
     [ -f "$MASON_PKG_FILE" ] || return 0
     grep -Ev '^[[:space:]]*(#|$)' "$MASON_PKG_FILE"
@@ -211,9 +260,10 @@ detect_os() {
 }
 
 get_packages() {
-    local col="$1" pkg result=""
+    local os="$1" pkg result=""
     for item in "${DEPS[@]}"; do
-        pkg=$(echo "$item" | cut -d'|' -f"$col" | tr -d ' ')
+        parse_dep_entry "$item"
+        pkg=$(dep_pkg_for_os "$os")
         [ -n "$pkg" ] && [ "$pkg" != "-" ] && result="$result$pkg "
     done
     echo "${result% }"  # trim trailing space
@@ -273,7 +323,7 @@ cmd_health() {
     echo -e " ${DIM}OS: $os${NC}"
 
     # --- Symlinks ---
-    log_step 1 5 "Symlinks"
+    log_step 1 "$HEALTH_STEPS" "Symlinks"
     for file in "${MANAGED_FILES[@]}"; do
         if [ -L "$HOME/$file" ]; then
             log_ok "$file"
@@ -288,13 +338,12 @@ cmd_health() {
     done
 
     # --- Dependencies ---
-    log_step 2 5 "Dependencies"
+    log_step 2 "$HEALTH_STEPS" "Dependencies"
     for item in "${DEPS[@]}"; do
-        local cmd brew_pkg dnf_pkg apt_pkg
-        cmd=$(echo "$item" | cut -d'|' -f1 | tr -d ' ')
-        brew_pkg=$(echo "$item" | cut -d'|' -f2 | tr -d ' ')
-        dnf_pkg=$(echo "$item" | cut -d'|' -f3 | tr -d ' ')
-        apt_pkg=$(echo "$item" | cut -d'|' -f4 | tr -d ' ')
+        local cmd pkg hint
+        parse_dep_entry "$item"
+        cmd="$DEP_CMD"
+        pkg=$(dep_pkg_for_os "$os")
 
         [ "$cmd" = "-" ] || [ -z "$cmd" ] && continue
 
@@ -308,12 +357,11 @@ cmd_health() {
             fi
             ok=$((ok + 1))
         else
-            # Show install hint based on OS
-            local hint=""
+            hint=""
             case "$os" in
-                macos)  [ "$brew_pkg" != "-" ] && [ -n "$brew_pkg" ] && hint="brew install $brew_pkg" ;;
-                fedora) [ "$dnf_pkg" != "-" ] && [ -n "$dnf_pkg" ] && hint="sudo dnf install $dnf_pkg" ;;
-                debian) [ "$apt_pkg" != "-" ] && [ -n "$apt_pkg" ] && hint="sudo apt install $apt_pkg" ;;
+                macos)  [ "$pkg" != "-" ] && [ -n "$pkg" ] && hint="brew install $pkg" ;;
+                fedora) [ "$pkg" != "-" ] && [ -n "$pkg" ] && hint="sudo dnf install $pkg" ;;
+                debian) [ "$pkg" != "-" ] && [ -n "$pkg" ] && hint="sudo apt install $pkg" ;;
             esac
             if [ -n "$hint" ]; then
                 log_fail "$cmd ${DIM}(run: $hint)${NC}"
@@ -325,7 +373,7 @@ cmd_health() {
     done
 
     # --- Neovim tools ---
-    log_step 3 5 "Neovim tools"
+    log_step 3 "$HEALTH_STEPS" "Neovim tools"
     if has_cmd nvim; then
         local total installed
         total=$(count_mason_packages)
@@ -357,7 +405,7 @@ cmd_health() {
     fi
 
     # --- Fonts ---
-    log_step 4 5 "Fonts"
+    log_step 4 "$HEALTH_STEPS" "Fonts"
     local font_dir="$HOME/Library/Fonts"
     local can_check_fonts=false
     has_cmd fc-list && can_check_fonts=true
@@ -388,29 +436,27 @@ cmd_health() {
     fi
 
     # --- Plugins ---
-    log_step 5 5 "Plugins"
+    log_step 5 "$HEALTH_STEPS" "Plugins"
     local plugins=(
         "$XDG_DATA_HOME/zinit|zinit"
         "$XDG_DATA_HOME/nvim/lazy|lazy.nvim"
         "$HOME/.config/tmux/plugins/tpm|tpm"
     )
     for item in "${plugins[@]}"; do
-        local p="${item%%|*}" name="${item##*|}"
-        if has_path "$p"; then
-            local count="" count_dir="$p"
+        parse_path_entry "$item"
+        if has_path "$ENTRY_PATH"; then
+            local count="" count_dir="$ENTRY_PATH"
             # tpm counts from plugins dir, not tpm subdir
-            [ "$name" = "tpm" ] && count_dir="$HOME/.config/tmux/plugins"
-            if [ -d "$count_dir" ]; then
-                count=$(find "$count_dir" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
-            fi
+            [ "$ENTRY_NAME" = "tpm" ] && count_dir="$HOME/.config/tmux/plugins"
+            count=$(count_child_dirs "$count_dir")
             if [ -n "$count" ] && [ "$count" != "0" ]; then
-                log_ok "$name ${DIM}($count plugins)${NC}"
+                log_ok "$ENTRY_NAME ${DIM}($count plugins)${NC}"
             else
-                log_ok "$name"
+                log_ok "$ENTRY_NAME"
             fi
             ok=$((ok + 1))
         else
-            log_warn "$name ${DIM}(not installed)${NC}"
+            log_warn "$ENTRY_NAME ${DIM}(not installed)${NC}"
             warn=$((warn + 1))
         fi
     done
@@ -449,7 +495,7 @@ cmd_status() {
     local lazy_dir="$XDG_DATA_HOME/nvim/lazy"
     if [ -d "$lazy_dir" ]; then
         local nvim_plugins
-        nvim_plugins=$(find "$lazy_dir" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
+        nvim_plugins=$(count_child_dirs "$lazy_dir")
         echo -e " ${CYAN}Neovim${NC}       lazy.nvim ${DIM}($nvim_plugins plugins)${NC}"
     else
         echo -e " ${DIM}Neovim${NC}       not configured"
@@ -471,7 +517,7 @@ cmd_status() {
     local tpm_dir="$HOME/.config/tmux/plugins"
     if [ -d "$tpm_dir" ]; then
         local tmux_plugins
-        tmux_plugins=$(find "$tpm_dir" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
+        tmux_plugins=$(count_child_dirs "$tpm_dir")
         echo -e " ${CYAN}Tmux${NC}         tpm ${DIM}($tmux_plugins plugins)${NC}"
     else
         echo -e " ${DIM}Tmux${NC}         not configured"
@@ -500,7 +546,7 @@ cmd_uninstall() {
 
     has_cmd stow || { log_fail "stow not found"; exit 1; }
 
-    log_step 1 2 "Remove symlinks"
+    log_step 1 "$UNINSTALL_STEPS" "Remove symlinks"
     cd "$DOTFILES_DIR"
     if "$DRY_RUN"; then
         log_dim "[dry-run] stow --target=\$HOME --delete ."
@@ -510,22 +556,22 @@ cmd_uninstall() {
     log_ok "Symlinks removed"
 
     if "$DRY_RUN"; then
-        log_step 2 2 "Cleanup"
+        log_step 2 "$UNINSTALL_STEPS" "Cleanup"
         log_dim "[dry-run] skipped"
         return
     fi
 
-    log_step 2 2 "Cleanup"
+    log_step 2 "$UNINSTALL_STEPS" "Cleanup"
     log_dim "Optional - press y to remove, Enter to skip"
     echo
     for item in "${CLEANUPS[@]}"; do
-        local p="${item%%|*}" name="${item##*|}"
-        if has_path "$p"; then
-            printf "     Remove %s? [y/N] " "$name"
+        parse_path_entry "$item"
+        if has_path "$ENTRY_PATH"; then
+            printf "     Remove %s? [y/N] " "$ENTRY_NAME"
             read -r REPLY
             case "$REPLY" in
-                [Yy]*) rm -rf "$p"; log_ok "Removed $name" ;;
-                *)     log_dim "Kept $name" ;;
+                [Yy]*) rm -rf "$ENTRY_PATH"; log_ok "Removed $ENTRY_NAME" ;;
+                *)     log_dim "Kept $ENTRY_NAME" ;;
             esac
         fi
     done
@@ -546,7 +592,7 @@ cmd_install() {
     "$DRY_RUN" && echo -e " ${DIM}Dry run - no changes will be made${NC}"
 
     # Step 1: Backup
-    log_step 1 6 "Backup"
+    log_step 1 "$INSTALL_STEPS" "Backup"
     local backed_up=0
     if "$DRY_RUN"; then
         log_dim "[dry-run] skipped"
@@ -569,30 +615,30 @@ cmd_install() {
     fi
 
     # Step 2: Dependencies
-    log_step 2 6 "Dependencies"
+    log_step 2 "$INSTALL_STEPS" "Dependencies"
     install_deps "$os"
 
     # Step 3: Shell
-    log_step 3 6 "Shell"
+    log_step 3 "$INSTALL_STEPS" "Shell"
     choose_shell
 
     # Step 4: Extras
-    log_step 4 6 "Extras"
+    log_step 4 "$INSTALL_STEPS" "Extras"
     install_extras
 
     # Step 5: Symlinks
-    log_step 5 6 "Symlinks"
+    log_step 5 "$INSTALL_STEPS" "Symlinks"
     cd "$DOTFILES_DIR"
     if "$DRY_RUN"; then
         log_dim "[dry-run] stow --target=\$HOME --restow ."
-        log_ok "Ready"
+        log_ok "Symlinks ready"
     else
         stow --target="$HOME" --restow .
-        log_ok "Created"
+        log_ok "Symlinks created"
     fi
 
     # Step 6: Neovim
-    log_step 6 6 "Neovim"
+    log_step 6 "$INSTALL_STEPS" "Neovim"
     bootstrap_neovim
 
     # Save state
@@ -611,19 +657,7 @@ cmd_install() {
     echo
     echo -e " ${GREEN}${BOLD}Done!${NC}"
     echo
-    echo -e " ${BOLD}Next steps${NC}"
-    if [ "$USE_SHELL" = "bash" ]; then
-        echo -e "   ${CYAN}1.${NC} Restart terminal (or run ${BOLD}bash${NC})"
-        echo -e "   ${CYAN}2.${NC} Open ${BOLD}nvim${NC}"
-        echo -e "   ${CYAN}3.${NC} If editor tools are missing, run ${BOLD}:MasonInstallAll${NC}"
-        echo -e "   ${CYAN}4.${NC} Open ${BOLD}tmux${NC}, press ${BOLD}Ctrl+Space I${NC} for plugins"
-    else
-        echo -e "   ${CYAN}1.${NC} Restart terminal (or run ${BOLD}zsh${NC})"
-        echo -e "   ${CYAN}2.${NC} Run ${BOLD}p10k configure${NC} for prompt setup"
-        echo -e "   ${CYAN}3.${NC} Open ${BOLD}nvim${NC}"
-        echo -e "   ${CYAN}4.${NC} If editor tools are missing, run ${BOLD}:MasonInstallAll${NC}"
-        echo -e "   ${CYAN}5.${NC} Open ${BOLD}tmux${NC}, press ${BOLD}Ctrl+Space I${NC} for plugins"
-    fi
+    print_next_steps
     echo
     log_dim "Verify: ./dot health"
     echo
@@ -651,10 +685,28 @@ print_install_summary() {
         if [ ${#SKIPPED_ITEMS[@]} -gt 0 ]; then
             echo -e " ${YELLOW}Skipped:${NC}"
             for item in "${SKIPPED_ITEMS[@]}"; do
-                echo -e "     ${DIM}-${NC} $item"
+                echo -e "     ${DIM}-${NC} ${DIM}$item${NC}"
             done
         fi
     fi
+}
+
+print_next_steps() {
+    echo -e " ${BOLD}Next steps${NC}"
+
+    if [ "$USE_SHELL" = "bash" ]; then
+        echo -e "   ${CYAN}1.${NC} Restart terminal (or run ${BOLD}bash${NC})"
+        echo -e "   ${CYAN}2.${NC} Open ${BOLD}nvim${NC}"
+        echo -e "   ${CYAN}3.${NC} If editor tools are missing, run ${BOLD}:MasonInstallAll${NC}"
+        echo -e "   ${CYAN}4.${NC} Open ${BOLD}tmux${NC}, press ${BOLD}Ctrl+Space I${NC} for plugins"
+        return
+    fi
+
+    echo -e "   ${CYAN}1.${NC} Restart terminal (or run ${BOLD}zsh${NC})"
+    echo -e "   ${CYAN}2.${NC} Run ${BOLD}p10k configure${NC} for prompt setup"
+    echo -e "   ${CYAN}3.${NC} Open ${BOLD}nvim${NC}"
+    echo -e "   ${CYAN}4.${NC} If editor tools are missing, run ${BOLD}:MasonInstallAll${NC}"
+    echo -e "   ${CYAN}5.${NC} Open ${BOLD}tmux${NC}, press ${BOLD}Ctrl+Space I${NC} for plugins"
 }
 
 # ============================================================================
@@ -662,90 +714,67 @@ print_install_summary() {
 # ============================================================================
 
 show_skipped_deps() {
-    local os="$1"
-    local col
-    case "$os" in
-        macos)  col=2 ;;
-        fedora) col=3 ;;
-        debian) col=4 ;;
-        *)      return ;;
-    esac
-
+    local os="$1" pkg
     for item in "${DEPS[@]}"; do
-        local cmd pkg
-        cmd=$(echo "$item" | cut -d'|' -f1 | tr -d ' ')
-        pkg=$(echo "$item" | cut -d'|' -f"$col" | tr -d ' ')
+        parse_dep_entry "$item"
+        pkg=$(dep_pkg_for_os "$os")
 
-        # Skip if package is available or if it's an install-only dep
-        [ "$cmd" = "-" ] && continue
+        [ "$DEP_CMD" = "-" ] && continue
         [ -n "$pkg" ] && [ "$pkg" != "-" ] && continue
 
-        track_skipped "$cmd" "not available for $os"
+        track_skipped "$DEP_CMD" "not available for $os"
     done
-    return 0
 }
 
 all_deps_installed() {
     for item in "${DEPS[@]}"; do
-        local cmd
-        cmd=$(echo "$item" | cut -d'|' -f1 | tr -d ' ')
-        [ "$cmd" = "-" ] || [ -z "$cmd" ] && continue
-        has_cmd "$cmd" || return 1
+        parse_dep_entry "$item"
+        [ "$DEP_CMD" = "-" ] || [ -z "$DEP_CMD" ] && continue
+        has_cmd "$DEP_CMD" || return 1
     done
     return 0
 }
 
+sync_neovim_plugins() {
+    log_info "Syncing Neovim plugins"
+    if ! run_nvim_headless_task "+Lazy! sync" "Syncing Neovim plugins..."; then
+        log_warn "Neovim plugin sync failed"
+        log_dim "Run: nvim --headless \"+Lazy! sync\" +qa"
+        return 1
+    fi
+    log_ok "Neovim plugins synced"
+}
+
+sync_mason_packages() {
+    local total
+    total=$(count_mason_packages)
+    [ "$total" -eq 0 ] && return 0
+
+    log_info "Syncing Mason packages"
+    if ! run_nvim_headless_task "+MasonInstallAll" "Syncing Mason packages..."; then
+        log_warn "Mason package sync failed"
+        log_dim "Run: nvim --headless \"+MasonInstallAll\" +qa"
+        return 1
+    fi
+    log_ok "Mason packages synced ${DIM}($total configured)${NC}"
+}
+
 bootstrap_neovim() {
-    if ! has_cmd nvim; then
-        if "$DRY_RUN"; then
-            local total
-            total=$(count_mason_packages)
-            log_dim "[dry-run] nvim --headless \"+Lazy! sync\" +qa"
-            log_ok "Neovim plugins"
-            track_installed "nvim-plugins"
-
-            if [ "$total" -gt 0 ]; then
-                log_dim "[dry-run] nvim --headless \"+MasonInstallAll\" +qa"
-                log_ok "Mason packages ${DIM}($total configured)${NC}"
-                track_installed "nvim-tools"
-            fi
-            return
-        fi
-
+    if ! has_cmd nvim && ! "$DRY_RUN"; then
         log_warn "Neovim bootstrap skipped"
         log_dim "Install neovim first to bootstrap plugins and Mason packages"
         return
     fi
 
-    log_info "Syncing Neovim plugins"
-    if "$DRY_RUN"; then
-        log_dim "[dry-run] nvim --headless \"+Lazy! sync\" +qa"
-    elif run_with_spin "Syncing Neovim plugins..." nvim --headless "+Lazy! sync" +qa; then
-        :
+    if sync_neovim_plugins; then
+        track_installed "Neovim plugins"
     else
-        log_warn "Neovim plugin bootstrap failed"
-        log_dim "Run: nvim --headless \"+Lazy! sync\" +qa"
         return
     fi
-    log_ok "Neovim plugins"
-    track_installed "nvim-plugins"
 
-    local total
-    total=$(count_mason_packages)
-    [ "$total" -eq 0 ] && return
-
-    log_info "Installing Mason packages"
-    if "$DRY_RUN"; then
-        log_dim "[dry-run] nvim --headless \"+MasonInstallAll\" +qa"
-    elif run_with_spin "Installing Mason packages..." nvim --headless "+MasonInstallAll" +qa; then
-        :
-    else
-        log_warn "Mason bootstrap failed"
-        log_dim "Run: nvim --headless \"+MasonInstallAll\" +qa"
-        return
+    if sync_mason_packages; then
+        [ "$(count_mason_packages)" -gt 0 ] && track_installed "Mason packages"
     fi
-    log_ok "Mason packages ${DIM}($total configured)${NC}"
-    track_installed "nvim-tools"
 }
 
 install_deps() {
@@ -776,10 +805,10 @@ install_deps() {
                     fi
                 fi
             fi
-            log_ok "Homebrew"
+            log_ok "Homebrew ready"
 
             local pkgs
-            pkgs=$(get_packages 2)
+            pkgs=$(get_packages "$os")
             if [ -n "$pkgs" ]; then
                 # shellcheck disable=SC2086 # intentional word splitting for package list
                 if "$DRY_RUN"; then
@@ -788,8 +817,8 @@ install_deps() {
                     read -ra pkg_array <<< "$pkgs"
                     run_with_spin "Installing packages..." brew install --quiet "${pkg_array[@]}"
                 fi
-                log_ok "Packages"
-                track_installed "packages"
+                log_ok "Packages installed"
+                track_installed "system packages"
             fi
 
             if "$DRY_RUN"; then
@@ -797,7 +826,7 @@ install_deps() {
             else
                 run_with_spin "Installing fonts..." brew install --quiet --cask "${CASKS[@]}"
             fi
-            log_ok "Fonts"
+            log_ok "Fonts installed"
             track_installed "fonts"
             ;;
 
@@ -808,10 +837,10 @@ install_deps() {
             else
                 sudo dnf install -y epel-release 2>/dev/null || true
             fi
-            log_ok "EPEL"
+            log_ok "EPEL ready"
 
             local pkgs
-            pkgs=$(get_packages 3)
+            pkgs=$(get_packages "$os")
             if [ -n "$pkgs" ]; then
                 if "$DRY_RUN"; then
                     log_dim "[dry-run] sudo dnf install -y $pkgs"
@@ -819,8 +848,8 @@ install_deps() {
                     read -ra pkg_array <<< "$pkgs"
                     run_with_spin "Installing packages..." sudo dnf install -y "${pkg_array[@]}"
                 fi
-                log_ok "Packages"
-                track_installed "packages"
+                log_ok "Packages installed"
+                track_installed "system packages"
             fi
 
             if ! has_cmd zoxide; then
@@ -830,7 +859,7 @@ install_deps() {
                 else
                     curl -fsSL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash >/dev/null 2>&1
                 fi
-                log_ok "zoxide"
+                log_ok "zoxide installed"
                 track_installed "zoxide"
             fi
             ;;
@@ -842,10 +871,10 @@ install_deps() {
             else
                 run_with_spin "Updating package lists..." sudo apt update
             fi
-            log_ok "Updated"
+            log_ok "Package lists updated"
 
             local pkgs
-            pkgs=$(get_packages 4)
+            pkgs=$(get_packages "$os")
             if [ -n "$pkgs" ]; then
                 if "$DRY_RUN"; then
                     log_dim "[dry-run] sudo apt install -y $pkgs"
@@ -853,8 +882,8 @@ install_deps() {
                     read -ra pkg_array <<< "$pkgs"
                     run_with_spin "Installing packages..." sudo apt install -y "${pkg_array[@]}"
                 fi
-                log_ok "Packages"
-                track_installed "packages"
+                log_ok "Packages installed"
+                track_installed "system packages"
             fi
             ;;
 
@@ -868,24 +897,20 @@ install_deps() {
 
 install_extras() {
     for item in "${EXTRAS[@]}"; do
-        local p url type name
-        p="${item%%|*}"; item="${item#*|}"
-        url="${item%%|*}"; item="${item#*|}"
-        type="${item%%|*}"
-        name="${item##*|}"
+        parse_extra_entry "$item"
 
-        if has_path "$p"; then
-            log_ok "$name"
+        if has_path "$EXTRA_PATH"; then
+            log_ok "$EXTRA_NAME ready"
         else
-            case "$type" in
-                curl) log_info "Downloading $name"
-                      run mkdir -p "$(dirname "$p")"
-                      run curl -sS -o "$p" "$url" ;;
-                git)  log_info "Cloning $name"
-                      run mkdir -p "$(dirname "$p")"
-                      run git clone --depth 1 -q "$url" "$p" ;;
+            case "$EXTRA_TYPE" in
+                curl) log_info "Downloading $EXTRA_NAME"
+                      run mkdir -p "$(dirname "$EXTRA_PATH")"
+                      run curl -sS -o "$EXTRA_PATH" "$EXTRA_URL" ;;
+                git)  log_info "Cloning $EXTRA_NAME"
+                      run mkdir -p "$(dirname "$EXTRA_PATH")"
+                      run git clone --depth 1 -q "$EXTRA_URL" "$EXTRA_PATH" ;;
             esac
-            log_ok "$name"
+            log_ok "$EXTRA_NAME installed"
         fi
     done
 }
@@ -962,7 +987,7 @@ cmd_update() {
     "$DRY_RUN" && echo -e " ${DIM}Dry run - no changes will be made${NC}"
 
     # Step 1: Pull latest dotfiles
-    log_step 1 3 "Pull latest"
+    log_step 1 "$UPDATE_STEPS" "Pull latest"
     cd "$DOTFILES_DIR"
     if "$DRY_RUN"; then
         log_dim "[dry-run] git pull"
@@ -976,7 +1001,7 @@ cmd_update() {
     log_ok "Dotfiles up to date"
 
     # Step 2: Re-stow symlinks
-    log_step 2 3 "Symlinks"
+    log_step 2 "$UPDATE_STEPS" "Symlinks"
     if "$DRY_RUN"; then
         log_dim "[dry-run] stow --target=\$HOME --restow ."
     else
@@ -985,7 +1010,7 @@ cmd_update() {
     log_ok "Symlinks refreshed"
 
     # Step 3: Update plugins
-    log_step 3 3 "Plugins"
+    log_step 3 "$UPDATE_STEPS" "Plugins"
 
     # Zinit
     if has_cmd zsh; then
@@ -995,28 +1020,13 @@ cmd_update() {
         else
             run_with_spin "Updating Zinit plugins..." zsh -ic "zinit update --all" || true
         fi
-        log_ok "Zinit"
+        log_ok "Zinit plugins updated"
     fi
 
     # Lazy.nvim
     if has_cmd nvim; then
-        log_info "Updating Neovim plugins..."
-        if "$DRY_RUN"; then
-            log_dim "[dry-run] nvim --headless '+Lazy! sync' +qa"
-        else
-            run_with_spin "Updating Neovim plugins..." nvim --headless "+Lazy! sync" +qa || true
-        fi
-        log_ok "Neovim plugins"
-
-        if [ "$(count_mason_packages)" -gt 0 ]; then
-            log_info "Syncing Mason packages..."
-            if "$DRY_RUN"; then
-                log_dim "[dry-run] nvim --headless '+MasonInstallAll' +qa"
-            else
-                run_with_spin "Syncing Mason packages..." nvim --headless "+MasonInstallAll" +qa || true
-            fi
-            log_ok "Mason"
-        fi
+        sync_neovim_plugins || true
+        sync_mason_packages || true
     fi
 
     # TPM
@@ -1028,7 +1038,7 @@ cmd_update() {
         else
             run_with_spin "Updating Tmux plugins..." "$tpm_update" all || true
         fi
-        log_ok "Tmux"
+        log_ok "Tmux plugins updated"
     fi
 
     echo

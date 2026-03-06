@@ -1,6 +1,6 @@
 # Dotfiles
 
-Modern terminal environment: Zsh, Neovim, Tmux, Alacritty. Inspired by [Dreams of Code](https://www.youtube.com/watch?v=DzNmUNvnB04).
+Terminal setup built around Zsh, Neovim, Tmux, and Alacritty. Inspired by [Dreams of Code](https://www.youtube.com/watch?v=DzNmUNvnB04).
 
 ![Neovim + Tmux](images/nvim-tmux.png)
 
@@ -28,9 +28,10 @@ Preview first: `./dot install -n`
 
 1. Restart terminal (or run `zsh`)
 2. Run `p10k configure` for prompt setup
-3. `./dot install` bootstraps Neovim plugins and Mason tools automatically
-4. Open `nvim` — if editor tools are missing, run `:MasonInstallAll`
-5. Open `tmux`, press `<prefix> I` to install plugins (`<prefix>` = `Ctrl+Space`)
+3. Neovim plugins and Mason tools are bootstrapped during `./dot install`
+4. Open `nvim`; if editor tools are still missing, run `:MasonInstallAll`
+5. Open `tmux`, then press `<prefix> I` to install TPM plugins (`<prefix>` = `Ctrl+Space`)
+6. Run `./dot health` to verify the install
 
 ## Commands
 
@@ -47,11 +48,11 @@ Preview first: `./dot install -n`
 
 ```
 .zshrc / .bashrc           Shell configs
-.config/nvim/              Neovim (Lazy.nvim)
+.config/nvim/              Neovim (NvChad + Lazy.nvim)
 .config/tmux/              Tmux (TPM)
 .config/alacritty/         Terminal (Tokyo Night)
 .config/gh/                GitHub CLI
-.config/ruff/              Python linter/formatter
+.config/ruff/              Python config
 .config/shell/aliases.sh   Shared aliases
 ```
 
