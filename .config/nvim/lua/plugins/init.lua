@@ -1,6 +1,12 @@
 return {
   -- NvChad completion engine
   { import = "nvchad.blink.lazyspec" },
+  {
+    "saghen/blink.cmp",
+    opts = function(_, opts)
+      return require("configs.blink").apply(opts)
+    end,
+  },
 
   -- Seamless navigation between vim and tmux panes (Ctrl+h/j/k/l)
   { "christoomey/vim-tmux-navigator", event = "VeryLazy" },
