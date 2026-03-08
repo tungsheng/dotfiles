@@ -901,16 +901,23 @@ install_extras() {
 
         if has_path "$EXTRA_PATH"; then
             log_ok "$EXTRA_NAME ready"
+            continue
+        fi
+
+        case "$EXTRA_TYPE" in
+            curl) log_info "Downloading $EXTRA_NAME"
+                  run mkdir -p "$(dirname "$EXTRA_PATH")"
+                  run curl -fsSL -o "$EXTRA_PATH" "$EXTRA_URL" ;;
+            git)  log_info "Cloning $EXTRA_NAME"
+                  run mkdir -p "$(dirname "$EXTRA_PATH")"
+                  run git clone --depth 1 -q "$EXTRA_URL" "$EXTRA_PATH" ;;
+        esac
+
+        if "$DRY_RUN"; then
+            log_ok "$EXTRA_NAME ready"
         else
-            case "$EXTRA_TYPE" in
-                curl) log_info "Downloading $EXTRA_NAME"
-                      run mkdir -p "$(dirname "$EXTRA_PATH")"
-                      run curl -sS -o "$EXTRA_PATH" "$EXTRA_URL" ;;
-                git)  log_info "Cloning $EXTRA_NAME"
-                      run mkdir -p "$(dirname "$EXTRA_PATH")"
-                      run git clone --depth 1 -q "$EXTRA_URL" "$EXTRA_PATH" ;;
-            esac
             log_ok "$EXTRA_NAME installed"
+            track_installed "$EXTRA_NAME"
         fi
     done
 }
