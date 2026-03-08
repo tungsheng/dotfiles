@@ -2,11 +2,17 @@ local configs = require "nvchad.configs.lspconfig"
 local lspconfig = require "lspconfig"
 local util = lspconfig.util
 
+local capabilities = vim.deepcopy(configs.capabilities)
+local has_blink, blink = pcall(require, "blink.cmp")
+if has_blink then
+  capabilities = blink.get_lsp_capabilities(capabilities)
+end
+
 -- Common options for all servers
 local defaults = {
   on_init = configs.on_init,
   on_attach = configs.on_attach,
-  capabilities = configs.capabilities,
+  capabilities = capabilities,
 }
 
 -- Helper to merge defaults with custom options
@@ -14,17 +20,41 @@ local function setup(server, opts)
   lspconfig[server].setup(vim.tbl_extend("force", defaults, opts or {}))
 end
 
-local function setup_optional(server, executable, opts)
-  if vim.fn.executable(executable) == 1 then
-    setup(server, opts)
+local function resolve_executable(executable)
+  local system_path = vim.fn.exepath(executable)
+  if system_path ~= "" then
+    return system_path
   end
+
+  local mason_path = vim.fs.joinpath(vim.fn.stdpath "data", "mason", "bin", executable)
+  if vim.fn.executable(mason_path) == 1 then
+    return mason_path
+  end
+end
+
+local function setup_optional(server, executable, opts)
+  local resolved = resolve_executable(executable)
+  if not resolved then return end
+
+  local merged_opts = vim.deepcopy(opts or {})
+  local default_cmd = vim.deepcopy(lspconfig[server].document_config.default_config.cmd or { executable })
+  local cmd = vim.deepcopy(merged_opts.cmd or default_cmd)
+
+  if #cmd == 0 then
+    cmd = { resolved }
+  else
+    cmd[1] = resolved
+  end
+
+  merged_opts.cmd = cmd
+  setup(server, merged_opts)
 end
 
 local function terraform_root_dir(fname)
   return util.root_pattern(".terraform", ".terraform.lock.hcl", ".git")(fname) or util.path.dirname(fname)
 end
 
--- Optional LSPs: only setup when the server binary is on PATH (avoids spawn errors)
+-- Optional LSPs: only setup when the server binary is available via PATH or Mason.
 local optional_servers = {
   { server = "bashls", executable = "bash-language-server" },
   { server = "ruff", executable = "ruff" },
