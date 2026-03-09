@@ -37,6 +37,15 @@ Preview first: `./dot install -n`
 5. Open `tmux`, then press `<prefix> I` to install TPM plugins (`<prefix>` = `Ctrl+Space`)
 6. Run `./dot health` to verify the install
 
+## Environment Files
+
+Interactive shells auto-load `~/.env` first, then the rest of `~/.env*` in sorted order.
+
+- Supported syntax: `KEY=VALUE` or `export KEY=VALUE`
+- Files are parsed as data, not sourced as shell code
+- Files must be regular files owned by you and deny all group/other access, for example `chmod 600 ~/.env ~/.env*`
+- Later files override earlier values when the same key appears more than once
+
 ## Commands
 
 | Command | Description |

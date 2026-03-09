@@ -31,6 +31,7 @@ alias cp='cp -i'
 # Shared config
 source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/aliases.sh"
 source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/nvm.sh"
+source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/env-loader.sh"
 
 # Shell integrations
 command -v fzf >/dev/null && eval "$(fzf --bash)"
@@ -42,3 +43,6 @@ export BUN_INSTALL="$HOME/.bun"
 
 # uv (Python)
 [[ -d "$HOME/.local/bin" ]] && export PATH="$HOME/.local/bin:$PATH"
+
+# Environment files
+load_home_env_files "$HOME"
