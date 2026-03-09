@@ -80,14 +80,12 @@ Run `:NvCheatsheet` for full NvChad bindings.
 | `ll` | `ls -la` |
 | `la` | `ls -lathr` |
 
-**Git aliases** (from OMZP::git plugin):
+**Git aliases** (from shared shell aliases):
 
 | Alias | Action |
 |-------|--------|
 | `gst` `ga` `gc` `gco` | status, add, commit, checkout |
 | `gp` `gl` `gd` | push, pull, diff |
-
-Run `alias | grep git` for full list.
 
 ## CLI Tools
 

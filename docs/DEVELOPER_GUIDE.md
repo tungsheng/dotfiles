@@ -67,7 +67,8 @@ Paths offered for removal during uninstall:
 CLEANUPS=(
     "$HOME/.config/alacritty/themes|Alacritty themes"
     "$XDG_DATA_HOME/git|Legacy git-prompt.sh"
-    "$XDG_DATA_HOME/zinit|Zinit"
+    "$XDG_DATA_HOME/zinit|Legacy Zinit"
+    "$XDG_DATA_HOME/zsh/plugins|Zsh plugins"
     "$XDG_DATA_HOME/nvim|Neovim data"
     "$HOME/.config/tmux/plugins|Tmux plugins"
 )
@@ -134,9 +135,9 @@ mydir/
 
 ## Tool Configuration
 
-| Tool | Config | Plugin Manager | Add Plugin |
-|------|--------|----------------|------------|
-| Zsh | `.zshrc` | Zinit | `zinit light author/plugin` |
+| Tool | Config | Runtime Model | Add Plugin |
+|------|--------|---------------|------------|
+| Zsh | `.zshrc` + `.config/shell/zsh.sh` | Pinned local checkouts | Add a pinned git extra in `dot` and source it from `.config/shell/zsh.sh` |
 | Neovim | `.config/nvim/` | Lazy.nvim | `lua/plugins/init.lua` |
 | Tmux | `.config/tmux/` | TPM | `set -g @plugin 'author/name'` |
 
@@ -148,6 +149,9 @@ mydir/
 - **Neovim filetypes**: `.config/nvim/lua/configs/filetypes.lua`
 - **Neovim Mason packages**: `.config/nvim/mason-packages.txt`
 - **Shared aliases**: `.config/shell/aliases.sh`
+- **Shared shell bootstrap**: `.config/shell/common.sh`
+- **Bash shell setup**: `.config/shell/bash.sh`
+- **Zsh shell setup**: `.config/shell/zsh.sh`
 - **Environment loader**: `.config/shell/env-loader.sh`
 
 ## Testing
@@ -155,7 +159,7 @@ mydir/
 ```shell
 ./dot install -n     # Preview changes
 ./dot install -v     # Verbose output
-./dot update         # Pull latest + update plugins
+./dot update         # Pull latest + sync extras + update plugins
 ./dot status         # Quick overview
 ./dot health         # Verify install
 

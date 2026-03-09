@@ -32,7 +32,7 @@ Preview first: `./dot install -n`
 
 1. Restart terminal (or run `zsh`)
 2. Run `p10k configure` for prompt setup
-3. Neovim plugins and Mason tools are bootstrapped during `./dot install`
+3. Shell helpers, pinned Zsh plugins, Neovim plugins, and Mason tools are bootstrapped during `./dot install`
 4. Open `nvim`; if editor tools are still missing, run `:MasonInstallAll`
 5. Open `tmux`, then press `<prefix> I` to install TPM plugins (`<prefix>` = `Ctrl+Space`)
 6. Run `./dot health` to verify the install
@@ -51,7 +51,7 @@ Interactive shells auto-load `~/.env` first, then the rest of `~/.env*` in sorte
 | Command | Description |
 |---------|-------------|
 | `./dot install` | Install dotfiles |
-| `./dot update` | Pull latest + update plugins |
+| `./dot update` | Pull latest + sync extras + update plugins |
 | `./dot install -n` | Preview (dry-run) |
 | `./dot uninstall` | Remove symlinks |
 | `./dot health` | Full status check |

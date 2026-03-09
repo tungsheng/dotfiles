@@ -4,6 +4,10 @@
 # Neovim
 .netrwhist
 
+# Zsh completion cache
+.zcompdump
+.zcompdump-*
+
 # Alacritty themes (cloned separately via setup)
 .config/alacritty/themes
 
