@@ -1,5 +1,30 @@
 # Changelog
 
+## v1.5.0 (2026-03-09)
+
+### Added
+- Safe `~/.env` and `~/.env*` loading for interactive bash and zsh shells
+- Modular `scripts/dot/` installer layout split into config, UI, helpers, operations, and commands
+
+### Changed
+- Simplify shell startup around shared helpers, XDG paths, and pinned local zsh plugin checkouts
+- Clarify repo layout and maintainer docs around shell, platform bootstrap, and installer entrypoints
+- Treat machine-local runtime files such as `.zcompdump`, `.nvimlog`, and `.ruff_cache` as ignored local artifacts
+
+### Fixed
+- Restore Terraform and HCL filetype detection, `terraformls` startup, and Blink completion behavior for root, block, and `var.*` member contexts
+- Use a blocking headless Mason install command in `dot` so Neovim tools bootstrap correctly outside the UI
+- Make managed-file health and backup checks handle paths inside symlinked parent directories, including GitHub CLI config
+- Replace the GNU-specific NVM version sort fallback with a portable installed-version resolver
+- Fix Alacritty config deprecation warnings on older releases
+- Use package-provided Git prompt scripts instead of downloaded copies
+
+### Security
+- Pin the bootstrap `lazy.nvim` commit instead of cloning a moving branch on first launch
+- Remove remote installer script execution for Homebrew and Fedora zoxide setup
+- Stop executing env files as shell code and load them as validated key/value data instead
+- Stop tracking local GitHub CLI host state in the repo and ignore it by default
+
 ## v1.4.3 (2026-02-16)
 
 - Fix CI workflow to only check our scripts (not zshrc/bashrc/third-party)
