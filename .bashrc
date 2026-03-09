@@ -15,9 +15,22 @@ HISTSIZE=5000
 HISTFILESIZE=5000
 HISTCONTROL=ignoreboth:erasedups
 
-# Git prompt (XDG location)
-if [[ -f "${XDG_DATA_HOME:-$HOME/.local/share}/git/git-prompt.sh" ]]; then
-  source "${XDG_DATA_HOME:-$HOME/.local/share}/git/git-prompt.sh"
+# Git prompt
+for git_prompt_path in \
+  /opt/homebrew/etc/bash_completion.d/git-prompt.sh \
+  /usr/local/etc/bash_completion.d/git-prompt.sh \
+  /usr/share/git/completion/git-prompt.sh \
+  /usr/share/git-core/contrib/completion/git-prompt.sh \
+  /usr/lib/git-core/git-sh-prompt
+do
+  if [[ -f "$git_prompt_path" ]]; then
+    # shellcheck disable=SC1090
+    source "$git_prompt_path"
+    break
+  fi
+done
+
+if declare -F __git_ps1 >/dev/null; then
   PS1='\[\e[33m\]\u\[\e[0m\]@\[\e[34m\]\h\[\e[0m\]:\[\e[35m\]\W\[\e[0m\]$(__git_ps1 " (%s)") \n$ '
 else
   PS1='\[\e[33m\]\u\[\e[0m\]@\[\e[34m\]\h\[\e[0m\]:\[\e[35m\]\W\[\e[0m\] \n$ '

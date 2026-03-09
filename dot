@@ -63,7 +63,6 @@ MANAGED_FILES=(.zshrc .bashrc .bash_profile .config/nvim .config/tmux/tmux.conf 
 
 # Extras: path|url|type|name (evaluated after XDG vars set)
 EXTRAS=(
-    "$XDG_DATA_HOME/git/git-prompt.sh|https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh|curl|git-prompt|-"
     "$HOME/.config/alacritty/themes|https://github.com/alacritty/alacritty-theme|git|alacritty-themes|d6aa290133caac2ac297b21cd9491596ac7297c3"
     "$HOME/.config/tmux/plugins/tpm|https://github.com/tmux-plugins/tpm|git|tpm|99469c4a9b1ccf77fade25842dc7bafbc8ce9946"
     "$XDG_DATA_HOME/zinit/zinit.git|https://github.com/zdharma-continuum/zinit.git|git|zinit|89e1858b72a3e1b7b7b7b867509cca85271a576c"
@@ -72,7 +71,7 @@ EXTRAS=(
 # Cleanup: path|name
 CLEANUPS=(
     "$HOME/.config/alacritty/themes|Alacritty themes"
-    "$XDG_DATA_HOME/git|git-prompt.sh"
+    "$XDG_DATA_HOME/git|Legacy git-prompt.sh"
     "$XDG_DATA_HOME/zinit|Zinit"
     "$XDG_DATA_HOME/nvim|Neovim data"
     "$HOME/.config/tmux/plugins|Tmux plugins"

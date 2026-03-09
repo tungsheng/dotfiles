@@ -66,7 +66,7 @@ Interactive shells auto-load `~/.env` first, then the rest of `~/.env*` in sorte
 .config/alacritty/         Terminal (Tokyo Night)
 .config/gh/                GitHub CLI
 .config/ruff/              Python config
-.config/shell/aliases.sh   Shared aliases
+.config/shell/             Shared shell helpers and aliases
 ```
 
 ## Key Bindings

@@ -50,10 +50,12 @@ MANAGED_FILES=(.zshrc .bashrc .config/nvim ...)
 External resources downloaded during install:
 
 ```bash
-# Format: "path|url|type|name"
+# Format: "path|url|type|name|ref"
+# - curl extras use "-" for ref
+# - git extras should pin a commit hash in ref
 EXTRAS=(
-    "$XDG_DATA_HOME/git/git-prompt.sh|https://...|curl|git-prompt"
-    "$HOME/.config/tmux/plugins/tpm|https://...|git|tpm"
+    "$HOME/.config/tmux/plugins/tpm|https://...|git|tpm|<commit>"
+    "$XDG_DATA_HOME/example/file|https://...|curl|example|-"
 )
 ```
 
@@ -64,7 +66,7 @@ Paths offered for removal during uninstall:
 ```bash
 CLEANUPS=(
     "$HOME/.config/alacritty/themes|Alacritty themes"
-    "$XDG_DATA_HOME/git|git-prompt.sh"
+    "$XDG_DATA_HOME/git|Legacy git-prompt.sh"
     "$XDG_DATA_HOME/zinit|Zinit"
     "$XDG_DATA_HOME/nvim|Neovim data"
     "$HOME/.config/tmux/plugins|Tmux plugins"
@@ -115,9 +117,11 @@ List one Mason package id per line. Blank lines and `#` comments are ignored.
 Add to `EXTRAS` array:
 
 ```bash
-"$HOME/path|https://url|curl|name"   # Single file
-"$HOME/path|https://url|git|name"    # Git repo
+"$HOME/path|https://url|curl|name|-"           # Single file
+"$HOME/path|https://url|git|name|<commit>"     # Git repo
 ```
+
+Pin git extras to a commit so installs stay reproducible.
 
 ### Exclude from Stow
 
@@ -144,6 +148,7 @@ mydir/
 - **Neovim filetypes**: `.config/nvim/lua/configs/filetypes.lua`
 - **Neovim Mason packages**: `.config/nvim/mason-packages.txt`
 - **Shared aliases**: `.config/shell/aliases.sh`
+- **Environment loader**: `.config/shell/env-loader.sh`
 
 ## Testing
 
