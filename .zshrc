@@ -3,12 +3,9 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# Homebrew
-if [[ -f /opt/homebrew/bin/brew ]]; then
-  eval "$(/opt/homebrew/bin/brew shellenv)"
-elif [[ -f /usr/local/bin/brew ]]; then
-  eval "$(/usr/local/bin/brew shellenv)"
-fi
+# Platform bootstrap
+source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/platform.sh"
+dotfiles_source_homebrew_shellenv
 
 source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/zsh.sh"
 dotfiles_zsh_prepare_plugins

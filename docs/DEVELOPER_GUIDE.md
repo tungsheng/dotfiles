@@ -149,6 +149,7 @@ mydir/
 - **Neovim filetypes**: `.config/nvim/lua/configs/filetypes.lua`
 - **Neovim Mason packages**: `.config/nvim/mason-packages.txt`
 - **Shared aliases**: `.config/shell/aliases.sh`
+- **Platform bootstrap**: `.config/shell/platform.sh`
 - **Shared shell bootstrap**: `.config/shell/common.sh`
 - **Bash shell setup**: `.config/shell/bash.sh`
 - **Zsh shell setup**: `.config/shell/zsh.sh`
@@ -179,7 +180,7 @@ docker run -it fedora:latest bash
 1. Update `VERSION` file (in repo root)
 2. Test on macOS and Linux
 3. Run `./dot health`
-4. Update `CHANGELOG.md`
+4. Update `docs/CHANGELOG.md`
 5. Tag and push:
    ```shell
    git tag -a v1.x.0 -m "v1.x.0 - Description"

@@ -57,17 +57,24 @@ Interactive shells auto-load `~/.env` first, then the rest of `~/.env*` in sorte
 | `./dot health` | Full status check |
 | `./dot status` | Quick overview |
 
-## Structure
+## Layout
 
 ```
-.zshrc / .bashrc           Shell configs
+dot                        Installer, health checks, update flow
+.config/shell/             Shared shell bootstrap, aliases, env loading
 .config/nvim/              Neovim (NvChad + Lazy.nvim)
 .config/tmux/              Tmux (TPM)
 .config/alacritty/         Terminal (Tokyo Night)
-.config/gh/                GitHub CLI
-.config/ruff/              Python config
-.config/shell/             Shared shell helpers and aliases
+.config/gh/                Shared GitHub CLI config
+docs/                      Maintainer guide, changelog, keybindings
 ```
+
+## Docs
+
+- [docs/README.md](docs/README.md) for the doc map
+- [docs/DEVELOPER_GUIDE.md](docs/DEVELOPER_GUIDE.md) for maintainer workflows
+- [docs/KEYBINDINGS.md](docs/KEYBINDINGS.md) for keymaps and shell aliases
+- [docs/CHANGELOG.md](docs/CHANGELOG.md) for release history
 
 ## Key Bindings
 
@@ -78,7 +85,7 @@ Interactive shells auto-load `~/.env` first, then the rest of `~/.env*` in sorte
 | Neovim | `Space` | Leader |
 | Neovim | `<leader>ff` | Find files |
 
-See [KEYBINDINGS.md](docs/KEYBINDINGS.md) for complete reference.
+See [docs/KEYBINDINGS.md](docs/KEYBINDINGS.md) for complete reference.
 
 ## Manual Install
 
@@ -93,4 +100,4 @@ cd ~/dotfiles && stow .
 
 ## License
 
-[MIT](LICENSE) · [Developer Guide](docs/DEVELOPER_GUIDE.md)
+[MIT](LICENSE) · [Docs Index](docs/README.md)

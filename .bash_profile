@@ -1,13 +1,11 @@
 # shellcheck shell=bash
 # ~/.bash_profile - Login shell config (sources .bashrc)
 
-# macOS: Homebrew
+# macOS: Homebrew + terminal defaults
+source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/platform.sh"
+dotfiles_source_homebrew_shellenv
+
 if [[ "$OSTYPE" == darwin* ]]; then
-  if [[ -f /opt/homebrew/bin/brew ]]; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-  elif [[ -f /usr/local/bin/brew ]]; then
-    eval "$(/usr/local/bin/brew shellenv)"
-  fi
   export TERM=xterm-256color
 fi
 
