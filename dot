@@ -59,7 +59,7 @@ DEPS=(
 
 CASKS=("font-jetbrains-mono-nerd-font" "font-hurmit-nerd-font")
 
-MANAGED_FILES=(.zshrc .bashrc .bash_profile .config/nvim .config/tmux/tmux.conf .config/alacritty/alacritty.toml .config/gh .config/ruff .config/shell)
+MANAGED_FILES=(.zshrc .bashrc .bash_profile .config/nvim .config/tmux/tmux.conf .config/alacritty/alacritty.toml .config/gh/config.yml .config/ruff .config/shell)
 
 # Extras: path|url|type|name (evaluated after XDG vars set)
 EXTRAS=(

@@ -12,6 +12,21 @@ fi
 # Add default node to PATH immediately (for tools like Mason)
 # This avoids full NVM load while ensuring node/npm is available
 if [[ -n "$NVM_DIR" && -d "$NVM_DIR/versions/node" ]]; then
+  _nvm_latest_installed_version() {
+    find "$NVM_DIR/versions/node" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; 2>/dev/null \
+      | awk '
+          {
+            version = $0
+            gsub(/^v/, "", version)
+            split(version, parts, ".")
+            printf "%09d.%09d.%09d %s\n", parts[1] + 0, parts[2] + 0, parts[3] + 0, $0
+          }
+        ' \
+      | sort \
+      | tail -n 1 \
+      | awk '{ print $2 }'
+  }
+
   _nvm_resolve_default() {
     local alias_file="$NVM_DIR/alias/default"
     local version=""
@@ -22,14 +37,16 @@ if [[ -n "$NVM_DIR" && -d "$NVM_DIR/versions/node" ]]; then
         version=$(cat "$NVM_DIR/alias/$version")
       done
     fi
-    # Fallback to latest installed version
-    if [[ ! -d "$NVM_DIR/versions/node/$version" ]]; then
-      version=$(find "$NVM_DIR/versions/node" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; 2>/dev/null | sort -V | tail -1)
+
+    # Fallback to the latest installed version without relying on GNU sort -V.
+    if [[ -z "$version" || ! -d "$NVM_DIR/versions/node/$version" ]]; then
+      version=$(_nvm_latest_installed_version)
     fi
     echo "$version"
   }
   _nvm_default=$(_nvm_resolve_default)
   [[ -n "$_nvm_default" ]] && export PATH="$NVM_DIR/versions/node/$_nvm_default/bin:$PATH"
+  unset -f _nvm_latest_installed_version
   unset -f _nvm_resolve_default
   unset _nvm_default
 fi
