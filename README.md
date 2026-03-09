@@ -60,7 +60,8 @@ Interactive shells auto-load `~/.env` first, then the rest of `~/.env*` in sorte
 ## Layout
 
 ```
-dot                        Installer, health checks, update flow
+dot                        Thin installer entrypoint
+scripts/dot/               Installer internals split by concern
 .config/shell/             Shared shell bootstrap, aliases, env loading
 .config/nvim/              Neovim (NvChad + Lazy.nvim)
 .config/tmux/              Tmux (TPM)

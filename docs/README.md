@@ -11,6 +11,7 @@ Reference map for this repository.
 ## Entry Points
 
 - `./dot`: install, update, status, health, and uninstall commands
+- `scripts/dot/`: installer internals split into config, UI, helpers, operations, and commands
 - `.config/shell/`: shared shell bootstrap and interactive behavior
 - `.config/nvim/`: editor configuration and plugins
 - `.config/tmux/`: multiplexer configuration

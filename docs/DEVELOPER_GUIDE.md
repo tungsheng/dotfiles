@@ -4,22 +4,16 @@ Guide for maintaining and extending this dotfiles repository.
 
 ## Script Architecture
 
-The `dot` script (bash 3.2+) is organized into sections:
+The `dot` command is a thin wrapper that sources the implementation from `scripts/dot/`:
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  Configuration    Data arrays, constants            │
-├─────────────────────────────────────────────────────┤
-│  Output           Colors, logging, spinner          │
-├─────────────────────────────────────────────────────┤
-│  Helpers          Utilities (run, has_cmd, etc.)    │
-├─────────────────────────────────────────────────────┤
-│  Commands         cmd_install, cmd_health, etc.     │
-├─────────────────────────────────────────────────────┤
-│  Install Helpers  OS-specific install functions     │
-├─────────────────────────────────────────────────────┤
-│  Main             Argument parsing, dispatch        │
-└─────────────────────────────────────────────────────┘
+dot                      Wrapper + argument parsing
+scripts/dot/config.sh    Constants, arrays, derived paths
+scripts/dot/ui.sh        Colors, spinner, logging, summaries
+scripts/dot/helpers.sh   Parsing, OS detection, common utilities
+scripts/dot/operations.sh
+                         Install/update helper workflows
+scripts/dot/commands.sh  install/update/status/health/uninstall commands
 ```
 
 ## Configuration Arrays
@@ -42,8 +36,10 @@ DEPS=(
 Files backed up before install and checked by `health`:
 
 ```bash
-MANAGED_FILES=(.zshrc .bashrc .config/nvim ...)
+MANAGED_FILES=(.zshrc .bashrc .config/gh/config.yml ...)
 ```
+
+Nested entries count as managed when Stow symlinks either the file itself or one of its parent directories.
 
 ### Extras (`EXTRAS`)
 
@@ -93,7 +89,7 @@ List one Mason package id per line. Blank lines and `#` comments are ignored.
 
 ### Add a Dependency
 
-1. Add to `DEPS` array in `dot`
+1. Add to `DEPS` array in `scripts/dot/config.sh`
 2. Test on target OS
 
 ```bash
@@ -104,7 +100,7 @@ List one Mason package id per line. Blank lines and `#` comments are ignored.
 
 1. Add the package id to `.config/nvim/mason-packages.txt`
 2. Update Neovim LSP/formatter/parser config if needed
-3. Run `nvim --headless "+MasonInstallAll" +qa`
+3. Run `nvim --headless "+MasonInstall <package-ids...>" +qa`
 
 ### Add a Dotfile
 
@@ -115,7 +111,7 @@ List one Mason package id per line. Blank lines and `#` comments are ignored.
 
 ### Add External Resource
 
-Add to `EXTRAS` array:
+Add to `EXTRAS` in `scripts/dot/config.sh`:
 
 ```bash
 "$HOME/path|https://url|curl|name|-"           # Single file
@@ -154,6 +150,11 @@ mydir/
 - **Bash shell setup**: `.config/shell/bash.sh`
 - **Zsh shell setup**: `.config/shell/zsh.sh`
 - **Environment loader**: `.config/shell/env-loader.sh`
+- **dot config/data**: `scripts/dot/config.sh`
+- **dot UI/logging**: `scripts/dot/ui.sh`
+- **dot helpers**: `scripts/dot/helpers.sh`
+- **dot workflows**: `scripts/dot/operations.sh`
+- **dot commands**: `scripts/dot/commands.sh`
 
 ## Testing
 

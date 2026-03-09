@@ -21,6 +21,7 @@ images
 
 # Scripts
 dot
+scripts
 
 # External resources (cloned by dot)
 \.config/alacritty/themes
@@ -31,3 +32,9 @@ dot
 
 # macOS
 \.DS_Store
+
+# Runtime/cache files
+\.zcompdump
+\.zcompdump-.*
+\.nvimlog
+\.ruff_cache
