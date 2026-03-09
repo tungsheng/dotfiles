@@ -50,8 +50,10 @@ grt() {
 
 reload() {
   if [[ -n "${ZSH_VERSION:-}" ]]; then
+    # shellcheck source=/dev/null
     source "$HOME/.zshrc"
   elif [[ -n "${BASH_VERSION:-}" ]]; then
+    # shellcheck source=/dev/null
     source "$HOME/.bashrc"
   else
     printf 'dotfiles: reload is only supported in bash or zsh\n' >&2
