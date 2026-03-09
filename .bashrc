@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # ~/.bashrc - Bash configuration
 
 # Exit if not interactive
@@ -41,7 +42,3 @@ export BUN_INSTALL="$HOME/.bun"
 
 # uv (Python)
 [[ -d "$HOME/.local/bin" ]] && export PATH="$HOME/.local/bin:$PATH"
-
-# Source environment secrets (API keys)
-# WARNING: This file is sourced as shell code. Only put 'export VAR=value' lines in it.
-[ -f ~/.env.secrets ] && source ~/.env.secrets

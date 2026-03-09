@@ -63,9 +63,10 @@ MANAGED_FILES=(.zshrc .bashrc .bash_profile .config/nvim .config/tmux/tmux.conf 
 
 # Extras: path|url|type|name (evaluated after XDG vars set)
 EXTRAS=(
-    "$XDG_DATA_HOME/git/git-prompt.sh|https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh|curl|git-prompt"
-    "$HOME/.config/alacritty/themes|https://github.com/alacritty/alacritty-theme|git|alacritty-themes"
-    "$HOME/.config/tmux/plugins/tpm|https://github.com/tmux-plugins/tpm|git|tpm"
+    "$XDG_DATA_HOME/git/git-prompt.sh|https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh|curl|git-prompt|-"
+    "$HOME/.config/alacritty/themes|https://github.com/alacritty/alacritty-theme|git|alacritty-themes|d6aa290133caac2ac297b21cd9491596ac7297c3"
+    "$HOME/.config/tmux/plugins/tpm|https://github.com/tmux-plugins/tpm|git|tpm|99469c4a9b1ccf77fade25842dc7bafbc8ce9946"
+    "$XDG_DATA_HOME/zinit/zinit.git|https://github.com/zdharma-continuum/zinit.git|git|zinit|89e1858b72a3e1b7b7b7b867509cca85271a576c"
 )
 
 # Cleanup: path|name
@@ -195,8 +196,13 @@ parse_extra_entry() {
     local item="$1"
     EXTRA_PATH="${item%%|*}"; item="${item#*|}"
     EXTRA_URL="${item%%|*}"; item="${item#*|}"
-    EXTRA_TYPE="${item%%|*}"
-    EXTRA_NAME="${item##*|}"
+    EXTRA_TYPE="${item%%|*}"; item="${item#*|}"
+    EXTRA_NAME="${item%%|*}"
+    if [ "$item" = "$EXTRA_NAME" ]; then
+        EXTRA_REF=""
+    else
+        EXTRA_REF="${item#*|}"
+    fi
 }
 
 count_child_dirs() {
@@ -438,7 +444,7 @@ cmd_health() {
     # --- Plugins ---
     log_step 5 "$HEALTH_STEPS" "Plugins"
     local plugins=(
-        "$XDG_DATA_HOME/zinit|zinit"
+        "$XDG_DATA_HOME/zinit/zinit.git/zinit.zsh|zinit"
         "$XDG_DATA_HOME/nvim/lazy|lazy.nvim"
         "$HOME/.config/tmux/plugins/tpm|tpm"
     )
@@ -486,7 +492,7 @@ cmd_status() {
     # Shell info
     local shell_name="${SHELL##*/}"
     local shell_info="$shell_name"
-    if [ "$shell_name" = "zsh" ] && [ -d "$XDG_DATA_HOME/zinit" ]; then
+    if [ "$shell_name" = "zsh" ] && [ -f "$XDG_DATA_HOME/zinit/zinit.git/zinit.zsh" ]; then
         shell_info="$shell_name ${DIM}(zinit loaded)${NC}"
     fi
     echo -e " ${CYAN}Shell${NC}        $shell_info"
@@ -791,43 +797,45 @@ install_deps() {
 
     case "$os" in
         macos)
+            local brew_ready=true
             if ! has_cmd brew; then
-                log_info "Installing Homebrew..."
+                log_warn "Homebrew not installed"
                 if "$DRY_RUN"; then
-                    log_dim "[dry-run] /bin/bash -c \"\$(curl ... install.sh)\""
+                    log_dim "[dry-run] install Homebrew manually from https://brew.sh"
                 else
-                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-                    # Apple Silicon or Intel Mac
-                    if [ -f /opt/homebrew/bin/brew ]; then
-                        eval "$(/opt/homebrew/bin/brew shellenv)"
-                    elif [ -f /usr/local/bin/brew ]; then
-                        eval "$(/usr/local/bin/brew shellenv)"
+                    log_dim "Install Homebrew manually from https://brew.sh, then re-run ./dot install"
+                fi
+                track_skipped "Homebrew" "install manually from brew.sh"
+                track_skipped "system packages" "install manually via Homebrew"
+                track_skipped "fonts" "install manually via Homebrew casks"
+                brew_ready=false
+            fi
+
+            if "$brew_ready"; then
+                log_ok "Homebrew ready"
+
+                local pkgs
+                pkgs=$(get_packages "$os")
+                if [ -n "$pkgs" ]; then
+                    # shellcheck disable=SC2086 # intentional word splitting for package list
+                    if "$DRY_RUN"; then
+                        log_dim "[dry-run] brew install $pkgs"
+                    else
+                        read -ra pkg_array <<< "$pkgs"
+                        run_with_spin "Installing packages..." brew install --quiet "${pkg_array[@]}"
                     fi
+                    log_ok "Packages installed"
+                    track_installed "system packages"
                 fi
-            fi
-            log_ok "Homebrew ready"
 
-            local pkgs
-            pkgs=$(get_packages "$os")
-            if [ -n "$pkgs" ]; then
-                # shellcheck disable=SC2086 # intentional word splitting for package list
                 if "$DRY_RUN"; then
-                    log_dim "[dry-run] brew install $pkgs"
+                    log_dim "[dry-run] brew install --cask ${CASKS[*]}"
                 else
-                    read -ra pkg_array <<< "$pkgs"
-                    run_with_spin "Installing packages..." brew install --quiet "${pkg_array[@]}"
+                    run_with_spin "Installing fonts..." brew install --quiet --cask "${CASKS[@]}"
                 fi
-                log_ok "Packages installed"
-                track_installed "system packages"
+                log_ok "Fonts installed"
+                track_installed "fonts"
             fi
-
-            if "$DRY_RUN"; then
-                log_dim "[dry-run] brew install --cask ${CASKS[*]}"
-            else
-                run_with_spin "Installing fonts..." brew install --quiet --cask "${CASKS[@]}"
-            fi
-            log_ok "Fonts installed"
-            track_installed "fonts"
             ;;
 
         fedora)
@@ -853,14 +861,12 @@ install_deps() {
             fi
 
             if ! has_cmd zoxide; then
-                log_info "Installing zoxide (not in dnf)..."
+                log_warn "zoxide is not installed"
                 if "$DRY_RUN"; then
-                    log_dim "[dry-run] curl ... zoxide install.sh | bash"
+                    log_dim "[dry-run] install zoxide manually (package unavailable in dnf)"
                 else
-                    curl -fsSL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash >/dev/null 2>&1
+                    log_dim "Install zoxide manually (package unavailable in dnf), then re-run ./dot health"
                 fi
-                log_ok "zoxide installed"
-                track_installed "zoxide"
             fi
             ;;
 
@@ -910,7 +916,12 @@ install_extras() {
                   run curl -fsSL -o "$EXTRA_PATH" "$EXTRA_URL" ;;
             git)  log_info "Cloning $EXTRA_NAME"
                   run mkdir -p "$(dirname "$EXTRA_PATH")"
-                  run git clone --depth 1 -q "$EXTRA_URL" "$EXTRA_PATH" ;;
+                  if [ -n "$EXTRA_REF" ] && [ "$EXTRA_REF" != "-" ]; then
+                      run git clone -q "$EXTRA_URL" "$EXTRA_PATH"
+                      run git -C "$EXTRA_PATH" checkout --quiet "$EXTRA_REF"
+                  else
+                      run git clone --depth 1 -q "$EXTRA_URL" "$EXTRA_PATH"
+                  fi ;;
         esac
 
         if "$DRY_RUN"; then
@@ -1020,7 +1031,7 @@ cmd_update() {
     log_step 3 "$UPDATE_STEPS" "Plugins"
 
     # Zinit
-    if has_cmd zsh; then
+    if has_cmd zsh && [ -f "$XDG_DATA_HOME/zinit/zinit.git/zinit.zsh" ]; then
         log_info "Updating Zinit plugins..."
         if "$DRY_RUN"; then
             log_dim "[dry-run] zinit update --all"
@@ -1028,6 +1039,8 @@ cmd_update() {
             run_with_spin "Updating Zinit plugins..." zsh -ic "zinit update --all" || true
         fi
         log_ok "Zinit plugins updated"
+    elif has_cmd zsh; then
+        log_dim "Zinit not installed; skipped"
     fi
 
     # Lazy.nvim

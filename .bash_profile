@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # ~/.bash_profile - Login shell config (sources .bashrc)
 
 # macOS: Homebrew

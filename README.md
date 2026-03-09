@@ -13,6 +13,10 @@ Terminal setup built around Zsh, Neovim, Tmux, and Alacritty. Inspired by [Dream
 | Fedora/RHEL | `sudo dnf install git` |
 
 > **RHEL/Alma**: Run `sudo dnf install epel-release` first if install fails.
+>
+> **macOS**: Install Homebrew from [brew.sh](https://brew.sh) before running `./dot install`.
+>
+> **Fedora/RHEL**: `zoxide` is not installed by `dnf` in this setup; install it separately if you want directory jumping.
 
 ## Install
 

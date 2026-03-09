@@ -12,39 +12,38 @@ fi
 
 # Zinit
 ZINIT_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git"
-if [[ ! -d "$ZINIT_HOME" ]]; then
-  mkdir -p "$(dirname "$ZINIT_HOME")"
-  if ! git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"; then
-    echo "Failed to clone Zinit" >&2
-    return
-  fi
+if [[ -f "${ZINIT_HOME}/zinit.zsh" ]]; then
+  source "${ZINIT_HOME}/zinit.zsh"
+
+  # Plugins
+  zinit ice depth=1; zinit light romkatv/powerlevel10k
+  zinit light zsh-users/zsh-syntax-highlighting
+  zinit light zsh-users/zsh-completions
+  zinit light zsh-users/zsh-autosuggestions
+  zinit light Aloxaf/fzf-tab
+
+  # Oh-My-Zsh snippets
+  zinit snippet OMZP::git
+  zinit snippet OMZP::sudo
+  zinit snippet OMZP::aws
+  zinit snippet OMZP::kubectl
+  zinit snippet OMZP::kubectx
+  zinit snippet OMZP::command-not-found
 fi
-source "${ZINIT_HOME}/zinit.zsh"
-
-# Plugins
-zinit ice depth=1; zinit light romkatv/powerlevel10k
-zinit light zsh-users/zsh-syntax-highlighting
-zinit light zsh-users/zsh-completions
-zinit light zsh-users/zsh-autosuggestions
-zinit light Aloxaf/fzf-tab
-
-# Oh-My-Zsh snippets
-zinit snippet OMZP::git
-zinit snippet OMZP::sudo
-zinit snippet OMZP::aws
-zinit snippet OMZP::kubectl
-zinit snippet OMZP::kubectx
-zinit snippet OMZP::command-not-found
 
 # Docker completions (before compinit)
 [[ -d "$HOME/.docker/completions" ]] && fpath=("$HOME/.docker/completions" $fpath)
 
 # Completions
 autoload -Uz compinit && compinit
-zinit cdreplay -q
+if [[ -f "${ZINIT_HOME}/zinit.zsh" ]]; then
+  zinit cdreplay -q
+fi
 
 # Powerlevel10k config
-[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
+if (( $+functions[p10k] )) && [[ -f ~/.p10k.zsh ]]; then
+  source ~/.p10k.zsh
+fi
 
 # Keybindings (emacs mode)
 bindkey -e
@@ -85,7 +84,3 @@ export BUN_INSTALL="$HOME/.bun"
 
 # uv (Python)
 [[ -d "$HOME/.local/bin" ]] && export PATH="$HOME/.local/bin:$PATH"
-
-# Source environment secrets (API keys)
-# WARNING: This file is sourced as shell code. Only put 'export VAR=value' lines in it.
-[ -f ~/.env.secrets ] && source ~/.env.secrets

@@ -3,10 +3,19 @@ vim.g.mapleader = " "
 
 -- bootstrap lazy and all plugins
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
+local lazy_commit = "306a05526ada86a7b30af95c5cc81ffba93fef97"
+
+local function run_bootstrap(cmd)
+  local output = vim.fn.system(cmd)
+  if vim.v.shell_error ~= 0 then
+    error(output)
+  end
+end
 
 if not vim.uv.fs_stat(lazypath) then
   local repo = "https://github.com/folke/lazy.nvim.git"
-  vim.fn.system { "git", "clone", "--filter=blob:none", repo, "--branch=stable", lazypath }
+  run_bootstrap { "git", "clone", "--filter=blob:none", "--no-checkout", repo, lazypath }
+  run_bootstrap { "git", "-C", lazypath, "checkout", lazy_commit }
 end
 
 vim.opt.rtp:prepend(lazypath)
