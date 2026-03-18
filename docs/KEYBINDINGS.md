@@ -80,12 +80,26 @@ Run `:NvCheatsheet` for full NvChad bindings.
 | `ll` | `ls -la` |
 | `la` | `ls -lathr` |
 
-**Git aliases** (from shared shell aliases):
+**Git aliases** (from `.config/shell/aliases.sh`):
 
 | Alias | Action |
 |-------|--------|
-| `gst` `ga` `gc` `gco` | status, add, commit, checkout |
-| `gp` `gl` `gd` | push, pull, diff |
+| `g` | `git` |
+| `ga` | `git add` |
+| `gb` `gbd` `gbD` `gbm` `gbr` | branch, delete, force-delete, move, remote |
+| `gbl` | `git blame -w` |
+| `gc` `gcv` `gcm` `gcam` | commit, verbose, message, all+message |
+| `gcb` `gco` `gcom` | checkout -b, checkout, checkout main |
+| `gcl` | `git clone --recurse-submodules` |
+| `gcp` | `git cherry-pick` |
+| `gd` | `git diff` |
+| `gl` `gpr` | pull, pull --rebase |
+| `gp` `gpo` | push, push origin |
+| `gre` `greh` `gres` | reset, hard, soft |
+| `gsh` | `git show` |
+| `gst` `gss` | status, status --short |
+| `gsta` `gstp` | stash, stash pop |
+| `grt` | cd to git repo root (function) |
 
 ## CLI Tools
 
