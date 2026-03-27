@@ -30,8 +30,8 @@ source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/aliases.sh"
 source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/nvm.sh"
 source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/env-loader.sh"
 
-# Shell integrations
-if [ -t 0 ] && [ -t 1 ]; then
+# Shell integrations (stdin tty only: some multiplexers/attach modes distort -t 1)
+if [ -t 0 ]; then
   case "$(dotfiles_current_shell 2>/dev/null)" in
     zsh)
       command -v fzf >/dev/null && eval "$(fzf --zsh)"

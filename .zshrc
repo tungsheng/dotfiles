@@ -31,6 +31,14 @@ SAVEHIST=$HISTSIZE
 setopt appendhistory sharehistory
 setopt hist_ignore_space hist_ignore_all_dups hist_find_no_dups
 
+# Merge history written by other zsh/tmux panes before each prompt. sharehistory
+# alone can lag; fc -RI reads only lines appended to HISTFILE since last read.
+dotfiles_zsh_merge_shared_history() {
+  [[ -n "$HISTFILE" && -r "$HISTFILE" ]] || return
+  builtin fc -RI "$HISTFILE" 2>/dev/null || true
+}
+precmd_functions+=(dotfiles_zsh_merge_shared_history)
+
 # Completion styling
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
