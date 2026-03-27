@@ -31,13 +31,12 @@ SAVEHIST=$HISTSIZE
 setopt appendhistory sharehistory
 setopt hist_ignore_space hist_ignore_all_dups hist_find_no_dups
 
-# Merge history written by other zsh/tmux panes before each prompt. sharehistory
-# alone can lag; fc -RI reads only lines appended to HISTFILE since last read.
-dotfiles_zsh_merge_shared_history() {
+# Pull other sessions' new lines into this shell before each prompt.
+dotfiles_zsh_hist_pull() {
   [[ -n "$HISTFILE" && -r "$HISTFILE" ]] || return
   builtin fc -RI "$HISTFILE" 2>/dev/null || true
 }
-precmd_functions+=(dotfiles_zsh_merge_shared_history)
+(( ! ${precmd_functions[(Ie)dotfiles_zsh_hist_pull]} )) && precmd_functions+=(dotfiles_zsh_hist_pull)
 
 # Completion styling
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
@@ -48,3 +47,10 @@ zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 
 source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/common.sh"
 dotfiles_zsh_load_plugins
+
+# zoxide must be last so nothing replaces `cd`. Do not gate on `[ -t 0 ]` — tmux
+# and some hosts report a non-TTY stdin during startup and would skip init.
+if command -v zoxide >/dev/null; then
+  eval "$(zoxide init --cmd cd zsh)"
+  alias z=__zoxide_z
+fi

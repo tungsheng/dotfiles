@@ -20,6 +20,14 @@ dotfiles_prepend_path_if_dir() {
   esac
 }
 
+# Bash only (zsh loads zoxide at the end of ~/.zshrc). Kept outside the `[ -t 0 ]`
+# fzf block so tmux / some terminals still hook `cd` when stdin looks non-TTY.
+dotfiles_bash_zoxide_init() {
+  command -v zoxide >/dev/null || return 0
+  eval "$(zoxide init --cmd cd bash)"
+  alias z=__zoxide_z
+}
+
 # Safety aliases (interactive shell only)
 alias rm='rm -i'
 alias mv='mv -i'
@@ -30,26 +38,24 @@ source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/aliases.sh"
 source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/nvm.sh"
 source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/env-loader.sh"
 
-# Shell integrations (stdin tty only: some multiplexers/attach modes distort -t 1)
+# ~/.env before fzf/zoxide (PATH, _ZO_DATA_DIR, etc.)
+load_home_env_files "$HOME"
+
+export BUN_INSTALL="$HOME/.bun"
+dotfiles_prepend_path_if_dir "$BUN_INSTALL/bin"
+dotfiles_prepend_path_if_dir "$HOME/.local/bin"
+
 if [ -t 0 ]; then
   case "$(dotfiles_current_shell 2>/dev/null)" in
     zsh)
       command -v fzf >/dev/null && eval "$(fzf --zsh)"
-      command -v zoxide >/dev/null && eval "$(zoxide init --cmd cd zsh)"
       ;;
     bash)
       command -v fzf >/dev/null && eval "$(fzf --bash)"
-      command -v zoxide >/dev/null && eval "$(zoxide init --cmd cd bash)"
       ;;
   esac
 fi
 
-# Bun
-export BUN_INSTALL="$HOME/.bun"
-dotfiles_prepend_path_if_dir "$BUN_INSTALL/bin"
-
-# uv (Python)
-dotfiles_prepend_path_if_dir "$HOME/.local/bin"
-
-# Environment files
-load_home_env_files "$HOME"
+case "$(dotfiles_current_shell 2>/dev/null)" in
+  bash) dotfiles_bash_zoxide_init ;;
+esac
