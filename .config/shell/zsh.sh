@@ -95,6 +95,16 @@ dotfiles_zsh_enable_sudo_shortcut() {
   bindkey -M viins '\e\e' sudo-command-line
 }
 
+dotfiles_zsh_bind_history_keys() {
+  bindkey -M emacs '^P' history-search-backward
+  bindkey -M emacs '^N' history-search-forward
+
+  bindkey -M emacs $'\e[A' up-line-or-history
+  bindkey -M emacs $'\e[B' down-line-or-history
+  bindkey -M emacs $'\eOA' up-line-or-history
+  bindkey -M emacs $'\eOB' down-line-or-history
+}
+
 dotfiles_zsh_enable_command_not_found() {
   local handler
 

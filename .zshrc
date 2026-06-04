@@ -18,10 +18,8 @@ if (( $+functions[p10k] )) && [[ -f ~/.p10k.zsh ]]; then
   source ~/.p10k.zsh
 fi
 
-# Keybindings (emacs mode)
+# Editing mode
 bindkey -e
-bindkey '^p' history-search-backward
-bindkey '^n' history-search-forward
 
 # History (XDG-compliant)
 HISTSIZE=5000
@@ -30,13 +28,6 @@ HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history"
 SAVEHIST=$HISTSIZE
 setopt appendhistory sharehistory
 setopt hist_ignore_space hist_ignore_all_dups hist_find_no_dups
-
-# Pull other sessions' new lines into this shell before each prompt.
-dotfiles_zsh_hist_pull() {
-  [[ -n "$HISTFILE" && -r "$HISTFILE" ]] || return
-  builtin fc -RI "$HISTFILE" 2>/dev/null || true
-}
-(( ! ${precmd_functions[(Ie)dotfiles_zsh_hist_pull]} )) && precmd_functions+=(dotfiles_zsh_hist_pull)
 
 # Completion styling
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
@@ -47,6 +38,7 @@ zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 
 source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/common.sh"
 dotfiles_zsh_load_plugins
+dotfiles_zsh_bind_history_keys
 
 # zoxide must be last so nothing replaces `cd`. Do not gate on `[ -t 0 ]` — tmux
 # and some hosts report a non-TTY stdin during startup and would skip init.
