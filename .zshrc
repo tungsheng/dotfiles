@@ -43,6 +43,11 @@ dotfiles_zsh_bind_history_keys
 # zoxide must be last so nothing replaces `cd`. Do not gate on `[ -t 0 ]` — tmux
 # and some hosts report a non-TTY stdin during startup and would skip init.
 if command -v zoxide >/dev/null; then
+  # zoxide's doctor diagnostic targets humans configuring an interactive shell.
+  # In non-interactive shells (scripts, agent sandboxes, CI) its chpwd hook isn't
+  # registered the way it expects, so it prints a false-positive warning to stderr
+  # on every `cd`. Silence it there; keep it for real interactive sessions.
+  [[ -o interactive ]] || export _ZO_DOCTOR=0
   eval "$(zoxide init --cmd cd zsh)"
   alias z=__zoxide_z
 fi
