@@ -44,10 +44,12 @@ dotfiles_zsh_bind_history_keys
 # and some hosts report a non-TTY stdin during startup and would skip init.
 if command -v zoxide >/dev/null; then
   # zoxide's doctor diagnostic targets humans configuring an interactive shell.
-  # In non-interactive shells (scripts, agent sandboxes, CI) its chpwd hook isn't
-  # registered the way it expects, so it prints a false-positive warning to stderr
-  # on every `cd`. Silence it there; keep it for real interactive sessions.
-  [[ -o interactive ]] || export _ZO_DOCTOR=0
+  # In non-interactive shells (scripts, CI) its chpwd hook isn't registered the
+  # way it expects, so it prints a false-positive warning to stderr on every `cd`.
+  # Agent sandboxes run an *interactive* zsh with stdout piped, so also silence it
+  # when stdout isn't a TTY. Gate on stdout (not stdin) to avoid the tmux-startup
+  # non-TTY-stdin issue. Keep the diagnostic for real interactive terminals.
+  { [[ -o interactive ]] && [[ -t 1 ]]; } || export _ZO_DOCTOR=0
   eval "$(zoxide init --cmd cd zsh)"
   alias z=__zoxide_z
 fi

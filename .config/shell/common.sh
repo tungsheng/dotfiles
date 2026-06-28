@@ -24,10 +24,11 @@ dotfiles_prepend_path_if_dir() {
 # fzf block so tmux / some terminals still hook `cd` when stdin looks non-TTY.
 dotfiles_bash_zoxide_init() {
   command -v zoxide >/dev/null || return 0
-  # Silence zoxide's doctor in non-interactive shells (scripts, agent sandboxes,
-  # CI): its chpwd hook isn't registered there, so it prints a false-positive
-  # warning to stderr on every `cd`. Keep it for real interactive sessions.
-  case $- in *i*) ;; *) export _ZO_DOCTOR=0 ;; esac
+  # Silence zoxide's doctor in non-interactive shells (scripts, CI): its chpwd
+  # hook isn't registered there, so it prints a false-positive warning to stderr
+  # on every `cd`. Agent sandboxes run an *interactive* shell with stdout piped,
+  # so also silence it when stdout isn't a TTY. Keep it for real terminals.
+  case $- in *i*) [ -t 1 ] || export _ZO_DOCTOR=0 ;; *) export _ZO_DOCTOR=0 ;; esac
   eval "$(zoxide init --cmd cd bash)"
   alias z=__zoxide_z
 }
